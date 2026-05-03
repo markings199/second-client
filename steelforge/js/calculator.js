@@ -1155,6 +1155,15 @@
     attachModeToggle(compRoot, { topic: 'BENDING' });
   };
 
+  window.SteelForge.initTension = (panelRoot) => {
+    const compRoot =
+      panelRoot?.querySelector?.('.sf-comp.sf-comp--tension') ??
+      panelRoot?.querySelector?.('.sf-comp') ??
+      panelRoot ??
+      document;
+    attachModeToggle(compRoot, { topic: 'TENSION' });
+  };
+
   function attachShearThumbs(root) {
     const groups = Array.from(root.querySelectorAll('.sf-comp--shear .sf-shear__thumbs'));
     if (groups.length === 0) return;

@@ -30,7 +30,7 @@
 
   function getPageFromHash() {
     const raw = (window.location.hash || '').replace(/^#/, '').trim();
-    return raw || 'dashboard';
+    return raw || 'overview';
   }
 
   function sleep(ms) {
@@ -119,6 +119,9 @@
         }
         if (safeId === 'bending' && window.SteelForge?.initBending) {
           window.SteelForge.initBending(panel);
+        }
+        if (safeId === 'tension' && window.SteelForge?.initTension) {
+          window.SteelForge.initTension(panel);
         }
         if (safeId === 'shear' && window.SteelForge?.initShear) {
           window.SteelForge.initShear(panel);

@@ -1,1 +1,309 @@
+<div class="sf-comp sf-comp--tension">
+  <div class="sf-comp__modeNav" role="tablist" aria-label="Tension calculator type">
+    <button class="sf-comp__modeBtn active" type="button" data-comp-mode="analysis" role="tab" aria-selected="true">
+      ANALYSIS TENSION
+    </button>
+    <button class="sf-comp__modeBtn" type="button" data-comp-mode="design" role="tab" aria-selected="false">
+      DESIGN TENSION
+    </button>
+  </div>
 
+  <!-- ANALYSIS — ref. client screens ~21 -->
+  <div class="sf-comp__mode is-active" data-comp-mode-pane="analysis" role="tabpanel" aria-label="Analysis tension">
+    <div class="sf-comp__card" role="region">
+      <div class="sf-comp__star" aria-hidden="true">★</div>
+
+      <div class="sf-tbRef__anaGrid">
+        <div class="sf-tbRef__anaLeft">
+          <section class="sf-tbRef__card">
+            <div class="sf-tbRef__methodBanner">
+              <div class="sf-tbRef__methodRow sf-tbRef__methodRow--refBanner">
+                <span class="sf-tbRef__pillLbl">ANALYSIS METHOD</span>
+                <div class="sf-tbRef__methodPick">
+                  <select class="sf-tbRef__methodSel sf-tbRef__methodSel--rect" id="sfTenAnaMethod" aria-label="Analysis method">
+                    <option value="lrfd" selected>LRFD</option>
+                    <option value="asd">ASD</option>
+                  </select>
+                  <span class="sf-tbRef__caret" aria-hidden="true">▾</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sf-tbRef__paramsHdr">PARAMETERS</div>
+
+            <div class="sf-tbRef__row sf-tbRef__row--select">
+              <span class="sf-tbRef__lab">SHAPE SELECTION</span>
+              <select class="sf-tbRef__sel sf-tbRef__sel--rect" id="sfTenAnaShape" aria-label="Shape">
+                <option value="l" selected>L-SHAPE</option>
+                <option value="manual">MANUAL</option>
+              </select>
+            </div>
+
+            <div class="sf-tbRef__row sf-tbRef__row--select">
+              <span class="sf-tbRef__lab">AISC MANUAL SELECTION</span>
+              <input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenAnaAisc" type="text" autocomplete="off" placeholder="e.g. L4X4X1/2" />
+            </div>
+
+            <div class="sf-tbRef__geom">
+              <div class="sf-tbRef__geomPair">
+                <label class="sf-tbRef__geomCell">
+                  <span class="sf-tbRef__geomLab">t =</span>
+                  <input class="sf-tbRef__pillIce sf-tbRef__pillIce--pill" id="sfTenAnaT" inputmode="decimal" />
+                  <span class="sf-tbRef__geomU">in</span>
+                </label>
+                <label class="sf-tbRef__geomCell">
+                  <span class="sf-tbRef__geomLab">A<sub>g</sub> =</span>
+                  <input class="sf-tbRef__pillIce sf-tbRef__pillIce--pill" id="sfTenAnaAgProp" inputmode="decimal" />
+                  <span class="sf-tbRef__geomU">in²</span>
+                </label>
+              </div>
+              <label class="sf-tbRef__geomFull">
+                <span class="sf-tbRef__geomLab">x̄ =</span>
+                <input class="sf-tbRef__pillIce sf-tbRef__pillIce--rect" id="sfTenAnaXbar" inputmode="decimal" />
+                <span class="sf-tbRef__geomU">in</span>
+              </label>
+            </div>
+
+            <div class="sf-tbRef__fieldStack">
+              <span class="sf-tbRef__stackLbl">LENGTH</span>
+              <input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenAnaLength" inputmode="decimal" autocomplete="off" />
+              <span class="sf-tbRef__stackUnit">in</span>
+            </div>
+
+            <div class="sf-tbRef__row sf-tbRef__row--select">
+              <span class="sf-tbRef__lab">STEEL GRADE</span>
+              <input class="sf-tbRef__inp sf-tbRef__inp--rect sf-tbRef__inp--steelGrade" id="sfTenAnaSteel" type="text" autocomplete="off" />
+            </div>
+
+            <div class="sf-tbRef__propsGrid sf-tbRef__propsGrid--2">
+              <label class="sf-tbRef__kv"><span>F<sub>y</sub> =</span><input class="sf-tbRef__pillIce sf-tbRef__pillIce--rect" id="sfTenAnaFy" inputmode="decimal" /><span class="sf-tbRef__u">ksi</span></label>
+              <label class="sf-tbRef__kv"><span>F<sub>u</sub> =</span><input class="sf-tbRef__pillIce sf-tbRef__pillIce--rect" id="sfTenAnaFu" inputmode="decimal" /><span class="sf-tbRef__u">ksi</span></label>
+            </div>
+
+            <div class="sf-tbRef__subHdr">SHEAR LAG FACTOR (U)</div>
+            <label class="sf-tbRef__row sf-tbRef__row--case"><span class="sf-tbRef__lab">CASE 1 =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenAnaCase1" inputmode="decimal" autocomplete="off" /></label>
+            <label class="sf-tbRef__row sf-tbRef__row--case"><span class="sf-tbRef__lab">CASE 2 =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenAnaCase2" inputmode="decimal" autocomplete="off" /></label>
+            <label class="sf-tbRef__row sf-tbRef__row--case"><span class="sf-tbRef__lab">CASE 8 =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenAnaCase8" inputmode="decimal" autocomplete="off" /></label>
+            <div class="sf-tbRef__row sf-tbRef__row--out">
+              <span class="sf-tbRef__lab">GOVERNING VALUE OF U =</span>
+              <span class="sf-tbRef__outYellow" id="sfTenAnaUgovern"></span>
+            </div>
+          </section>
+
+          <section class="sf-tbRef__card sf-tbRef__card--bolt">
+            <div class="sf-tbRef__paramsHdr">BOLT SPECIFICATIONS</div>
+            <label class="sf-tbRef__row sf-tbRef__row--case"><span class="sf-tbRef__lab">NUMBER OF BOLTS</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenAnaNBolts" inputmode="numeric" autocomplete="off" /></label>
+            <div class="sf-tbRef__row sf-tbRef__row--bolt">
+              <span class="sf-tbRef__lab">GIVEN DIAMETER</span>
+              <select class="sf-tbRef__sel sf-tbRef__sel--sm sf-tbRef__sel--rect" id="sfTenAnaBoltKind" aria-label="Bolt type"><option value="bolt" selected>BOLT</option></select>
+              <input class="sf-tbRef__inp sf-tbRef__inp--sm sf-tbRef__inp--rect" id="sfTenAnaDh" inputmode="decimal" autocomplete="off" placeholder="3/4" />
+              <span class="sf-tbRef__u">in</span>
+            </div>
+            <div class="sf-tbRef__row sf-tbRef__row--out">
+              <span class="sf-tbRef__lab">AREA OF HOLES (A<sub>h</sub>) =</span>
+              <span class="sf-tbRef__outYellow" id="sfTenAnaAh"></span>
+              <span class="sf-tbRef__u">in²</span>
+            </div>
+          </section>
+        </div>
+
+        <section class="sf-tbRef__card sf-tbRef__anaCritical" aria-label="Critical path specifications">
+          <div class="sf-tbRef__badge">CRITICAL PATH SPECIFICATIONS</div>
+
+          <div class="sf-tbRef__cpBlk">
+            <div class="sf-tbRef__cpTitle">NON-STAGGERED HOLES</div>
+            <div class="sf-tbRef__row sf-tbRef__row--out">
+              <span class="sf-tbRef__lab">NET AREA (A<sub>n</sub>) =</span>
+              <span class="sf-tbRef__outGrey" id="sfTenAnaAnNs"></span>
+              <span class="sf-tbRef__u">in²</span>
+            </div>
+          </div>
+
+          <div class="sf-tbRef__cpBlk">
+            <div class="sf-tbRef__cpTitle">STAGGERED HOLES</div>
+            <div class="sf-tbRef__stGrid" aria-label="Stagger pitch and gauge">
+              <span></span><span class="sf-tbRef__gh">s<sub>1</sub>–s<sub>5</sub></span><span class="sf-tbRef__gh">g<sub>1</sub>–g<sub>5</sub></span>
+              <span class="sf-tbRef__gr">1</span><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaS1" inputmode="decimal" /><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaG1" inputmode="decimal" />
+              <span class="sf-tbRef__gr">2</span><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaS2" inputmode="decimal" /><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaG2" inputmode="decimal" />
+              <span class="sf-tbRef__gr">3</span><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaS3" inputmode="decimal" /><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaG3" inputmode="decimal" />
+              <span class="sf-tbRef__gr">4</span><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaS4" inputmode="decimal" /><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaG4" inputmode="decimal" />
+              <span class="sf-tbRef__gr">5</span><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaS5" inputmode="decimal" /><input class="sf-tbRef__inp sf-tbRef__inp--xs sf-tbRef__inp--rect" id="sfTenAnaG5" inputmode="decimal" />
+              <span class="sf-tbRef__gr sf-tbRef__gr--sum"></span>
+              <span class="sf-tbRef__sumAcross">SUM</span>
+              <input class="sf-tbRef__inp sf-tbRef__inp--rect sf-tbRef__inp--sumSlot" id="sfTenAnaStagSum" inputmode="decimal" autocomplete="off" aria-label="Stagger sum" />
+            </div>
+            <div class="sf-tbRef__row sf-tbRef__row--out">
+              <span class="sf-tbRef__lab">NET AREA (A<sub>n</sub>) =</span>
+              <span class="sf-tbRef__outGrey" id="sfTenAnaAnStag"></span>
+              <span class="sf-tbRef__u">in²</span>
+            </div>
+          </div>
+
+          <div class="sf-tbRef__row sf-tbRef__row--out sf-tbRef__govRow">
+            <span class="sf-tbRef__lab">GOVERNING NET AREA =</span>
+            <span class="sf-tbRef__outYellow" id="sfTenAnaAnGov"></span>
+            <span class="sf-tbRef__u">in²</span>
+          </div>
+
+          <!-- Legacy hook IDs for downstream calcs (hidden outputs; optional wiring) -->
+          <div class="sf-tbRef__legacyHooks" aria-hidden="true">
+            <span id="sfTenAnaLrfdYield"></span><span id="sfTenAnaLrfdFracture"></span><span id="sfTenAnaLrfdGov"></span><span id="sfTenAnaLrfdUlt"></span>
+            <span id="sfTenAnaAsdYield"></span><span id="sfTenAnaAsdFracture"></span><span id="sfTenAnaAsdGov"></span><span id="sfTenAnaAsdAllow"></span>
+          </div>
+        </section>
+      </div>
+
+      <div class="sf-comp__solveSlot">
+        <button type="button" class="sf-comp__solve" id="sfTenAnaSolve">SOLVE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN — refs ~22 LRFD / ~23 ASD -->
+  <div class="sf-comp__mode" data-comp-mode-pane="design" role="tabpanel" aria-label="Design tension">
+    <div class="sf-comp__card" role="region">
+      <div class="sf-comp__star" aria-hidden="true">★</div>
+
+      <div class="sf-tbRef__desGrid">
+        <section class="sf-tbRef__card sf-tbRef__desCol">
+          <div class="sf-tbRef__methodRow">
+            <span class="sf-tbRef__pillLbl">DESIGN METHOD</span>
+            <div class="sf-tbRef__methodPick">
+              <select class="sf-tbRef__methodSel sf-tbRef__methodSel--lg sf-tbRef__methodSel--rect" id="sfTenDesMethod" aria-label="Design method">
+                <option value="lrfd" selected>LRFD</option>
+                <option value="asd">ASD</option>
+              </select>
+              <span class="sf-tbRef__caret" aria-hidden="true">▾</span>
+            </div>
+          </div>
+
+          <div class="sf-tbRef__paramsHdr">PARAMETERS</div>
+
+          <label class="sf-tbRef__row sf-tbRef__row--tri"><span class="sf-tbRef__lab">DEAD LOAD (DL) =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenDesDl" inputmode="decimal" autocomplete="off" /><span class="sf-tbRef__u">kips</span></label>
+          <label class="sf-tbRef__row sf-tbRef__row--tri"><span class="sf-tbRef__lab">LIVE LOAD (LL) =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenDesLl" inputmode="decimal" autocomplete="off" /><span class="sf-tbRef__u">kips</span></label>
+          <label class="sf-tbRef__row sf-tbRef__row--tri"><span class="sf-tbRef__lab">LENGTH =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenDesL" inputmode="decimal" autocomplete="off" /><span class="sf-tbRef__u">in</span></label>
+
+          <div class="sf-tbRef__row sf-tbRef__row--select">
+            <span class="sf-tbRef__lab">STEEL GRADE</span>
+            <input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenDesSteel" type="text" autocomplete="off" />
+          </div>
+          <div class="sf-tbRef__propsGrid sf-tbRef__propsGrid--2">
+            <label class="sf-tbRef__kv"><span>F<sub>y</sub> =</span><input class="sf-tbRef__pillIce sf-tbRef__pillIce--rect" id="sfTenDesFy" inputmode="decimal" /><span class="sf-tbRef__u">ksi</span></label>
+            <label class="sf-tbRef__kv"><span>F<sub>u</sub> =</span><input class="sf-tbRef__pillIce sf-tbRef__pillIce--rect" id="sfTenDesFu" inputmode="decimal" /><span class="sf-tbRef__u">ksi</span></label>
+          </div>
+
+          <div class="sf-tbRef__row sf-tbRef__row--select">
+            <span class="sf-tbRef__lab">SHEAR LAG FACTOR</span>
+            <input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenDesShearLag" type="text" autocomplete="off" placeholder="e.g. CASE 2" />
+          </div>
+          <div class="sf-tbRef__row sf-tbRef__row--out">
+            <span class="sf-tbRef__lab">U =</span>
+            <input class="sf-tbRef__inpU" id="sfTenDesU" inputmode="decimal" autocomplete="off" />
+          </div>
+
+          <label class="sf-tbRef__row sf-tbRef__row--tri"><span class="sf-tbRef__lab">MIN. RADIUS OF GYRATION r =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenDesR" inputmode="decimal" autocomplete="off" /><span class="sf-tbRef__u">in</span></label>
+
+          <div class="sf-tbRef__paramsHdr sf-tbRef__paramsHdr--sub">BOLT SPECIFICATIONS</div>
+          <div class="sf-tbRef__row sf-tbRef__row--select">
+            <span class="sf-tbRef__lab">NUMBER OF BOLTS</span>
+            <input class="sf-tbRef__inp sf-tbRef__inp--rect" id="sfTenDesN" inputmode="numeric" autocomplete="off" />
+          </div>
+          <div class="sf-tbRef__row sf-tbRef__row--bolt">
+            <span class="sf-tbRef__lab">GIVEN DIAMETER</span>
+            <select class="sf-tbRef__sel sf-tbRef__sel--sm sf-tbRef__sel--rect" id="sfTenDesBoltKind" aria-label="Bolt type"><option value="bolt" selected>BOLT</option></select>
+            <input class="sf-tbRef__inp sf-tbRef__inp--sm sf-tbRef__inp--rect" id="sfTenDesDh" inputmode="decimal" autocomplete="off" placeholder="7/8" />
+            <span class="sf-tbRef__u">in</span>
+          </div>
+          <div class="sf-tbRef__row sf-tbRef__row--out">
+            <span class="sf-tbRef__lab">FINAL DIAMETER d =</span>
+            <span class="sf-tbRef__outYellow" id="sfTenDesDf"></span>
+            <span class="sf-tbRef__u">in</span>
+          </div>
+        </section>
+
+        <div class="sf-tbRef__desMid">
+          <section class="sf-tbRef__card">
+            <div class="sf-tbRef__paramsHdr">DEMAND LOAD</div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.2DL + 1.6LL =</span><span class="sf-tbRef__outIce" id="sfTenDesComb1216"></span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.4DL =</span><span class="sf-tbRef__outIce" id="sfTenDesComb14"></span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">DL + LL =</span><span class="sf-tbRef__outIce" id="sfTenDesCombDlLl"></span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">T<sub>u</sub> =</span><span class="sf-tbRef__outYellow" id="sfTenDesTu"></span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">T<sub>s</sub> =</span><span class="sf-tbRef__outYellow" id="sfTenDesTs"></span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">GOVERNING (ASD) =</span><span class="sf-tbRef__outYellow" id="sfTenDesTasd"></span><span class="sf-tbRef__u">kips</span></div>
+            <span class="sf-tbRef__legacyHooks" aria-hidden="true"><span id="sfTenDesPu"></span><span id="sfTenDesPa"></span></span>
+          </section>
+
+          <section class="sf-tbRef__card">
+            <div class="sf-tbRef__paramsHdr">REQUIREMENT ANALYSIS</div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">TENSILE YIELDING — MIN. A<sub>g</sub></span><span class="sf-tbRef__outIce" id="sfTenDesYieldAg"></span><span class="sf-tbRef__u">in²</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">TENSILE FRACTURE — MIN. A<sub>e</sub></span><span class="sf-tbRef__outIce" id="sfTenDesFracAe"></span><span class="sf-tbRef__u">in²</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ASSUMED GROSS A<sub>g</sub></span><span class="sf-tbRef__outIce" id="sfTenDesFracAssAg"></span><span class="sf-tbRef__u">in²</span></div>
+            <div class="sf-tbRef__row sf-tbRef__row--out sf-tbRef__govRow">
+              <span class="sf-tbRef__lab">GOVERNING GROSS A<sub>g</sub> =</span>
+              <span class="sf-tbRef__outYellow" id="sfTenDesGovAg"></span>
+              <span class="sf-tbRef__u">in²</span>
+            </div>
+            <span class="sf-tbRef__legacyHooks" aria-hidden="true">
+              <span id="sfTenDesReqAgLrfd"></span><span id="sfTenDesReqAgAsd"></span><span id="sfTenDesLrfdAg"></span><span id="sfTenDesAsdAg"></span>
+            </span>
+          </section>
+        </div>
+
+        <div class="sf-tbRef__desRight">
+          <section class="sf-tbRef__card">
+            <div class="sf-tbRef__paramsHdr">SELECTION OF SECTION</div>
+            <div class="sf-tensDes__tableWrap">
+              <table class="sf-tensDes__table sf-tensDes__table--wide">
+                <thead>
+                  <tr>
+                    <th>SECTIONS</th>
+                    <th>AREA (IN²)</th>
+                    <th>A<sub>g</sub> (IN²)</th>
+                    <th>REMARKS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>L3½X2½X3/8</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td><span class="sf-tbRef__pillTag sf-tbRef__pillTag--unsafe">UNSAFE</span></td>
+                  </tr>
+                  <tr>
+                    <td>L4X3½X5/16</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td><span class="sf-tbRef__pillTag sf-tbRef__pillTag--safe">SAFE</span></td>
+                  </tr>
+                  <tr>
+                    <td>L5X5X3/8</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td><span class="sf-tbRef__pillTag sf-tbRef__pillTag--safe">SAFE</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="sf-tbRef__card sf-tbRef__heroCard">
+            <div class="sf-tbRef__heroLbl">LIGHTEST L-SECTION TO USE =</div>
+            <div class="sf-tbRef__heroPill" id="sfTenDesLrfdSec">—</div>
+          </section>
+
+          <section class="sf-tbRef__card sf-tbRef__vizCard" aria-label="Section visuals">
+            <div class="sf-tbRef__renders">
+              <img src="./assets/compression/w-section-plain.png" alt="Wide-flange steel section (undeformed)" class="sf-tbRef__renderImg" loading="lazy" />
+              <img src="./assets/compression/w-section-stress.png" alt="Wide-flange steel section under axial tension" class="sf-tbRef__renderImg" loading="lazy" />
+            </div>
+          </section>
+          <span class="sf-tbRef__legacyHooks" aria-hidden="true"><span id="sfTenDesAsdSec"></span></span>
+        </div>
+      </div>
+
+      <div class="sf-comp__solveSlot">
+        <button type="button" class="sf-comp__solve" id="sfTenDesSolve">SOLVE</button>
+      </div>
+    </div>
+  </div>
+</div>
