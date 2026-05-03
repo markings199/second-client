@@ -1,0 +1,842 @@
+<div class="sf-comp sf-comp--compression">
+  <div class="sf-comp__modeNav" role="tablist" aria-label="Compression calculator type">
+    <button class="sf-comp__modeBtn active" type="button" data-comp-mode="analysis" role="tab" aria-selected="true">
+      ANALYSIS COMPRESSION
+    </button>
+    <button class="sf-comp__modeBtn" type="button" data-comp-mode="design" role="tab" aria-selected="false">
+      DESIGN COMPRESSION
+    </button>
+  </div>
+
+  <div class="sf-comp__mode is-active" data-comp-mode-pane="analysis" role="tabpanel" aria-label="Analysis compression">
+    <div class="sf-comp__emptyPane">
+      <div class="sf-comp__grayShell" role="region" aria-label="Analysis compression workspace">
+        <div class="sf-comp__star" aria-hidden="true">★</div>
+        <div class="sf-comp__grayShell-body sf-comp__grayShell-body--analysis">
+          <aside class="sf-compAna__sidebar" aria-label="Compression analysis inputs">
+            <div class="sf-compAna__headRow">
+              <span class="sf-compAna__pillLabel">Analysis method</span>
+              <div class="sf-compAna__selectWrap sf-compAna__selectWrap--method">
+                <select id="sfCompAnaMethod" class="sf-compAna__select" aria-label="Analysis method">
+                  <option value="lrfd" selected>LRFD</option>
+                  <option value="asd">ASD</option>
+                </select>
+                <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+              </div>
+            </div>
+
+            <div class="sf-compAna__headRow">
+              <span class="sf-compAna__pillLabel">Shape selection</span>
+              <div class="sf-compAna__selectWrap sf-compAna__selectWrap--shapeKind">
+                <select id="sfCompAnaShapeKind" class="sf-compAna__select" aria-label="Shape type">
+                  <option value="w" selected>W-SHAPE</option>
+                </select>
+                <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+              </div>
+            </div>
+
+            <div class="sf-compAna__headRow sf-compAna__headRow--aisc">
+              <span class="sf-compAna__pillLabel">AISC manual selection</span>
+              <div class="sf-compAna__selectWrap sf-compAna__selectWrap--aisc">
+                <select id="sfCompAnaShape" class="sf-compAna__select" aria-label="AISC section"></select>
+                <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+              </div>
+            </div>
+
+            <div class="sf-compAna__props" aria-label="Section properties">
+              <label class="sf-compAna__kv">
+                <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">E</span> =</span>
+                <input id="sfCompAnaE" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="29000" readonly />
+                <span class="sf-compAna__unit">ksi</span>
+              </label>
+              <label class="sf-compAna__kv">
+                <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">A<sub>g</sub></span> =</span>
+                <input id="sfCompAnaAg" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="148" />
+                <span class="sf-compAna__unit">in²</span>
+              </label>
+              <label class="sf-compAna__kv">
+                <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">λ<sub>f</sub></span> =</span>
+                <input id="sfCompAnaLamF" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="2.98" />
+                <span class="sf-compAna__unit sf-compAna__unit--dash">—</span>
+              </label>
+              <label class="sf-compAna__kv">
+                <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">λ<sub>w</sub></span> =</span>
+                <input id="sfCompAnaLamW" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="22.3" />
+                <span class="sf-compAna__unit sf-compAna__unit--dash">—</span>
+              </label>
+              <label class="sf-compAna__kv">
+                <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">r<sub>x</sub></span> =</span>
+                <input id="sfCompAnaRx" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="16.8" />
+                <span class="sf-compAna__unit">in</span>
+              </label>
+              <label class="sf-compAna__kv">
+                <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">r<sub>y</sub></span> =</span>
+                <input id="sfCompAnaRy" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="3.72" />
+                <span class="sf-compAna__unit">in</span>
+              </label>
+            </div>
+
+            <div class="sf-compAna__steelBlock">
+              <div class="sf-compAna__headRow sf-compAna__headRow--steel">
+                <span class="sf-compAna__pillLabel">Steel grade</span>
+                <div class="sf-compAna__selectWrap sf-compAna__selectWrap--steel">
+                  <select id="sfCompAnaSteel" class="sf-compAna__select" aria-label="Steel grade"></select>
+                  <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                </div>
+              </div>
+              <label class="sf-compAna__kv">
+                <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">F<sub>y</sub></span> =</span>
+                <input id="sfCompAnaFy" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" inputmode="decimal" value="36" />
+                <span class="sf-compAna__unit">ksi</span>
+              </label>
+              <label class="sf-compAna__kv">
+                <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">F<sub>u</sub></span> =</span>
+                <input id="sfCompAnaFu" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" inputmode="decimal" value="58" />
+                <span class="sf-compAna__unit">ksi</span>
+              </label>
+            </div>
+
+            <div class="sf-compAna__lengthBlock">
+              <div class="sf-compAna__lengthTitle">Length</div>
+              <div class="sf-compAna__lengthCols">
+                <div class="sf-compAna__lengthCol">
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">x<sub>1</sub> =</span>
+                    <input id="sfCompAnaX1" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="70" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">x<sub>2</sub> =</span>
+                    <input id="sfCompAnaX2" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">x<sub>3</sub> =</span>
+                    <input id="sfCompAnaX3" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">x<sub>4</sub> =</span>
+                    <input id="sfCompAnaX4" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">x<sub>5</sub> =</span>
+                    <input id="sfCompAnaX5" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                </div>
+                <div class="sf-compAna__lengthCol">
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">y<sub>1</sub> =</span>
+                    <input id="sfCompAnaY1" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="70" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">y<sub>2</sub> =</span>
+                    <input id="sfCompAnaY2" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="70" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">y<sub>3</sub> =</span>
+                    <input id="sfCompAnaY3" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">y<sub>4</sub> =</span>
+                    <input id="sfCompAnaY4" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                  <label class="sf-compAna__kv sf-compAna__kv--coord">
+                    <span class="sf-compAna__kvLab">y<sub>5</sub> =</span>
+                    <input id="sfCompAnaY5" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                    <span class="sf-compAna__unit">ft</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <section class="sf-compAnaCompact" aria-label="Check compactness">
+            <div class="sf-compAnaCompact__card">
+              <div class="sf-compAnaCompact__title">CHECK COMPACTNESS</div>
+              <div class="sf-compAnaCompact__inner">
+                <div class="sf-compAnaCompact__seg sf-compAnaCompact__seg--flange">
+                  <div class="sf-compAnaCompact__sectionTitle">FLANGE</div>
+                  <div class="sf-compAnaCompact__row">
+                    <div class="sf-compAnaCompact__lambda">(λ<sub>p</sub>) =</div>
+                    <div class="sf-compAnaCompact__value">10.78527803</div>
+                  </div>
+                  <div class="sf-compAnaCompact__row">
+                    <div class="sf-compAnaCompact__lambda">(λ<sub>r</sub>) =</div>
+                    <div class="sf-compAnaCompact__value">38.36331061</div>
+                  </div>
+                </div>
+
+                <div class="sf-compAnaCompact__seg sf-compAnaCompact__seg--web">
+                  <div class="sf-compAnaCompact__sectionTitle">WEB</div>
+                  <div class="sf-compAnaCompact__row">
+                    <div class="sf-compAnaCompact__lambda">(λ<sub>p</sub>) =</div>
+                    <div class="sf-compAnaCompact__value">106.7174876</div>
+                  </div>
+                  <div class="sf-compAnaCompact__row">
+                    <div class="sf-compAnaCompact__lambda">(λ<sub>r</sub>) =</div>
+                    <div class="sf-compAnaCompact__value">161.7791705</div>
+                  </div>
+                </div>
+
+                <div class="sf-compAnaCompact__aside">
+                  <div class="sf-compAnaCompact__verdictTitle">VERDICT</div>
+                  <div class="sf-compAnaCompact__asideRow sf-compAnaCompact__asideRow--flange">
+                    <div class="sf-compAnaCompact__badge">COMPACT FLANGE</div>
+                  </div>
+                  <div class="sf-compAnaCompact__asideRow sf-compAnaCompact__asideRow--web">
+                    <div class="sf-compAnaCompact__badge">COMPACT WEB</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sf-compAnaCompact__imgCard" aria-label="Section compactness image">
+              <div class="sf-compAnaCompact__imgPane">
+                <img src="./assets/beam-tension.png" alt="Beam section view" class="sf-compAnaCompact__img" />
+              </div>
+              <div class="sf-compAnaCompact__imgPane">
+                <img src="./assets/beam-shear.png" alt="Beam shear view" class="sf-compAnaCompact__img" />
+              </div>
+            </div>
+
+            <div class="sf-compCap" aria-label="Checking capacity">
+              <div class="sf-compCap__card">
+                <div class="sf-compCap__title">CHECKING CAPACITY</div>
+
+                <div class="sf-compCap__section">
+                  <div class="sf-compCap__label">EULER&rsquo;S ELASTIC BUCKLING STRESS:</div>
+                  <div class="sf-compCap__row">
+                    <span class="sf-compCap__sym">F<sub>e</sub></span>
+                    <span class="sf-compCap__eq">=</span>
+                    <span class="sf-compCap__pill">22.45355143</span>
+                    <span class="sf-compCap__unit">ksi</span>
+                  </div>
+                </div>
+
+                <div class="sf-compCap__section">
+                  <div class="sf-compCap__label">CRITICAL ELASTIC BUCKLING STRESS:</div>
+                  <div class="sf-compCap__row">
+                    <span class="sf-compCap__sym">F<sub>cr</sub></span>
+                    <span class="sf-compCap__eq">=</span>
+                    <span class="sf-compCap__pill">18.40188393</span>
+                    <span class="sf-compCap__unit">ksi</span>
+                  </div>
+                </div>
+
+                <div class="sf-compCap__section">
+                  <div class="sf-compCap__label">NOMINAL LOAD:</div>
+                  <div class="sf-compCap__row">
+                    <span class="sf-compCap__sym">P<sub>n</sub></span>
+                    <span class="sf-compCap__eq">=</span>
+                    <span class="sf-compCap__pill sf-compCap__pill--empty" aria-hidden="true"></span>
+                    <span class="sf-compCap__unit">kips</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sf-compGov sf-compAnaCompact__slotRightBelow" aria-label="Governing capacity">
+              <div class="sf-compGov__header">GOVERNING CAPACITY:</div>
+              <div class="sf-compGov__body">
+                <span class="sf-compGov__sym">P<sub>u</sub></span>
+                <span class="sf-compGov__eq">=</span>
+                <span class="sf-compGov__pill" id="sfCompGovPu">2451.13</span>
+                <span class="sf-compGov__unit">kips</span>
+              </div>
+            </div>
+
+            <div class="sf-compAnaCritical__card" aria-label="Critical slenderness ratio">
+              <div class="sf-compAnaCritical__title">CRITICAL SLENDERNESS RATIO</div>
+
+              <div class="sf-compAnaCritical__header">
+                <div>ELEMENT</div>
+                <div>CONNECTION</div>
+                <div>K</div>
+                <div>L (in)</div>
+                <div>r</div>
+                <div>K·L/r</div>
+              </div>
+
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">X<sub>1</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Fixed-Pinned</option></select>
+                <div class="sf-compAnaCritical__input">0.8</div>
+                <div class="sf-compAnaCritical__input">840</div>
+                <div class="sf-compAnaCritical__input">16.8</div>
+                <div class="sf-compAnaCritical__output">40</div>
+              </div>
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">X<sub>2</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Pinned-Pinned</option></select>
+                <div class="sf-compAnaCritical__input">1</div>
+                <div class="sf-compAnaCritical__input">0</div>
+                <div class="sf-compAnaCritical__input">16.8</div>
+                <div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div>
+              </div>
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">X<sub>3</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Fixed-Fixed</option></select>
+                <div class="sf-compAnaCritical__input">0.65</div>
+                <div class="sf-compAnaCritical__input">0</div>
+                <div class="sf-compAnaCritical__input">16.8</div>
+                <div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div>
+              </div>
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">X<sub>4</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Fixed-Pinned</option></select>
+                <div class="sf-compAnaCritical__input">0.8</div>
+                <div class="sf-compAnaCritical__input">0</div>
+                <div class="sf-compAnaCritical__input">16.8</div>
+                <div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div>
+              </div>
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">X<sub>5</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Fixed-Free</option></select>
+                <div class="sf-compAnaCritical__input">1.2</div>
+                <div class="sf-compAnaCritical__input">0</div>
+                <div class="sf-compAnaCritical__input">16.8</div>
+                <div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div>
+              </div>
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">Y<sub>1</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Fixed-Pinned</option></select>
+                <div class="sf-compAnaCritical__input">0.8</div>
+                <div class="sf-compAnaCritical__input">420</div>
+                <div class="sf-compAnaCritical__input">3.72</div>
+                <div class="sf-compAnaCritical__output">90.32258065</div>
+              </div>
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">Y<sub>2</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Pinned-Pinned</option></select>
+                <div class="sf-compAnaCritical__input">1</div>
+                <div class="sf-compAnaCritical__input">420</div>
+                <div class="sf-compAnaCritical__input">3.72</div>
+                <div class="sf-compAnaCritical__output sf-compAnaCritical__output--governing-klr">112.9032258</div>
+              </div>
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">Y<sub>3</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Fixed-Pinned</option></select>
+                <div class="sf-compAnaCritical__input">0.5</div>
+                <div class="sf-compAnaCritical__input">0</div>
+                <div class="sf-compAnaCritical__input">3.72</div>
+                <div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div>
+              </div>
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">Y<sub>4</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Fixed-Pinned</option></select>
+                <div class="sf-compAnaCritical__input">0.65</div>
+                <div class="sf-compAnaCritical__input">0</div>
+                <div class="sf-compAnaCritical__input">3.72</div>
+                <div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div>
+              </div>
+              <div class="sf-compAnaCritical__row">
+                <div class="sf-compAnaCritical__element">Y<sub>5</sub></div>
+                <select class="sf-compAnaCritical__select"><option>Free-Pinned</option></select>
+                <div class="sf-compAnaCritical__input">2</div>
+                <div class="sf-compAnaCritical__input">0</div>
+                <div class="sf-compAnaCritical__input">3.72</div>
+                <div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div>
+              </div>
+
+              <div class="sf-compAnaCritical__governing">
+                <div class="sf-compAnaCritical__governingSpan" aria-hidden="true"></div>
+                <div class="sf-compAnaCritical__governingKlr">
+                  <span class="sf-compAnaCritical__governingLab">Governing K·L/r =</span>
+                  <span class="sf-compAnaCritical__highlight sf-compAnaCritical__highlight--governing-klr">112.9032258</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+        <div class="sf-comp__dots" aria-hidden="true">
+          <span class="sf-comp__dot"></span>
+          <span class="sf-comp__dot"></span>
+          <span class="sf-comp__dot"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sf-comp__mode" data-comp-mode-pane="design" role="tabpanel" aria-label="Design compression">
+    <div class="sf-comp__emptyPane sf-compDes__emptyPane">
+      <div class="sf-comp__grayShell" role="region" aria-label="Design compression workspace">
+        <div class="sf-comp__star" aria-hidden="true">★</div>
+        <div class="sf-comp__grayShell-body sf-comp__grayShell-body--design">
+            <aside class="sf-compAna__sidebar sf-compDes__sidebar sf-compDes__card--params" aria-label="Design compression parameters">
+              <div class="sf-compAna__headRow">
+                <span class="sf-compAna__pillLabel">DESIGN METHOD</span>
+                <div class="sf-compAna__selectWrap sf-compAna__selectWrap--method">
+                  <select id="sfCompDesMethod" class="sf-compAna__select" aria-label="Design method">
+                    <option value="lrfd" selected>LRFD</option>
+                    <option value="asd">ASD</option>
+                  </select>
+                  <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                </div>
+              </div>
+
+              <div class="sf-compDes__paramsTitle">PARAMETERS:</div>
+
+              <div class="sf-compDes__kvLoads" aria-label="Service loads">
+                <label class="sf-compAna__kv">
+                  <span class="sf-compAna__kvLab">DEAD LOAD (DL) =</span>
+                  <input id="sfCompDesDl" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="100" />
+                  <span class="sf-compAna__unit">kips</span>
+                </label>
+                <label class="sf-compAna__kv">
+                  <span class="sf-compAna__kvLab">LIVE LOAD (LL) =</span>
+                  <input id="sfCompDesLl" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="100" />
+                  <span class="sf-compAna__unit">kips</span>
+                </label>
+              </div>
+
+              <div class="sf-compAna__lengthBlock">
+                <div class="sf-compAna__lengthTitle">LENGTH</div>
+                <div class="sf-compAna__lengthCols">
+                  <div class="sf-compAna__lengthCol">
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">x<sub>1</sub> =</span>
+                      <input id="sfCompDesX1" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="80" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">x<sub>2</sub> =</span>
+                      <input id="sfCompDesX2" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">x<sub>3</sub> =</span>
+                      <input id="sfCompDesX3" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">x<sub>4</sub> =</span>
+                      <input id="sfCompDesX4" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">x<sub>5</sub> =</span>
+                      <input id="sfCompDesX5" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                  </div>
+                  <div class="sf-compAna__lengthCol">
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">y<sub>1</sub> =</span>
+                      <input id="sfCompDesY1" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="40" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">y<sub>2</sub> =</span>
+                      <input id="sfCompDesY2" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="40" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">y<sub>3</sub> =</span>
+                      <input id="sfCompDesY3" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">y<sub>4</sub> =</span>
+                      <input id="sfCompDesY4" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                    <label class="sf-compAna__kv sf-compAna__kv--coord">
+                      <span class="sf-compAna__kvLab">y<sub>5</sub> =</span>
+                      <input id="sfCompDesY5" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="0" />
+                      <span class="sf-compAna__unit">ft</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sf-compDes__steelBlock">
+                <div class="sf-compDes__steelHead">
+                  <span class="sf-compAna__pillLabel">STEEL TYPE =</span>
+                  <div class="sf-compAna__selectWrap sf-compAna__selectWrap--steel sf-compDes__steelSelect">
+                    <select id="sfCompDesSteel" class="sf-compAna__select" aria-label="Steel type"></select>
+                    <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                  </div>
+                </div>
+                <label class="sf-compAna__kv">
+                  <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">F<sub>y</sub></span> =</span>
+                  <input id="sfCompDesFy" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" inputmode="decimal" value="50" />
+                  <span class="sf-compAna__unit">ksi</span>
+                </label>
+                <label class="sf-compAna__kv">
+                  <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">F<sub>u</sub></span> =</span>
+                  <input id="sfCompDesFu" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" inputmode="decimal" value="65" />
+                  <span class="sf-compAna__unit">ksi</span>
+                </label>
+              </div>
+
+              <label class="sf-compAna__kv sf-compDes__kvModulus" aria-label="Modulus of elasticity">
+                <span class="sf-compAna__kvLab">MODULUS OF ELASTICITY (<span class="sf-compAna__sym">E</span>) =</span>
+                <input id="sfCompDesE" class="sf-compAna__pillInput" type="text" inputmode="decimal" value="29000" readonly />
+                <span class="sf-compAna__unit">ksi</span>
+              </label>
+            </aside>
+
+            <section class="sf-compDes__midCard sf-compDes__midCard--slender" aria-label="Critical slenderness ratio">
+              <div class="sf-compDes__slenderTitleWrap">
+                <h3 class="sf-compDes__slenderTitle">CRITICAL SLENDERNESS RATIO</h3>
+              </div>
+              <div class="sf-compDes__midScroll sf-compDes__midScroll--slender">
+                <table class="sf-compDes__slenderTable">
+                  <thead>
+                    <tr>
+                      <th scope="col">ELEMENT</th>
+                      <th scope="col">CONNECTION</th>
+                      <th scope="col">K</th>
+                      <th scope="col">L (ft)</th>
+                      <th scope="col">KL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>x</i><sub>1</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelX1" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection x1">
+                            <option value="fixed-pinned" selected>Fixed-Pinned</option>
+                            <option value="pinned-pinned">Pinned-Pinned</option>
+                            <option value="fixed-fixed">Fixed-Fixed</option>
+                            <option value="free-pinned">Free-Pinned</option>
+                            <option value="fixed-free">Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKX1" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="0.8" aria-label="K x1" /></td>
+                      <td><input id="sfCompDesSlLX1" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L x1 feet" /></td>
+                      <td><input id="sfCompDesSlKLX1" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL x1" /></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>x</i><sub>2</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelX2" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection x2">
+                            <option value="fixed-pinned">Fixed-Pinned</option>
+                            <option value="pinned-pinned" selected>Pinned-Pinned</option>
+                            <option value="fixed-fixed">Fixed-Fixed</option>
+                            <option value="free-pinned">Free-Pinned</option>
+                            <option value="fixed-free">Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKX2" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="1" aria-label="K x2" /></td>
+                      <td><input id="sfCompDesSlLX2" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L x2 feet" /></td>
+                      <td><input id="sfCompDesSlKLX2" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL x2" /></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>x</i><sub>3</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelX3" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection x3">
+                            <option value="fixed-pinned">Fixed-Pinned</option>
+                            <option value="pinned-pinned">Pinned-Pinned</option>
+                            <option value="fixed-fixed" selected>Fixed-Fixed</option>
+                            <option value="free-pinned">Free-Pinned</option>
+                            <option value="fixed-free">Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKX3" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="0.65" aria-label="K x3" /></td>
+                      <td><input id="sfCompDesSlLX3" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L x3 feet" /></td>
+                      <td><input id="sfCompDesSlKLX3" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL x3" /></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>x</i><sub>4</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelX4" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection x4">
+                            <option value="fixed-pinned">Fixed-Pinned</option>
+                            <option value="pinned-pinned">Pinned-Pinned</option>
+                            <option value="fixed-fixed">Fixed-Fixed</option>
+                            <option value="free-pinned" selected>Free-Pinned</option>
+                            <option value="fixed-free">Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKX4" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="2" aria-label="K x4" /></td>
+                      <td><input id="sfCompDesSlLX4" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L x4 feet" /></td>
+                      <td><input id="sfCompDesSlKLX4" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL x4" /></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>x</i><sub>5</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelX5" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection x5">
+                            <option value="fixed-pinned">Fixed-Pinned</option>
+                            <option value="pinned-pinned">Pinned-Pinned</option>
+                            <option value="fixed-fixed">Fixed-Fixed</option>
+                            <option value="free-pinned">Free-Pinned</option>
+                            <option value="fixed-free" selected>Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKX5" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="1.2" aria-label="K x5" /></td>
+                      <td><input id="sfCompDesSlLX5" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L x5 feet" /></td>
+                      <td><input id="sfCompDesSlKLX5" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL x5" /></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>y</i><sub>1</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelY1" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection y1">
+                            <option value="fixed-pinned" selected>Fixed-Pinned</option>
+                            <option value="pinned-pinned">Pinned-Pinned</option>
+                            <option value="fixed-fixed">Fixed-Fixed</option>
+                            <option value="free-pinned">Free-Pinned</option>
+                            <option value="fixed-free">Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKY1" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="0.8" aria-label="K y1" /></td>
+                      <td><input id="sfCompDesSlLY1" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L y1 feet" /></td>
+                      <td><input id="sfCompDesSlKLY1" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL y1" /></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>y</i><sub>2</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelY2" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection y2">
+                            <option value="fixed-pinned">Fixed-Pinned</option>
+                            <option value="pinned-pinned" selected>Pinned-Pinned</option>
+                            <option value="fixed-fixed">Fixed-Fixed</option>
+                            <option value="free-pinned">Free-Pinned</option>
+                            <option value="fixed-free">Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKY2" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="1" aria-label="K y2" /></td>
+                      <td><input id="sfCompDesSlLY2" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L y2 feet" /></td>
+                      <td><input id="sfCompDesSlKLY2" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL y2" /></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>y</i><sub>3</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelY3" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection y3">
+                            <option value="fixed-pinned">Fixed-Pinned</option>
+                            <option value="pinned-pinned">Pinned-Pinned</option>
+                            <option value="fixed-fixed">Fixed-Fixed</option>
+                            <option value="free-pinned">Free-Pinned</option>
+                            <option value="fixed-free" selected>Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKY3" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="1.2" aria-label="K y3" /></td>
+                      <td><input id="sfCompDesSlLY3" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L y3 feet" /></td>
+                      <td><input id="sfCompDesSlKLY3" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL y3" /></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>y</i><sub>4</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelY4" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection y4">
+                            <option value="fixed-pinned">Fixed-Pinned</option>
+                            <option value="pinned-pinned">Pinned-Pinned</option>
+                            <option value="fixed-fixed">Fixed-Fixed</option>
+                            <option value="free-pinned">Free-Pinned</option>
+                            <option value="fixed-free" selected>Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKY4" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="1.2" aria-label="K y4" /></td>
+                      <td><input id="sfCompDesSlLY4" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L y4 feet" /></td>
+                      <td><input id="sfCompDesSlKLY4" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL y4" /></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="sf-compDes__elemLab"><i>y</i><sub>5</sub></span></th>
+                      <td>
+                        <div class="sf-compAna__selectWrap sf-compDes__tableSelectWrap">
+                          <select id="sfCompDesSlSelY5" class="sf-compAna__select sf-compDes__tableSelect" aria-label="Connection y5">
+                            <option value="fixed-pinned">Fixed-Pinned</option>
+                            <option value="pinned-pinned">Pinned-Pinned</option>
+                            <option value="fixed-fixed">Fixed-Fixed</option>
+                            <option value="free-pinned">Free-Pinned</option>
+                            <option value="fixed-free" selected>Fixed-Free</option>
+                          </select>
+                          <span class="sf-compAna__caret" aria-hidden="true">▾</span>
+                        </div>
+                      </td>
+                      <td><input id="sfCompDesSlKY5" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--k" type="text" inputmode="decimal" value="1.2" aria-label="K y5" /></td>
+                      <td><input id="sfCompDesSlLY5" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--l" type="text" readonly tabindex="-1" aria-label="L y5 feet" /></td>
+                      <td><input id="sfCompDesSlKLY5" class="sf-compAna__pillInput sf-compDes__slenderPill sf-compDes__slenderPill--kl" type="text" readonly tabindex="-1" aria-label="KL y5" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <aside class="sf-compDes__demandCard" aria-label="Demand load combinations">
+              <div class="sf-compDes__demandTitleWrap">
+                <span class="sf-compDes__demandTitle">DEMAND LOAD</span>
+              </div>
+              <div class="sf-compDes__demandGrid" role="group">
+                <!-- Row 1: combo 1 | Pu (reference: label above yellow pill) -->
+                <span class="sf-compDes__demandLab sf-compDes__demandRow--lrfd">1.2DL + 1.6LL =</span>
+                <div class="sf-compDes__demandVal sf-compDes__demandVal--comb sf-compDes__demandRow--lrfd">
+                  <input id="sfCompDesComb12" class="sf-compAna__pillInput sf-compDes__pillComb" type="text" readonly tabindex="-1" value="" />
+                  <span class="sf-compAna__unit">kips</span>
+                </div>
+                <div class="sf-compDes__demandVal sf-compDes__demandVal--out">
+                  <span class="sf-compDes__symLab sf-compDes__symLab--above"><span class="sf-compAna__sym">P<sub>u</sub></span> =</span>
+                  <div class="sf-compDes__outPillRow">
+                    <input id="sfCompDesPu" class="sf-compAna__pillInput sf-compDes__pillOut" type="text" readonly tabindex="-1" value="" />
+                    <span class="sf-compAna__unit">kips</span>
+                  </div>
+                </div>
+
+                <!-- Row 2: combo only — no Pu/Pa column (reference) -->
+                <span class="sf-compDes__demandLab sf-compDes__demandRow--lrfd">1.4DL =</span>
+                <div class="sf-compDes__demandVal sf-compDes__demandVal--comb sf-compDes__demandRow--lrfd">
+                  <input id="sfCompDesComb14" class="sf-compAna__pillInput sf-compDes__pillComb" type="text" readonly tabindex="-1" value="" />
+                  <span class="sf-compAna__unit">kips</span>
+                </div>
+                <div class="sf-compDes__demandVal sf-compDes__demandVal--spacer" aria-hidden="true"></div>
+
+                <!-- Row 3: combo svc | Pa -->
+                <span class="sf-compDes__demandLab sf-compDes__demandRow--asd">DL + LL =</span>
+                <div class="sf-compDes__demandVal sf-compDes__demandVal--comb sf-compDes__demandRow--asd">
+                  <input id="sfCompDesCombSvc" class="sf-compAna__pillInput sf-compDes__pillComb" type="text" readonly tabindex="-1" value="" />
+                  <span class="sf-compAna__unit">kips</span>
+                </div>
+                <div class="sf-compDes__demandVal sf-compDes__demandVal--out">
+                  <span class="sf-compDes__symLab sf-compDes__symLab--above"><span class="sf-compAna__sym">P<sub>a</sub></span> =</span>
+                  <div class="sf-compDes__outPillRow">
+                    <input id="sfCompDesPa" class="sf-compAna__pillInput sf-compDes__pillOut" type="text" readonly tabindex="-1" value="" />
+                    <span class="sf-compAna__unit">kips</span>
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            <section class="sf-compDes__midCard sf-compDes__midCard--safe" aria-label="Safe sections">
+              <div class="sf-compDes__safeTitleWrap">
+                <h3 class="sf-compDes__safeTitle">SAFE SECTION/S</h3>
+              </div>
+              <div class="sf-compDes__midScroll sf-compDes__midScroll--safe">
+                <table class="sf-compDes__safeTable">
+                  <thead>
+                    <tr>
+                      <th scope="col">SECTION</th>
+                      <th scope="col">WEIGHT (lb/ft)</th>
+                      <th scope="col"><span class="sf-compAna__sym">P<sub>u</sub></span></th>
+                      <th scope="col">REMARKS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input id="sfCompDesSafeSec1" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="W14X90" /></td>
+                      <td><input id="sfCompDesSafeWt1" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="90" /></td>
+                      <td><input id="sfCompDesSafePu1" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="355.7186975" /></td>
+                      <td><input id="sfCompDesSafeRm1" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="355.7186975" /></td>
+                    </tr>
+                    <tr>
+                      <td><input id="sfCompDesSafeSec2" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="W12X106" /></td>
+                      <td><input id="sfCompDesSafeWt2" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="106" /></td>
+                      <td><input id="sfCompDesSafePu2" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="295.891673" /></td>
+                      <td><input id="sfCompDesSafeRm2" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="295.891673" /></td>
+                    </tr>
+                    <tr>
+                      <td><input id="sfCompDesSafeSec3" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="NO SECTION" /></td>
+                      <td><input id="sfCompDesSafeWt3" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="NO SECTION" /></td>
+                      <td><input id="sfCompDesSafePu3" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="NO SECTION" /></td>
+                      <td><input id="sfCompDesSafeRm3" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="NO SECTION" /></td>
+                    </tr>
+                    <tr>
+                      <td><input id="sfCompDesSafeSec4" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="NO SECTION" /></td>
+                      <td><input id="sfCompDesSafeWt4" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="NO SECTION" /></td>
+                      <td><input id="sfCompDesSafePu4" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="NO SECTION" /></td>
+                      <td><input id="sfCompDesSafeRm4" class="sf-compDes__safeCell" type="text" readonly tabindex="-1" value="NO SECTION" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+          <div class="sf-compDes__vizCol" aria-label="Visualization, governing lengths, and lightest section">
+            <div class="sf-compDes__slenderRail sf-compDes__slenderRail--vizCol" aria-label="Section renders and governing lengths">
+              <div class="sf-compDes__beamPhotoTray" role="group" aria-label="W-section renders">
+                <figure class="sf-compDes__beamPhotoCard">
+                  <div class="sf-compDes__beamPhotoMat">
+                    <img
+                      class="sf-compDes__beamPhoto"
+                      src="./assets/compression/w-section-plain.png"
+                      width="320"
+                      height="480"
+                      decoding="async"
+                      alt="W-shape steel section, clean 3D render"
+                    />
+                  </div>
+                </figure>
+                <figure class="sf-compDes__beamPhotoCard">
+                  <div class="sf-compDes__beamPhotoMat">
+                    <img
+                      class="sf-compDes__beamPhoto"
+                      src="./assets/compression/w-section-stress.png"
+                      width="320"
+                      height="480"
+                      decoding="async"
+                      alt="W-shape steel section with stress visualization"
+                    />
+                  </div>
+                </figure>
+              </div>
+
+              <div class="sf-compDes__govShell">
+                <div class="sf-compDes__govBlock" role="group" aria-label="Governing effective lengths">
+                  <div class="sf-compDes__govRow">
+                    <span class="sf-compDes__govLab">Governing <span class="sf-compAna__sym">KL<sub>x</sub></span> =</span>
+                    <input id="sfCompDesGovKLx" class="sf-compAna__pillInput sf-compDes__govPill" type="text" readonly tabindex="-1" value="" aria-label="Governing KLx" />
+                  </div>
+                  <div class="sf-compDes__govRow">
+                    <span class="sf-compDes__govLab">Governing <span class="sf-compAna__sym">KL<sub>y</sub></span> =</span>
+                    <input id="sfCompDesGovKLy" class="sf-compAna__pillInput sf-compDes__govPill" type="text" readonly tabindex="-1" value="" aria-label="Governing KLy" />
+                  </div>
+                  <div class="sf-compDes__govRow sf-compDes__govRow--yellow">
+                    <span class="sf-compDes__govLab">Assuming <span class="sf-compAna__sym">KL<sub>y</sub></span> Governed =</span>
+                    <input id="sfCompDesGovKLyAsm" class="sf-compAna__pillInput sf-compDes__govPill sf-compDes__govPill--yellow" type="text" readonly tabindex="-1" value="" aria-label="Assuming KLy governed" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <section class="sf-compDes__lightestCard" aria-label="Lightest acceptable section">
+              <div class="sf-compDes__lightestLabelCol">
+                <span class="sf-compDes__lightestLine">LIGHTEST</span>
+                <span class="sf-compDes__lightestLine">W-SECTION =</span>
+                <span class="sf-compDes__lightestLine">TO USE</span>
+              </div>
+              <div class="sf-compDes__lightestValueCol">
+                <input id="sfCompDesLightest" class="sf-compDes__lightestPill" type="text" readonly tabindex="-1" value="W14X90" aria-label="Lightest W section" />
+              </div>
+            </section>
+          </div>
+        </div>
+        <div class="sf-comp__dots" aria-hidden="true">
+          <span class="sf-comp__dot"></span>
+          <span class="sf-comp__dot"></span>
+          <span class="sf-comp__dot"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

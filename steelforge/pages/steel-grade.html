@@ -1,0 +1,111 @@
+<div class="sf-grade" aria-label="Steel Grade">
+  <div class="sf-grade__card" role="region" aria-label="Steel Grade Card">
+    <div class="sf-grade__star" aria-hidden="true">★</div>
+
+    <div class="sf-grade__cols">
+      <!-- LEFT: TABLE -->
+      <section class="sf-grade__panel sf-grade__panel--table" aria-label="ASTM Table">
+        <div class="sf-grade__panelInner">
+          <div class="sf-grade__tableWrap" role="region" aria-label="ASTM table">
+            <table class="sf-grade__table">
+              <thead>
+                <tr>
+                  <th>ASTM Designation</th>
+                  <th>Yield Stress, Fy (ksi)</th>
+                  <th>Tensile Stress, Fu (ksi)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>A36</td><td>36</td><td>58</td></tr>
+                <tr><td>A572 Gr. 42</td><td>42</td><td>60</td></tr>
+                <tr><td>A572 Gr. 50</td><td>50</td><td>65</td></tr>
+                <tr><td>A572 Gr. 55</td><td>55</td><td>70</td></tr>
+                <tr><td>A572 Gr. 60</td><td>60</td><td>75</td></tr>
+                <tr><td>A572 Gr. 65</td><td>65</td><td>80</td></tr>
+                <tr><td>A588</td><td>50</td><td>70</td></tr>
+                <tr><td>A992</td><td>50</td><td>65</td></tr>
+                <tr><td>A500 Gr. B</td><td>46</td><td>58</td></tr>
+                <tr><td>A500 Gr. C</td><td>50</td><td>62</td></tr>
+                <tr><td>A514</td><td>100</td><td>110</td></tr>
+                <tr><td>A709 Gr. 50</td><td>50</td><td>65</td></tr>
+                <tr><td>A709 Gr. 50W</td><td>50</td><td>70</td></tr>
+                <tr><td>A913 Gr. 50</td><td>50</td><td>65</td></tr>
+                <tr><td>A913 Gr. 65</td><td>65</td><td>80</td></tr>
+                <tr><td>A913 Gr. 70</td><td>70</td><td>85</td></tr>
+                <tr><td>A847</td><td>50</td><td>70</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: TOP SELECTOR + BOTTOM INFO -->
+      <div class="sf-grade__right" aria-label="Selection and Info">
+        <section class="sf-grade__panel sf-grade__panel--select" aria-label="ASTM Selection">
+          <div class="sf-grade__panelInner sf-grade__panelInner--select">
+            <div class="sf-grade__row sf-grade__row--top">
+              <div class="sf-grade__label">ASTM Designation</div>
+              <select class="sf-grade__select" aria-label="ASTM Designation">
+                <option>A36</option>
+                <option>A572 Gr. 42</option>
+                <option>A572 Gr. 50</option>
+                <option selected>A992</option>
+                <option>A588</option>
+              </select>
+            </div>
+
+            <div class="sf-grade__triple" aria-label="Fy and Fu selection">
+              <div class="sf-grade__tripleCol">
+                <div class="sf-grade__label">Yield Stress, Fy (ksi)</div>
+                <select class="sf-grade__select sf-grade__select--mini" aria-label="Fy">
+                  <option>35</option>
+                  <option>36</option>
+                  <option>42</option>
+                  <option>46</option>
+                  <option selected>50</option>
+                  <option>55</option>
+                </select>
+              </div>
+
+              <div class="sf-grade__tripleCol">
+                <div class="sf-grade__label">Tensile Stress, Fy (ksi)</div>
+                <div class="sf-grade__pill sf-grade__pill--blue" aria-label="Fu pill"></div>
+              </div>
+            </div>
+
+            <div class="sf-grade__selected" aria-label="Selected values">
+              <div class="sf-grade__selectedTitle">SELECTED:</div>
+
+              <div class="sf-grade__selRow">
+                <div class="sf-grade__selLabel">Designation</div>
+                <div class="sf-grade__pill sf-grade__pill--yl"></div>
+              </div>
+              <div class="sf-grade__selRow">
+                <div class="sf-grade__selLabel">Fy</div>
+                <div class="sf-grade__pill sf-grade__pill--yl"></div>
+              </div>
+              <div class="sf-grade__selRow">
+                <div class="sf-grade__selLabel">Fu</div>
+                <div class="sf-grade__pill sf-grade__pill--yl"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="sf-grade__info" aria-label="What is ASTM?">
+          <div class="sf-grade__infoIcon" aria-hidden="true">
+            <i class="fa-solid fa-lightbulb"></i>
+          </div>
+          <div class="sf-grade__infoBody">
+            <div class="sf-grade__infoTitle">What is ASTM?</div>
+            <div class="sf-grade__infoText">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nunc dolor magna,
+              commodo vitae facilisis eu, consequat ut elit. Donec placerat iaculis lacus.
+              Etiam vehicula nisl id odio rhoncus, sit amet posuere ante interdum.
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
