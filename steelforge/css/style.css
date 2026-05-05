@@ -8899,10 +8899,10 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 /* —— Bending: deflection sub-mode (replaces legacy .sf-ref toggles) —— */
-.sf-comp--bending .sf-comp__card:has(#sfBendDefYes:checked) .sf-bendDes__branch--noDefl {
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendDes__branch--noDefl {
   display: none !important;
 }
-.sf-comp--bending .sf-comp__card:has(#sfBendDefNo:checked) .sf-bendDes__branch--defl {
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendDes__branch--defl {
   display: none !important;
 }
 
@@ -8934,8 +8934,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
   user-select: none;
 }
 
-.sf-comp--bending .sf-comp__card:has(#sfBendDefNo:checked) label.sf-bendDes__subBtn[for='sfBendDefNo'],
-.sf-comp--bending .sf-comp__card:has(#sfBendDefYes:checked) label.sf-bendDes__subBtn[for='sfBendDefYes'] {
+.sf-comp--bending:has(#sfBendDefNo:checked) label.sf-bendDes__subBtn[for='sfBendDefNo'],
+.sf-comp--bending:has(#sfBendDefYes:checked) label.sf-bendDes__subBtn[for='sfBendDefYes'] {
   background: rgba(205, 218, 232, 0.92);
   border-color: rgba(29, 120, 179, 0.35);
 }

@@ -628,7 +628,7 @@
     const nav = root.querySelector('.sf-comp__modeNav');
     if (!nav) return;
 
-    const buttons = Array.from(root.querySelectorAll('.sf-comp__modeBtn'));
+    const buttons = Array.from(nav.querySelectorAll('button.sf-comp__modeBtn'));
     const panes = Array.from(root.querySelectorAll('.sf-comp__mode'));
     const indicator = root.querySelector('.sf-comp__indicator span');
 
@@ -1126,9 +1126,10 @@
     };
 
     nav.addEventListener('click', (e) => {
-      const btn = e.target.closest('.sf-comp__modeBtn');
-      if (!btn) return;
-      const mode = btn.getAttribute('data-comp-mode') || 'analysis';
+      const btn = e.target.closest('button.sf-comp__modeBtn');
+      if (!btn || !nav.contains(btn)) return;
+      const mode = btn.getAttribute('data-comp-mode');
+      if (!mode) return;
       setMode(mode);
     });
 

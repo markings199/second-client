@@ -1,1 +1,77 @@
+<div class="sf-comp sf-comp--tensionRod">
+  <div class="sf-comp__modeNav" role="tablist" aria-label="Tension rod calculator type">
+    <button class="sf-comp__modeBtn active" type="button" role="tab" aria-selected="true">ANALYSIS TENSION ROD</button>
+    <button class="sf-comp__modeBtn" type="button" role="tab" aria-selected="false">DESIGN TENSION ROD</button>
+  </div>
 
+  <div class="sf-comp__mode is-active" role="tabpanel" aria-label="Analysis tension rod">
+    <div class="sf-comp__card" role="region">
+      <div class="sf-comp__star" aria-hidden="true">★</div>
+
+      <div class="sf-rod__grid">
+        <section class="sf-tbRef__card sf-rod__left" aria-label="Rod parameters">
+          <div class="sf-tbRef__methodRow">
+            <span class="sf-tbRef__pillLbl">ANALYSIS METHOD</span>
+            <div class="sf-tbRef__methodPick">
+              <select class="sf-tbRef__methodSel sf-tbRef__methodSel--rect" aria-label="Method">
+                <option value="lrfd" selected>LRFD</option>
+                <option value="asd">ASD</option>
+              </select>
+              <span class="sf-tbRef__caret" aria-hidden="true">▾</span>
+            </div>
+          </div>
+
+          <div class="sf-tbRef__paramsHdr">PARAMETERS</div>
+          <label class="sf-tbRef__row sf-tbRef__row--tri"><span class="sf-tbRef__lab">ROD DIAMETER d =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" inputmode="decimal" /><span class="sf-tbRef__u">in</span></label>
+          <label class="sf-tbRef__row sf-tbRef__row--tri"><span class="sf-tbRef__lab">ROD LENGTH L =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" inputmode="decimal" /><span class="sf-tbRef__u">ft</span></label>
+          <label class="sf-tbRef__row sf-tbRef__row--tri"><span class="sf-tbRef__lab">THREAD REDUCTION FACTOR =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" inputmode="decimal" placeholder="e.g. 0.75" /><span class="sf-tbRef__u">-</span></label>
+
+          <div class="sf-tbRef__row sf-tbRef__row--select">
+            <span class="sf-tbRef__lab">STEEL GRADE</span>
+            <input class="sf-tbRef__inp sf-tbRef__inp--rect" type="text" value="A36" />
+          </div>
+          <div class="sf-tbRef__propsGrid sf-tbRef__propsGrid--2">
+            <label class="sf-tbRef__kv"><span>F<sub>y</sub> =</span><input class="sf-tbRef__pillIce sf-tbRef__pillIce--rect" value="36" /><span class="sf-tbRef__u">ksi</span></label>
+            <label class="sf-tbRef__kv"><span>F<sub>u</sub> =</span><input class="sf-tbRef__pillIce sf-tbRef__pillIce--rect" value="58" /><span class="sf-tbRef__u">ksi</span></label>
+          </div>
+
+          <div class="sf-tbRef__paramsHdr sf-tbRef__paramsHdr--sub">LOAD INPUT</div>
+          <label class="sf-tbRef__row sf-tbRef__row--tri"><span class="sf-tbRef__lab">DEAD LOAD (DL) =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" inputmode="decimal" /><span class="sf-tbRef__u">kips</span></label>
+          <label class="sf-tbRef__row sf-tbRef__row--tri"><span class="sf-tbRef__lab">LIVE LOAD (LL) =</span><input class="sf-tbRef__inp sf-tbRef__inp--rect" inputmode="decimal" /><span class="sf-tbRef__u">kips</span></label>
+        </section>
+
+        <div class="sf-rod__right">
+          <section class="sf-tbRef__card" aria-label="Demand and capacity">
+            <div class="sf-tbRef__paramsHdr">DEMAND LOAD</div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.2DL + 1.6LL =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.4DL =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">DL + LL =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">GOVERNING T =</span><span class="sf-tbRef__outYellow">—</span><span class="sf-tbRef__u">kips</span></div>
+          </section>
+
+          <section class="sf-tbRef__card" aria-label="Area checks">
+            <div class="sf-tbRef__paramsHdr">AREA CHECKS</div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">GROSS AREA A<sub>g</sub> = πd²/4</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">in²</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">EFFECTIVE AREA A<sub>e</sub> = k·A<sub>g</sub></span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">in²</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">TENSION YIELD (A<sub>g</sub>)</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">TENSION FRACTURE (A<sub>e</sub>)</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips</span></div>
+            <div class="sf-tbRef__row sf-tbRef__row--out sf-tbRef__govRow">
+              <span class="sf-tbRef__lab">GOVERNING CAPACITY =</span>
+              <span class="sf-tbRef__outYellow">—</span>
+              <span class="sf-tbRef__u">kips</span>
+            </div>
+          </section>
+
+          <section class="sf-tbRef__card sf-rod__status" aria-label="Status">
+            <div class="sf-tbRef__heroLbl">TENSION ROD VERDICT</div>
+            <div class="sf-tbRef__heroPill">—</div>
+          </section>
+        </div>
+      </div>
+
+      <div class="sf-comp__solveSlot">
+        <button type="button" class="sf-comp__solve">SOLVE</button>
+      </div>
+    </div>
+  </div>
+</div>

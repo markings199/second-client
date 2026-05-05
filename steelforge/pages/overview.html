@@ -1,17 +1,54 @@
-<div class="placeholder-content">
-  <div class="section-header">📋 OVERVIEW</div>
-  <div class="desc-text">
-    This dashboard loads modules from <code>pages/*.html</code>. Update each module independently.
-  </div>
+<div class="sf-comp sf-comp--overview">
+  <div class="sf-comp__card" role="region" aria-label="Overview">
+    <div class="sf-comp__star" aria-hidden="true">★</div>
 
-  <div class="calc-card">
-    <span>📐 Design Ratios:</span>
-    <div style="display: flex; gap: 24px; margin-top: 10px; flex-wrap:wrap;">
-      <span><strong>Tension:</strong> 0.42</span>
-      <span><strong>Compression:</strong> 0.68</span>
-      <span><strong>Bending:</strong> 0.55</span>
-      <span><strong>Shear:</strong> 0.31</span>
+    <div class="sf-overview__head">
+      <div class="sf-overview__title">PROJECT OVERVIEW</div>
+      <div class="sf-overview__sub">PRINCIPLES OF STEEL DESIGN ANALYSIS &amp; DESIGN CALCULATOR</div>
     </div>
-    <div class="sub-meta">✔ Critical condition: Compression (KL/r=42.5)</div>
+
+    <div class="sf-overview__grid">
+      <section class="sf-tbRef__card sf-overview__panel" aria-label="Assigned modules">
+        <div class="sf-tbRef__paramsHdr">MODULES IN SCOPE</div>
+        <div class="sf-overview__chips">
+          <span class="sf-overview__chip sf-overview__chip--active">OVERVIEW</span>
+          <span class="sf-overview__chip sf-overview__chip--active">TENSION</span>
+          <span class="sf-overview__chip sf-overview__chip--active">TENSION ROD</span>
+          <span class="sf-overview__chip sf-overview__chip--active">BENDING</span>
+          <span class="sf-overview__chip">COMPRESSION</span>
+          <span class="sf-overview__chip">SHEAR</span>
+          <span class="sf-overview__chip">STEEL GRADE</span>
+          <span class="sf-overview__chip">SECTION PROPS</span>
+        </div>
+
+        <div class="sf-overview__kvList">
+          <div class="sf-overview__kv"><span class="sf-overview__k">Layout style</span><span class="sf-overview__v">Client reference parity</span></div>
+          <div class="sf-overview__kv"><span class="sf-overview__k">Theme</span><span class="sf-overview__v">Charcoal shell + white cards + ice/yellow pills</span></div>
+          <div class="sf-overview__kv"><span class="sf-overview__k">Status</span><span class="sf-overview__v">Ready for review</span></div>
+        </div>
+      </section>
+
+      <section class="sf-tbRef__card sf-overview__panel" aria-label="Reference previews">
+        <div class="sf-tbRef__paramsHdr">REFERENCE SNAPSHOTS</div>
+        <div class="sf-overview__thumbs">
+          <figure class="sf-overview__thumb">
+            <img src="./assets/reference/ref-tension-analysis.png" alt="Tension analysis reference" loading="lazy" />
+            <figcaption>TENSION ANALYSIS</figcaption>
+          </figure>
+          <figure class="sf-overview__thumb">
+            <img src="./assets/reference/tension-design-lrfd-ref.png" alt="Tension design reference" loading="lazy" />
+            <figcaption>TENSION DESIGN</figcaption>
+          </figure>
+          <figure class="sf-overview__thumb">
+            <img src="./assets/reference/ref-bending-analysis.png" alt="Bending analysis reference" loading="lazy" />
+            <figcaption>BENDING ANALYSIS</figcaption>
+          </figure>
+          <figure class="sf-overview__thumb">
+            <img src="./assets/reference/bending-beam-visual.png" alt="Bending beam visual reference" loading="lazy" />
+            <figcaption>BENDING VISUAL</figcaption>
+          </figure>
+        </div>
+      </section>
+    </div>
   </div>
 </div>
