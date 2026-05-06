@@ -285,37 +285,147 @@
     if (!pane || !shapeSel) return;
 
     const input = (id) => pane.querySelector(`#${id}`);
-    const shapes = window.SteelForgeDB?.bySeries('W') ?? [];
+    const CSV_NAME = 'exel program EWIWIWI(S(STEEL SELECTION)).csv';
+    const COL = { type: 0, label: 2, Ag: 5, lamF: 23, lamW: 24, rx: 31, ry: 37 };
 
-    if (shapeSel.options.length === 0 && shapes.length > 0) {
-      shapes.forEach((s) => {
-        const opt = document.createElement('option');
-        opt.value = s.name;
-        opt.textContent = s.name.replace(/x/gi, '×');
-        shapeSel.appendChild(opt);
-      });
+    function parseCsvLine(line) {
+      const out = [];
+      let cur = '';
+      let q = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (q) {
+          if (c === '\"' && line[i + 1] === '\"') {
+            cur += '\"';
+            i++;
+          } else if (c === '\"') q = false;
+          else cur += c;
+        } else if (c === '\"') q = true;
+        else if (c === ',') {
+          out.push(cur);
+          cur = '';
+        } else cur += c;
+      }
+      out.push(cur);
+      return out;
     }
 
-    const steelEl = input('sfCompAnaSteel');
-    populateStructuralSteelGradeSelect(steelEl, 'a1043_36');
+    function parseNumLike(v) {
+      if (v == null) return null;
+      const s0 = String(v).replace(/\u00A0/g, ' ').trim();
+      if (!s0 || s0 === '—' || s0 === '–' || s0 === '-') return null;
+      const s = s0.replace(/\s+/g, ' ');
+      if (/^-?\d+\/\d+$/.test(s)) {
+        const [a, b] = s.split('/').map(Number);
+        return b ? a / b : null;
+      }
+      if (/^-?\d+\s+\d+\/\d+$/.test(s)) {
+        const [whole, frac] = s.split(' ');
+        const [a, b] = frac.split('/').map(Number);
+        if (!b) return null;
+        return Number(whole) + a / b;
+      }
+      const n = Number(s.replace(/,/g, ''));
+      return Number.isFinite(n) ? n : null;
+    }
 
-    const fmtNum = (v, digits = 2) => {
-      if (!Number.isFinite(v)) return '';
-      return String(Number(v.toFixed(digits)));
+    const fmt = (v, d = 8) => {
+      if (!Number.isFinite(v)) return '—';
+      return v.toFixed(d).replace(/\.?0+$/, '');
     };
-    const mm2toIn2 = (mm2) => mm2 / 645.16;
-    const mmToIn = (mm) => mm / 25.4;
 
-    const applyShape = () => {
-      const name = shapeSel.value;
-      const s = shapes.find((x) => x.name === name);
-      if (!s) return;
+    let wRowsPromise = null;
+    function loadWShapesFromCsv() {
+      if (wRowsPromise) return wRowsPromise;
+      wRowsPromise = fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
+        .then((r) => {
+          if (!r.ok) throw new Error(String(r.status));
+          return r.text();
+        })
+        .then((txt) => {
+          const lines = txt.split(/\r?\n/);
+          const rows = [];
+          for (let i = 4; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line || !line.trim()) continue;
+            const r = parseCsvLine(line);
+            if (String(r[COL.type] || '').trim() !== 'W') continue;
+            const lab = String(r[COL.label] || '').trim();
+            if (!lab) continue;
+            rows.push(r);
+          }
+          return rows;
+        })
+        .catch(() => {
+          wRowsPromise = null;
+          return [];
+        });
+      return wRowsPromise;
+    }
+
+    const getSelectedWRow = (rows) => {
+      const v = String(shapeSel.value || '').trim().toUpperCase();
+      return rows.find((r) => String(r[COL.label] || '').trim().toUpperCase() === v) ?? null;
+    };
+
+    const steelEl = input('sfCompAnaSteel');
+    populateStructuralSteelGradeSelect(steelEl, getPreferredStructuralSteelGradeId());
+
+    const E_DEFAULT = 29000;
+    const PHI_C = 0.9;
+    const OMEGA_C = 1.67;
+    const connK = {
+      'fixed-pinned': 0.8,
+      'pinned-pinned': 1,
+      'fixed-fixed': 0.65,
+      'free-pinned': 2,
+      'fixed-free': 1.2,
+    };
+
+    function aiscFcr(Fy, Fe, KLr) {
+      if (![Fy, Fe, KLr].every((x) => Number.isFinite(x) && x > 0)) return null;
+      const limit = 4.71 * Math.sqrt(E_DEFAULT / Fy);
+      if (KLr <= limit) return (0.658 ** (Fy / Fe)) * Fy;
+      return 0.877 * Fe;
+    }
+
+    function compactLimits(Fy) {
+      if (!Number.isFinite(Fy) || Fy <= 0) return null;
+      const root = Math.sqrt(E_DEFAULT / Fy);
+      return {
+        flange: { lp: 0.38 * root, lr: 1.0 * root },
+        web: { lp: 3.76 * root, lr: 5.7 * root },
+      };
+    }
+
+    const applyShape = (rows) => {
+      const row = getSelectedWRow(rows);
+      if (!row) return;
       const agEl = input('sfCompAnaAg');
+      const lamFEl = input('sfCompAnaLamF');
+      const lamWEl = input('sfCompAnaLamW');
       const rxEl = input('sfCompAnaRx');
       const ryEl = input('sfCompAnaRy');
-      if (agEl) agEl.value = fmtNum(mm2toIn2(s.area_mm2), 2);
-      if (rxEl) rxEl.value = fmtNum(mmToIn(s.rx_mm), 2);
-      if (ryEl) ryEl.value = fmtNum(mmToIn(s.ry_mm), 2);
+      if (agEl) {
+        agEl.value = fmt(parseNumLike(row[COL.Ag]), 2);
+        agEl.readOnly = true;
+      }
+      if (lamFEl) {
+        lamFEl.value = fmt(parseNumLike(row[COL.lamF]), 2);
+        lamFEl.readOnly = true;
+      }
+      if (lamWEl) {
+        lamWEl.value = fmt(parseNumLike(row[COL.lamW]), 2);
+        lamWEl.readOnly = true;
+      }
+      if (rxEl) {
+        rxEl.value = fmt(parseNumLike(row[COL.rx]), 2);
+        rxEl.readOnly = true;
+      }
+      if (ryEl) {
+        ryEl.value = fmt(parseNumLike(row[COL.ry]), 2);
+        ryEl.readOnly = true;
+      }
     };
 
     const applySteelGrade = () => {
@@ -329,16 +439,138 @@
 
     const eEl = input('sfCompAnaE');
     if (eEl && String(eEl.value).trim() === '') eEl.value = '29000';
+    if (eEl) eEl.readOnly = true;
 
-    shapeSel.addEventListener('change', applyShape);
-    steelEl?.addEventListener('change', applySteelGrade);
+    function updateCompactnessAndCapacity() {
+      const Fy = parseNum(input('sfCompAnaFy')?.value);
+      const Ag = parseNum(input('sfCompAnaAg')?.value);
+      const lamF = parseNum(input('sfCompAnaLamF')?.value);
+      const lamW = parseNum(input('sfCompAnaLamW')?.value);
+      const rx = parseNum(input('sfCompAnaRx')?.value);
+      const ry = parseNum(input('sfCompAnaRy')?.value);
+
+      const lim = compactLimits(Fy);
+      const fVals = pane.querySelectorAll('.sf-compAnaCompact__seg--flange .sf-compAnaCompact__value');
+      const wVals = pane.querySelectorAll('.sf-compAnaCompact__seg--web .sf-compAnaCompact__value');
+      if (lim && fVals.length >= 2) {
+        fVals[0].textContent = fmt(lim.flange.lp, 8);
+        fVals[1].textContent = fmt(lim.flange.lr, 8);
+      }
+      if (lim && wVals.length >= 2) {
+        wVals[0].textContent = fmt(lim.web.lp, 8);
+        wVals[1].textContent = fmt(lim.web.lr, 8);
+      }
+
+      const flangeBadge = pane.querySelector('.sf-compAnaCompact__asideRow--flange .sf-compAnaCompact__badge');
+      const webBadge = pane.querySelector('.sf-compAnaCompact__asideRow--web .sf-compAnaCompact__badge');
+      const classify = (lam, { lp, lr }, kind) => {
+        if (!Number.isFinite(lam)) return `${kind.toUpperCase()} —`;
+        if (lam <= lp) return `COMPACT ${kind.toUpperCase()}`;
+        if (lam <= lr) return `NONCOMPACT ${kind.toUpperCase()}`;
+        return `SLENDER ${kind.toUpperCase()}`;
+      };
+      if (lim && flangeBadge) flangeBadge.textContent = classify(lamF, lim.flange, 'flange');
+      if (lim && webBadge) webBadge.textContent = classify(lamW, lim.web, 'web');
+
+      // Critical slenderness table based on x/y (ft) and connection K.
+      const xs = [1, 2, 3, 4, 5].map((i) => parseNum(input(`sfCompAnaX${i}`)?.value) ?? 0);
+      const ys = [1, 2, 3, 4, 5].map((i) => parseNum(input(`sfCompAnaY${i}`)?.value) ?? 0);
+      const rows = Array.from(pane.querySelectorAll('.sf-compAnaCritical__row'));
+      let gov = null;
+      rows.forEach((rowEl, idx) => {
+        const axis = idx < 5 ? 'x' : 'y';
+        const i = axis === 'x' ? idx : idx - 5;
+        const Lft = axis === 'x' ? xs[i] : ys[i];
+        const sel = rowEl.querySelector('select.sf-compAnaCritical__select');
+        if (sel && sel.options.length <= 1) {
+          const prev = sel.value;
+          sel.innerHTML = '';
+          [
+            ['fixed-pinned', 'Fixed-Pinned'],
+            ['pinned-pinned', 'Pinned-Pinned'],
+            ['fixed-fixed', 'Fixed-Fixed'],
+            ['free-pinned', 'Free-Pinned'],
+            ['fixed-free', 'Fixed-Free'],
+          ].forEach(([v, t]) => {
+            const o = document.createElement('option');
+            o.value = v;
+            o.textContent = t;
+            sel.appendChild(o);
+          });
+          sel.value = prev && connK[prev] ? prev : axis === 'x' ? 'fixed-pinned' : 'pinned-pinned';
+        }
+        const K = sel ? connK[sel.value] ?? 1 : 1;
+        const Lin = Number.isFinite(Lft) ? Lft * 12 : null;
+        const rUse = axis === 'x' ? rx : ry;
+        const klr = Number.isFinite(Lin) && Lin > 0 && Number.isFinite(rUse) && rUse > 0 ? (K * Lin) / rUse : null;
+        const inputs = rowEl.querySelectorAll('.sf-compAnaCritical__input');
+        const out = rowEl.querySelector('.sf-compAnaCritical__output');
+        if (inputs.length >= 3) {
+          inputs[0].textContent = fmt(K, 2);
+          inputs[1].textContent = Number.isFinite(Lin) ? fmt(Lin, 0) : '0';
+          inputs[2].textContent = Number.isFinite(rUse) ? fmt(rUse, 2) : '—';
+        }
+        if (out) {
+          out.classList.toggle('sf-compAnaCritical__output--empty', !(Number.isFinite(klr) && klr > 0));
+          out.textContent = Number.isFinite(klr) && klr > 0 ? fmt(klr, 8) : '';
+        }
+        if (Number.isFinite(klr) && klr > 0) gov = gov == null ? klr : Math.max(gov, klr);
+      });
+      const govEl = pane.querySelector('.sf-compAnaCritical__highlight--governing-klr');
+      if (govEl) govEl.textContent = Number.isFinite(gov) ? fmt(gov, 8) : '—';
+
+      // Capacity (ksi/in).
+      const fe = Number.isFinite(gov) && gov > 0 ? (Math.PI ** 2 * E_DEFAULT) / (gov ** 2) : null;
+      const fcr = Number.isFinite(Fy) && Number.isFinite(fe) ? aiscFcr(Fy, fe, gov) : null;
+      const pn = Number.isFinite(fcr) && Number.isFinite(Ag) ? fcr * Ag : null; // kips
+      const method = String(input('sfCompAnaMethod')?.value || 'lrfd').toLowerCase();
+      const cap = method === 'asd' ? (Number.isFinite(pn) ? pn / OMEGA_C : null) : (Number.isFinite(pn) ? PHI_C * pn : null);
+
+      const capSections = pane.querySelectorAll('.sf-compCap__section');
+      const fePill = capSections[0]?.querySelector('.sf-compCap__pill') ?? null;
+      const fcrPill = capSections[1]?.querySelector('.sf-compCap__pill') ?? null;
+      const pnPill = capSections[2]?.querySelector('.sf-compCap__pill') ?? null;
+      if (fePill) fePill.textContent = fmt(fe, 8);
+      if (fcrPill) fcrPill.textContent = fmt(fcr, 8);
+      if (pnPill) pnPill.textContent = Number.isFinite(pn) ? fmt(pn, 2) : '—';
+
+      const puPill = pane.querySelector('#sfCompGovPu');
+      if (puPill) puPill.textContent = Number.isFinite(cap) ? fmt(cap, 2) : '—';
+    }
+
+    const wire = (rows) => {
+      shapeSel.addEventListener('change', () => {
+        applyShape(rows);
+        updateCompactnessAndCapacity();
+      });
+      steelEl?.addEventListener('change', () => {
+        applySteelGrade();
+        updateCompactnessAndCapacity();
+      });
+      pane.querySelectorAll('input, select').forEach((el) => {
+        el.addEventListener('input', updateCompactnessAndCapacity);
+        el.addEventListener('change', updateCompactnessAndCapacity);
+      });
+    };
 
     applySteelGrade();
-    if (shapeSel.value) applyShape();
-    else if (shapes.length) {
-      shapeSel.selectedIndex = 0;
-      applyShape();
-    }
+    loadWShapesFromCsv().then((rows) => {
+      shapeSel.innerHTML = '';
+      rows.forEach((r) => {
+        const lab = String(r[COL.label] || '').trim();
+        if (!lab) return;
+        const opt = document.createElement('option');
+        opt.value = lab;
+        opt.textContent = lab.replace(/X/gi, '×');
+        shapeSel.appendChild(opt);
+      });
+      const pref = rows.find((r) => String(r[COL.label] || '').trim().toUpperCase() === 'W44X335');
+      if (pref) shapeSel.value = String(pref[COL.label] || '').trim();
+      else if (rows[0]) shapeSel.value = String(rows[0][COL.label] || '').trim();
+      applyShape(rows);
+      wire(rows);
+      updateCompactnessAndCapacity();
+    });
   }
 
   function attachCompressionDesignPanel(root) {
@@ -363,6 +595,81 @@
     }
 
     const input = (id) => pane.querySelector(`#${id}`);
+    const CSV_NAME = 'exel program EWIWIWI(S(STEEL SELECTION)).csv';
+    const COL = { type: 0, label: 2, weightLbFt: 4, Ag: 5, rx: 31, ry: 37 };
+
+    function parseCsvLine(line) {
+      const out = [];
+      let cur = '';
+      let q = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (q) {
+          if (c === '\"' && line[i + 1] === '\"') {
+            cur += '\"';
+            i++;
+          } else if (c === '\"') q = false;
+          else cur += c;
+        } else if (c === '\"') q = true;
+        else if (c === ',') {
+          out.push(cur);
+          cur = '';
+        } else cur += c;
+      }
+      out.push(cur);
+      return out;
+    }
+
+    function parseNumLike(v) {
+      if (v == null) return null;
+      const s0 = String(v).replace(/\u00A0/g, ' ').trim();
+      if (!s0 || s0 === '—' || s0 === '–' || s0 === '-') return null;
+      const s = s0.replace(/\s+/g, ' ');
+      if (/^-?\d+\/\d+$/.test(s)) {
+        const [a, b] = s.split('/').map(Number);
+        return b ? a / b : null;
+      }
+      if (/^-?\d+\s+\d+\/\d+$/.test(s)) {
+        const [whole, frac] = s.split(' ');
+        const [a, b] = frac.split('/').map(Number);
+        if (!b) return null;
+        return Number(whole) + a / b;
+      }
+      const n = Number(s.replace(/,/g, ''));
+      return Number.isFinite(n) ? n : null;
+    }
+
+    const fmt = (v, d = 2) => {
+      if (!Number.isFinite(v)) return '';
+      return v.toFixed(d).replace(/\.?0+$/, '');
+    };
+
+    function loadWShapesFromCsv() {
+      // Share cache between compression design/analysis without cross-function refactors.
+      if (!window.SteelForge) window.SteelForge = {};
+      if (window.SteelForge.__sfWShapesCsvPromise) return window.SteelForge.__sfWShapesCsvPromise;
+      window.SteelForge.__sfWShapesCsvPromise = fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
+        .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
+        .then((txt) => {
+          const lines = txt.split(/\\r?\\n/);
+          const rows = [];
+          for (let i = 4; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line || !line.trim()) continue;
+            const r = parseCsvLine(line);
+            if (String(r[COL.type] || '').trim() !== 'W') continue;
+            const lab = String(r[COL.label] || '').trim();
+            if (!lab) continue;
+            rows.push(r);
+          }
+          return rows;
+        })
+        .catch(() => {
+          window.SteelForge.__sfWShapesCsvPromise = null;
+          return [];
+        });
+      return window.SteelForge.__sfWShapesCsvPromise;
+    }
 
     const SF_COMP_DES_CONN_K = {
       'fixed-pinned': 0.8,
@@ -426,11 +733,8 @@
       const govEl = input('sfCompDesGovKLyAsm');
       if (klxEl) klxEl.value = Number.isFinite(maxX) ? fmtKlLocal(maxX) : '';
       if (klyEl) klyEl.value = Number.isFinite(maxY) ? fmtKlLocal(maxY) : '';
-      let gov = NaN;
-      if (Number.isFinite(maxX) && Number.isFinite(maxY)) gov = Math.min(maxX, maxY);
-      else if (Number.isFinite(maxY)) gov = maxY;
-      else if (Number.isFinite(maxX)) gov = maxX;
-      if (govEl) govEl.value = Number.isFinite(gov) ? fmtKlLocal(gov) : '';
+      // Reference: yellow pill is "Assuming KLy governed" → show KLy when present.
+      if (govEl) govEl.value = Number.isFinite(maxY) ? fmtKlLocal(maxY) : '';
       syncLightestFromSafeTop();
     };
 
@@ -448,6 +752,92 @@
         }
       }
       updateGoverningKLFromSlender();
+    };
+
+    const E_DEFAULT = 29000;
+    const PHI_C = 0.9;
+    const OMEGA_C = 1.67;
+
+    function aiscFcr(Fy, Fe, KLr) {
+      if (![Fy, Fe, KLr].every((x) => Number.isFinite(x) && x > 0)) return null;
+      const limit = 4.71 * Math.sqrt(E_DEFAULT / Fy);
+      if (KLr <= limit) return (0.658 ** (Fy / Fe)) * Fy;
+      return 0.877 * Fe;
+    }
+
+    const setSafeRow = (i, sec, wt, cap, remark) => {
+      const secEl = input(`sfCompDesSafeSec${i}`);
+      const wtEl = input(`sfCompDesSafeWt${i}`);
+      const puEl = input(`sfCompDesSafePu${i}`);
+      const rmEl = input(`sfCompDesSafeRm${i}`);
+      if (!secEl || !wtEl || !puEl || !rmEl) return;
+      if (!sec) {
+        secEl.value = 'NO SECTION';
+        wtEl.value = 'NO SECTION';
+        puEl.value = 'NO SECTION';
+        rmEl.value = 'NO SECTION';
+        return;
+      }
+      secEl.value = sec;
+      wtEl.value = fmt(wt, 0);
+      puEl.value = fmt(cap, 2);
+      rmEl.value = remark || 'SAFE';
+    };
+
+    const updateSafeSections = (wRows) => {
+      const methodEl = input('sfCompDesMethod');
+      const isLRFD = methodEl?.value !== 'asd';
+      const Fy = parseNum(input('sfCompDesFy')?.value);
+      const Pu = parseNum(input('sfCompDesPu')?.value);
+      const Pa = parseNum(input('sfCompDesPa')?.value);
+
+      // Governing KL in ft from the table.
+      const KLx = parseNum(input('sfCompDesGovKLx')?.value);
+      const KLy = parseNum(input('sfCompDesGovKLy')?.value);
+      const KLxIn = Number.isFinite(KLx) ? KLx * 12 : NaN;
+      const KLyIn = Number.isFinite(KLy) ? KLy * 12 : NaN;
+
+      const demand = isLRFD ? Pu : Pa;
+      const demandOk = Number.isFinite(demand) && demand > 0;
+
+      const candidates = [];
+      if (!Number.isFinite(Fy) || Fy <= 0 || !demandOk || wRows.length === 0) {
+        for (let i = 1; i <= 4; i++) setSafeRow(i, null);
+        syncLightestFromSafeTop();
+        return;
+      }
+
+      for (const r of wRows) {
+        const lab = String(r[COL.label] || '').trim().toUpperCase();
+        const wt = parseNumLike(r[COL.weightLbFt]);
+        const Ag = parseNumLike(r[COL.Ag]);
+        const rx = parseNumLike(r[COL.rx]);
+        const ry = parseNumLike(r[COL.ry]);
+        if (!lab || ![wt, Ag, rx, ry].every((v) => Number.isFinite(v) && v > 0)) continue;
+
+        const klrx = Number.isFinite(KLxIn) && KLxIn > 0 ? KLxIn / rx : NaN;
+        const klry = Number.isFinite(KLyIn) && KLyIn > 0 ? KLyIn / ry : NaN;
+        const KLr = Number.isFinite(klrx) && Number.isFinite(klry) ? Math.max(klrx, klry) : Number.isFinite(klry) ? klry : klrx;
+        if (!Number.isFinite(KLr) || KLr <= 0) continue;
+
+        const Fe = (Math.PI ** 2 * E_DEFAULT) / (KLr ** 2);
+        const Fcr = aiscFcr(Fy, Fe, KLr);
+        if (!Number.isFinite(Fcr) || Fcr <= 0) continue;
+        const Pn = Fcr * Ag; // kips
+        const cap = isLRFD ? PHI_C * Pn : Pn / OMEGA_C;
+        const ok = cap >= demand;
+        if (!ok) continue;
+        candidates.push({ lab, wt, cap });
+      }
+
+      candidates.sort((a, b) => a.wt - b.wt || b.cap - a.cap || a.lab.localeCompare(b.lab));
+      const top = candidates.slice(0, 4);
+      for (let i = 1; i <= 4; i++) {
+        const c = top[i - 1];
+        if (!c) setSafeRow(i, null);
+        else setSafeRow(i, c.lab, c.wt, c.cap, 'SAFE');
+      }
+      syncLightestFromSafeTop();
     };
 
     /** Match reference DEMAND LOAD: whole kips as integers; decimals only when needed */
@@ -499,20 +889,26 @@
       }
 
       updateSlenderKL();
+      // Safe sections depend on demand + governing lengths; computed when CSV is ready.
+      loadWShapesFromCsv().then(updateSafeSections);
     };
 
     const steelEl = input('sfCompDesSteel');
     const fyEl = input('sfCompDesFy');
     const fuEl = input('sfCompDesFu');
-    populateStructuralSteelGradeSelect(steelEl, 'a992');
+    populateStructuralSteelGradeSelect(steelEl, getPreferredStructuralSteelGradeId() || 'a992');
 
     const syncSteel = () => {
       if (!steelEl || steelEl.value === 'custom') {
+        if (fyEl) fyEl.readOnly = false;
         if (fuEl) fuEl.readOnly = false;
         return;
       }
       const g = steelPropsFromStructuralGradeSelect(steelEl.value);
-      if (g && fyEl) fyEl.value = String(g.fy);
+      if (g && fyEl) {
+        fyEl.value = String(g.fy);
+        fyEl.readOnly = true;
+      }
       if (g && fuEl) {
         fuEl.value = String(g.fu);
         fuEl.readOnly = true;
@@ -530,6 +926,8 @@
 
     syncSteel();
     updateDemand();
+    // Ensure the safe table is computed on initial load.
+    loadWShapesFromCsv().then(updateSafeSections);
 
     // #region agent log
     fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', {
@@ -1154,6 +1552,12 @@
       panelRoot ??
       document;
     attachModeToggle(compRoot, { topic: 'BENDING' });
+    if (window.SteelForge?.initBendingAnalysis) {
+      window.SteelForge.initBendingAnalysis(panelRoot ?? document);
+    }
+    if (window.SteelForge?.initBendingDesign) {
+      window.SteelForge.initBendingDesign(panelRoot ?? document);
+    }
   };
 
   window.SteelForge.initTension = (panelRoot) => {
@@ -1163,6 +1567,12 @@
       panelRoot ??
       document;
     attachModeToggle(compRoot, { topic: 'TENSION' });
+    if (window.SteelForge?.initTensionAnalysis) {
+      window.SteelForge.initTensionAnalysis(panelRoot ?? document);
+    }
+    if (window.SteelForge?.initTensionDesign) {
+      window.SteelForge.initTensionDesign(panelRoot ?? document);
+    }
   };
 
   function attachShearThumbs(root) {
@@ -1275,6 +1685,11 @@
     else selectEl.value = ids.has(preferredId) ? preferredId : grades[0].id;
   }
 
+  function getPreferredStructuralSteelGradeId() {
+    const activeId = window.SteelForge?.activeStructuralSteelGrade?.id;
+    return activeId || 'a992';
+  }
+
   function attachShearAnalysis(root) {
     const pane = root.querySelector('.sf-comp__mode[data-comp-mode-pane="analysis"]');
     if (!pane) return;
@@ -1293,7 +1708,7 @@
     const shapeSel = input('sfShearAnaShape');
     const steelEl = input('sfShearAnaSteel');
 
-    populateStructuralSteelGradeSelect(steelEl, 'a992');
+    populateStructuralSteelGradeSelect(steelEl, getPreferredStructuralSteelGradeId());
 
     const fmtGeom = (v, maxDecimals = 4) => {
       if (!Number.isFinite(v)) return '';
@@ -1304,6 +1719,16 @@
     const shapeAw = (s) => (s && (s.Aw ?? s.aw)) ?? null;
     const shapeLambdaW = (s) => (s && (s.lambdaW ?? s.lambda_w)) ?? null;
     const shapeLambdaF = (s) => (s && (s.lambdaF ?? s.lambda_f)) ?? null;
+
+    const setManualGeometryMode = (isManual) => {
+      const hEl = input('sfShearAnaH');
+      const awEl = input('sfShearAnaAw');
+      const lamEl = input('sfShearAnaLambda');
+      if (hEl) hEl.readOnly = !isManual;
+      if (awEl) awEl.readOnly = !isManual;
+      // λ is always derived from geometry for strict consistency with CSV-derived h/tw.
+      if (lamEl) lamEl.readOnly = true;
+    };
 
     const applySteelGradeProps = () => {
       const fyEl = input('sfShearAnaFy');
@@ -1329,6 +1754,22 @@
     const applyCatalogDefaults = () => {
       const Eel = input('sfShearAnaE');
       if (Eel) Eel.value = '29000';
+    };
+
+    const normalizeInputs = () => {
+      const norm = (id, d = 4, min = 0) => {
+        const el = input(id);
+        if (!el) return;
+        const v = parseNum(el.value);
+        if (!Number.isFinite(v)) return;
+        el.value = fmtNum(Math.max(min, v), d);
+      };
+      norm('sfShearAnaA', 4, 0);
+      norm('sfShearAnaH', 4, 0);
+      norm('sfShearAnaFy', 3, 0);
+      norm('sfShearAnaFu', 3, 0);
+      norm('sfShearAnaAw', 4, 0);
+      norm('sfShearAnaVu', 3, 0);
     };
 
     const syncWebSpacingAndKv = () => {
@@ -1359,6 +1800,7 @@
       if (lamEl && lamVal != null) lamEl.value = fmtGeom(lamVal, 3);
       if (lamFEl) lamFEl.value = lamFVal != null ? fmtGeom(lamFVal, 3) : '';
       if (awEl && awVal != null) awEl.value = fmtGeom(awVal, 4);
+      setManualGeometryMode(false);
       applyCatalogDefaults();
       syncWebSpacingAndKv();
     };
@@ -1373,6 +1815,17 @@
       });
     }
 
+    const applyDefaultShapeOnLoad = () => {
+      if (!shapeSel || !shapes.length) return;
+      // Match workbook-style deterministic defaults used across modules.
+      const pref = shapes.find((s) => String(s.name || '').trim().toUpperCase() === 'W44X335');
+      const fallback = shapeNamesSorted[0] ?? null;
+      const chosen = pref ?? fallback;
+      if (!chosen) return;
+      shapeSel.value = chosen.name;
+      applyShape(chosen.name);
+    };
+
     const updateImageState = () => {
       const stiffened = (webCondEl?.value || 'stiffened') === 'stiffened';
       const plainImg = pane.querySelector('.sf-shearAna__imgEl--plain');
@@ -1382,6 +1835,7 @@
     };
 
     const update = () => {
+      normalizeInputs();
       syncWebSpacingAndKv();
       const fy = num('sfShearAnaFy');
       const aw = num('sfShearAnaAw');
@@ -1536,8 +1990,12 @@
     const kv0 = input('sfShearAnaKv');
     if (E0 && String(E0.value).trim() === '') E0.value = '29000';
     if (kv0 && String(kv0.value).trim() === '') kv0.value = '5';
+    if (E0) E0.readOnly = true;
+    if (kv0) kv0.readOnly = true;
+    setManualGeometryMode(!(shapeSel?.value));
     syncWebSpacingAndKv();
     if (shapeSel?.value) applyShape(shapeSel.value);
+    else applyDefaultShapeOnLoad();
 
     updateImageState();
     update();
@@ -1649,6 +2107,8 @@
     const designShapeImgs = pane.querySelectorAll('.sf-shearDes__shapeImg');
 
     const update = () => {
+      normalizeInputs();
+      syncSteelPropsFromGrade();
       const method = (input('sfShearDesMethod')?.value || 'lrfd').toLowerCase();
       const isLRFD = method === 'lrfd';
       const layout = METHOD_LAYOUT[isLRFD ? 'lrfd' : 'asd'];
@@ -1867,12 +2327,13 @@
 
     const steelTypeEl = input('sfShearDesSteelType');
     const fyEl = input('sfShearDesFy');
-    populateStructuralSteelGradeSelect(steelTypeEl, 'a992');
+    populateStructuralSteelGradeSelect(steelTypeEl, getPreferredStructuralSteelGradeId());
 
     const syncSteelPropsFromGrade = () => {
       const fuEl = input('sfShearDesFu');
       if (!steelTypeEl || !fyEl) return;
       if (steelTypeEl.value === 'custom') {
+        fyEl.readOnly = false;
         if (fuEl) {
           fuEl.value = '';
           fuEl.readOnly = false;
@@ -1882,11 +2343,27 @@
       const g = steelPropsFromStructuralGradeSelect(steelTypeEl.value);
       if (g) {
         fyEl.value = String(g.fy);
+        fyEl.readOnly = true;
         if (fuEl) {
           fuEl.value = String(g.fu);
           fuEl.readOnly = true;
         }
       }
+    };
+
+    const normalizeInputs = () => {
+      const norm = (id, d = 3, min = 0) => {
+        const el = input(id);
+        if (!el) return;
+        const v = parseNum(el.value);
+        if (!Number.isFinite(v)) return;
+        el.value = fmtNum(Math.max(min, v), d);
+      };
+      norm('sfShearDesFy', 3, 0);
+      norm('sfShearDesFu', 3, 0);
+      norm('sfShearDesDL', 4, 0);
+      norm('sfShearDesLL', 4, 0);
+      norm('sfShearDesL', 3, 0);
     };
 
     pane.querySelectorAll('input, select').forEach((el) => {
@@ -1902,11 +2379,47 @@
     update();
   }
 
+  window.SteelForge.initTensionRod = (panelRoot) => {
+    const compRoot =
+      panelRoot?.querySelector?.('.sf-comp.sf-comp--tensionRod') ??
+      panelRoot?.querySelector?.('.sf-comp') ??
+      panelRoot ??
+      document;
+    attachModeToggle(compRoot, { topic: 'TENSION ROD' });
+    if (window.SteelForge?.initTensionRodAnalysis) {
+      window.SteelForge.initTensionRodAnalysis(panelRoot ?? document);
+    }
+    if (window.SteelForge?.initTensionRodDesign) {
+      window.SteelForge.initTensionRodDesign(panelRoot ?? document);
+    }
+    const tr =
+      compRoot?.classList?.contains?.('sf-comp--tensionRod') ? compRoot : compRoot?.querySelector?.('.sf-comp--tensionRod');
+    const nav = tr?.querySelector?.('.sf-comp__modeNav');
+    if (nav && tr && !tr.dataset.sfRodModeSync) {
+      tr.dataset.sfRodModeSync = '1';
+      nav.addEventListener('click', () => {
+        requestAnimationFrame(() => {
+          const active = tr.querySelector('.sf-comp__mode.is-active');
+          const m = active?.getAttribute('data-comp-mode-pane');
+          if (m === 'analysis') window.SteelForge?.__tensionRodRecomputeAnalysis?.();
+          if (m === 'design') window.SteelForge?.__tensionRodRecomputeDesign?.();
+        });
+      });
+    }
+  };
+
   window.SteelForge.initShear = (panelRoot) => {
     const root = panelRoot.querySelector('.sf-comp') ? panelRoot : document;
     attachModeToggle(root, { topic: 'SHEAR' });
     attachShearThumbs(root);
-    attachShearAnalysis(root);
-    attachShearDesign(root);
+    const runAttach = () => {
+      attachShearAnalysis(root);
+      attachShearDesign(root);
+    };
+    if (typeof window.SteelForge?.ensureShearShapesFromCsv === 'function') {
+      window.SteelForge.ensureShearShapesFromCsv().finally(runAttach);
+    } else {
+      runAttach();
+    }
   };
 })();

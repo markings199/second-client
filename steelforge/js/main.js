@@ -37,6 +37,29 @@
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  function initOverviewNavigation(root) {
+    if (!root) return;
+    const actions = Array.from(root.querySelectorAll('[data-overview-page]'));
+    if (actions.length === 0) return;
+    const allowed = new Set(Array.from(allowedPages));
+    actions.forEach((el) => {
+      const target = el.getAttribute('data-overview-page');
+      if (!target || !allowed.has(target)) return;
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', () => loadPage(target));
+      if (el.tagName !== 'BUTTON') {
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        el.addEventListener('keydown', (evt) => {
+          if (evt.key === 'Enter' || evt.key === ' ') {
+            evt.preventDefault();
+            loadPage(target);
+          }
+        });
+      }
+    });
+  }
+
   async function animatePanelOut() {
     // If CSS isn't loaded yet, or user prefers reduced motion, keep it instant.
     if (!window.matchMedia || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -105,12 +128,6 @@
       panel.classList.toggle('comp-panel', true);
       panel.classList.toggle('comp-shell', !isCompression);
       panel.classList.toggle('sheet-panel', false);
-      panel.classList.toggle('steelgrade-no-scroll', safeId === 'steel-grade');
-      panel.classList.toggle('secprops-no-scroll', safeId === 'section-props');
-      document.body.classList.toggle('steelgrade-fullscreen', safeId === 'steel-grade');
-      document.documentElement.classList.toggle('steelgrade-fullscreen', safeId === 'steel-grade');
-      document.body.classList.toggle('secprops-fullscreen', safeId === 'section-props');
-      document.documentElement.classList.toggle('secprops-fullscreen', safeId === 'section-props');
 
       // Initialize calculators that need JS binding after HTML injection.
       try {
@@ -125,6 +142,18 @@
         }
         if (safeId === 'shear' && window.SteelForge?.initShear) {
           window.SteelForge.initShear(panel);
+        }
+        if (safeId === 'steel-grade' && window.SteelForge?.initSteelGrade) {
+          window.SteelForge.initSteelGrade(panel);
+        }
+        if (safeId === 'section-props' && window.SteelForge?.initSectionProps) {
+          window.SteelForge.initSectionProps(panel);
+        }
+        if (safeId === 'tension-rod' && window.SteelForge?.initTensionRod) {
+          window.SteelForge.initTensionRod(panel);
+        }
+        if (safeId === 'overview') {
+          initOverviewNavigation(panel);
         }
       } catch (_) {
         // ignore init failures to avoid breaking navigation

@@ -7,47 +7,45 @@
         <div class="sf-secprops__titleRow">
           <h2 class="sf-secprops__title">SECTION<br>PROPERTIES</h2>
           <div class="sf-secprops__searchWrap" aria-label="Search section type">
-            <input class="sf-secprops__search" type="text" aria-label="Search" />
+            <input class="sf-secprops__search" type="text" aria-label="Search" autocomplete="off" />
             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <ul class="sf-secprops__suggest" role="listbox" hidden></ul>
           </div>
         </div>
 
         <div class="sf-secprops__form">
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Weight (W)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">lb/ft</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Area (Ag)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in²</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Depth (d)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Web Thickness (tw)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Flange Width (bf)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Flange Thickness (tf)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Moment of Inertia @X (Ix)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in⁴</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Moment of Inertia @Y (Iy)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in⁴</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Moment of Inertia @Z (Iz)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in⁴</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Web Thickness (tw)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Flange Width (bf)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in</span></div>
-          <div class="sf-secprops__row"><span class="sf-secprops__label">Flange Thickness (tf)</span><span class="sf-secprops__pill"></span><span class="sf-secprops__unit">in</span></div>
+          <div class="sf-secprops__row"><span class="sf-secprops__label">Weight (W)</span><input class="sf-secprops__pill sf-secprops__val" type="text" readonly data-csv-col="4" aria-readonly="true" /><span class="sf-secprops__unit">lb/ft</span></div>
+          <div class="sf-secprops__row"><span class="sf-secprops__label">Area (Ag)</span><input class="sf-secprops__pill sf-secprops__val" type="text" readonly data-csv-col="5" aria-readonly="true" /><span class="sf-secprops__unit">in²</span></div>
+          <div class="sf-secprops__row"><span class="sf-secprops__label">Depth (d)</span><input class="sf-secprops__pill sf-secprops__val" type="text" readonly data-csv-col="6" aria-readonly="true" /><span class="sf-secprops__unit">in</span></div>
+          <div class="sf-secprops__row"><span class="sf-secprops__label">Web Thickness (tw)</span><input class="sf-secprops__pill sf-secprops__val" type="text" readonly data-csv-col="8" aria-readonly="true" /><span class="sf-secprops__unit">in</span></div>
+          <div class="sf-secprops__row"><span class="sf-secprops__label">Flange Width (bf)</span><input class="sf-secprops__pill sf-secprops__val" type="text" readonly data-csv-col="12" aria-readonly="true" /><span class="sf-secprops__unit">in</span></div>
+          <div class="sf-secprops__row"><span class="sf-secprops__label">Flange Thickness (tf)</span><input class="sf-secprops__pill sf-secprops__val" type="text" readonly data-csv-col="14" aria-readonly="true" /><span class="sf-secprops__unit">in</span></div>
+          <div class="sf-secprops__row"><span class="sf-secprops__label">Moment of Inertia @X (Ix)</span><input class="sf-secprops__pill sf-secprops__val" type="text" readonly data-csv-col="29" aria-readonly="true" /><span class="sf-secprops__unit">in⁴</span></div>
+          <div class="sf-secprops__row"><span class="sf-secprops__label">Moment of Inertia @Y (Iy)</span><input class="sf-secprops__pill sf-secprops__val" type="text" readonly data-csv-col="35" aria-readonly="true" /><span class="sf-secprops__unit">in⁴</span></div>
+          <div class="sf-secprops__row"><span class="sf-secprops__label">Moment of Inertia @Z (Iz)</span><input class="sf-secprops__pill sf-secprops__val" type="text" readonly data-csv-col="41" aria-readonly="true" /><span class="sf-secprops__unit">in⁴</span></div>
         </div>
       </section>
 
       <section class="sf-secprops__panel sf-secprops__panel--right" aria-label="Section Type Cards">
-        <article class="sf-secprops__shape">
+        <article class="sf-secprops__shape sf-secprops__shape--active" data-sf-family="w" role="button" tabindex="0">
           <div class="sf-secprops__shapeArt">
             <img class="sf-secprops__shapeImg" src="./assets/sections/DESIGN_4.png" alt="W shape diagram" />
           </div>
           <div class="sf-secprops__shapeLabel">W - SHAPES</div>
         </article>
-        <article class="sf-secprops__shape">
+        <article class="sf-secprops__shape" data-sf-family="angle" role="button" tabindex="0">
           <div class="sf-secprops__shapeArt">
             <img class="sf-secprops__shapeImg" src="./assets/sections/DESIGN_3.png" alt="Angle section diagram" />
           </div>
           <div class="sf-secprops__shapeLabel">ANGLES</div>
         </article>
-        <article class="sf-secprops__shape">
+        <article class="sf-secprops__shape" data-sf-family="c" role="button" tabindex="0">
           <div class="sf-secprops__shapeArt">
             <img class="sf-secprops__shapeImg" src="./assets/sections/DESIGN_2.png" alt="C shape diagram" />
           </div>
           <div class="sf-secprops__shapeLabel">C - SHAPES</div>
         </article>
-        <article class="sf-secprops__shape">
+        <article class="sf-secprops__shape" data-sf-family="hss" role="button" tabindex="0">
           <div class="sf-secprops__shapeArt">
             <img class="sf-secprops__shapeImg" src="./assets/sections/DESIGN_1.png" alt="HSS section diagram" />
           </div>
@@ -57,8 +55,7 @@
         <section class="sf-secprops__dyk" aria-label="Did you know">
           <div class="sf-secprops__dykTitle">DYK?</div>
           <p class="sf-secprops__dykText">
-            L Etiam vehicula nisi id odio rhoncus, sit amet posuere ante interdum.
-            L Etiam vehicula nisi id odio rhoncus.
+            Values shown are read directly from <strong>exel program EWIWIWI(S(STEEL SELECTION)).csv</strong> (AISC-style columns).
           </p>
         </section>
       </section>

@@ -29,9 +29,10 @@
   };
 
   /**
-   * Client Excel steel grade table: ASTM designation with Fy / Fu (ksi).
+   * Workbook material table: ASTM designation with Fy / Fu (ksi).
+   * The STEEL SELECTION CSV export in this project lists section geometry only (W, HSS, 2L, …), not these grades.
    * `catalogId` matches the workbook row ID column where provided (rows 1–32).
-   * Duplicates in source (e.g. two A1065 Gr. 50 tensile values) are separate rows.
+   * Variants with different Fu (e.g. A1065 Gr. 50) are separate rows with distinct labels.
    */
   window.SteelForgeStructuralSteelGrades = [
     { catalogId: 1, id: 'a36', label: 'A36', fy: 36, fu: 58 },

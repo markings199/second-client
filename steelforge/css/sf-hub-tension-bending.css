@@ -27,7 +27,7 @@
   flex: 0 0 auto !important;
   max-height: none !important;
   height: auto !important;
-  min-height: min(560px, 78vh);
+  min-height: min(520px, 74vh);
   overflow: visible;
 }
 
@@ -5052,16 +5052,89 @@
 }
 
 .sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'].is-active > .sf-comp__card {
-  min-height: min(720px, 85vh);
+  min-height: min(650px, 78vh);
   height: auto !important;
+}
+
+/* ===== Tension Design layout polish (compact, same structure) ===== */
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__desGrid {
+  grid-template-columns: minmax(260px, 340px) minmax(220px, 280px) minmax(280px, 1fr);
+  gap: 12px;
+  padding: 6px 2px 4px;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__desRight {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__vizCard--under {
+  grid-column: 1 / span 2;
+  grid-row: 2;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__desMid,
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__desRight {
+  gap: 8px;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__card {
+  padding: 10px 12px 11px;
+  border-radius: 14px;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__row {
+  margin-bottom: 4px;
+  font-size: 0.69rem;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__reqLine {
+  margin-bottom: 6px;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__inp,
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__sel {
+  min-height: 27px;
+  font-size: 0.76rem;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__pillIce {
+  min-height: 25px;
+  font-size: 0.74rem;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tensDes__table {
+  font-size: 0.64rem;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tensDes__table th,
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tensDes__table td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__heroCard {
+  padding: 12px 12px;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__heroPill {
+  min-height: 38px;
+  font-size: 0.9rem;
+  padding: 7px 18px;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__renderImg {
+  max-height: 118px;
 }
 
 /* ========= Reference grids (tension analysis / design, bending analysis) ========= */
 .sf-tbRef__anaGrid {
   display: grid;
   grid-template-columns: minmax(340px, 460px) minmax(320px, 1fr);
-  gap: 18px;
-  padding: 8px 4px 6px;
+  gap: 14px;
+  padding: 6px 2px 4px;
   align-items: start;
   max-width: 100%;
 }
@@ -5069,7 +5142,7 @@
 .sf-tbRef__anaLeft {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -6130,7 +6203,8 @@
 
 /* ----- Analysis Tension / Analysis Bending only (design modes unchanged) ----- */
 .sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__anaGrid {
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 12px;
 }
 
 .sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__anaLeft {
@@ -6222,7 +6296,8 @@
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__bendShell {
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 16px;
+  gap: 12px;
+  padding: 8px 10px 6px;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__bendLeft,
@@ -6235,17 +6310,45 @@
 }
 
 .sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__anaLeft > .sf-tbRef__card:first-of-type {
-  padding-top: 26px;
+  padding-top: 20px;
 }
 
 .sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__methodBanner,
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__methodBanner {
-  margin: -16px -6px 14px;
-  padding: 12px 14px 14px;
+  margin: -10px -4px 10px;
+  padding: 10px 12px 10px;
   background: #ffffff;
   border-radius: 16px;
   border: 1px solid rgba(26, 45, 92, 0.1);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Tension analysis density pass: slightly smaller controls, same structure */
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__card {
+  padding: 10px 12px 11px;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__row {
+  margin-bottom: 4px;
+  font-size: 0.69rem;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__inp,
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__sel {
+  min-height: 27px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  font-size: 0.76rem;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__pillIce {
+  min-height: 25px;
+  font-size: 0.75rem;
+}
+
+.sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__propsGrid {
+  margin: 4px 0 8px;
+  gap: 6px 8px;
 }
 
 /* Bending reference keeps method row inline (not boxed/offset) */
@@ -6260,6 +6363,7 @@
 .sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__methodBanner .sf-tbRef__methodRow--refBanner,
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__methodBanner .sf-tbRef__methodRow--refBanner {
   margin-bottom: 0;
+  gap: 8px;
 }
 
 .sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__methodBanner .sf-tbRef__methodSel,
@@ -6267,6 +6371,22 @@
   background: #ffffff !important;
   border-color: rgba(26, 45, 92, 0.14) !important;
   box-shadow: inset 0 0 0 1px rgba(26, 45, 92, 0.05);
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__card {
+  padding: 10px 12px 11px;
+  border-radius: 14px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__row {
+  margin-bottom: 4px;
+  gap: 6px 8px;
+  font-size: 0.69rem;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__paramsHdr {
+  margin: 7px 0 5px;
+  font-size: 0.74rem;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__bendCompactTop .sf-tbRef__verdictBox {
@@ -6282,17 +6402,52 @@
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__sel--rect {
   background: #dbeafe !important;
   border-color: rgba(59, 130, 246, 0.22) !important;
+  min-height: 27px;
+  font-size: 0.75rem;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__outIce {
   background: linear-gradient(180deg, #e0f2fe 0%, #dbeafe 100%) !important;
   border-color: rgba(59, 130, 246, 0.18) !important;
+  min-height: 24px;
+  font-size: 0.73rem;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__verdictPill {
   min-width: 92px;
   min-height: 34px;
   font-size: 0.72rem;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__mnRow {
+  gap: 6px 8px;
+  margin-top: 4px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__mnVal {
+  min-width: 88px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capHero {
+  gap: 8px 10px;
+  margin: 8px 0 10px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capHeroSym {
+  font-size: 1rem;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capHeroOval {
+  min-width: 108px;
+  min-height: 46px;
+  padding: 7px 20px;
+  font-size: 1.02rem;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capHeroUnit {
+  font-size: 0.71rem;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__propsGrid--bend .sf-tbRef__kv,
@@ -6304,6 +6459,34 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__propsGrid--bend {
+  gap: 5px 8px;
+  margin: 4px 0 8px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__propsGrid--bend .sf-tbRef__kv {
+  grid-template-columns: minmax(16px, auto) minmax(0, 1fr) minmax(20px, auto);
+  gap: 4px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__row--select {
+  grid-template-columns: minmax(0, 1fr) minmax(116px, 1.15fr);
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__inp,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__sel,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__u,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__lab,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__reqLbl {
+  min-width: 0;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] #sfBendAnaSteel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Top deflection tabs beside main mode tabs (visible only on design mode) */
@@ -6376,8 +6559,13 @@
 
 .content-panel.comp-panel > .sf-comp.sf-comp--overview > .sf-comp__card {
   min-height: min(560px, 78vh);
+  max-height: min(88vh, 920px);
   height: auto !important;
   padding: 14px 16px 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
 }
 
 .sf-overview__head {
@@ -6521,10 +6709,46 @@
 
 .sf-comp--tensionRod .sf-rod__grid {
   display: grid;
-  grid-template-columns: minmax(290px, 0.95fr) minmax(0, 1.25fr);
-  gap: 14px;
+  grid-template-columns: minmax(274px, 0.92fr) minmax(0, 1.22fr);
+  gap: 10px;
   align-items: start;
-  padding: 8px 4px 6px;
+  padding: 6px 2px 4px;
+}
+
+.sf-comp--tensionRod .sf-rod__grid--design {
+  max-height: min(72vh, 820px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+/* Design tension rod: use full panel height (no cramped inner scroll) */
+.content-panel.comp-panel > .sf-comp.sf-comp--tensionRod > .sf-comp__mode[data-comp-mode-pane='design'].is-active > .sf-comp__card {
+  min-height: min(600px, 82vh);
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] .sf-rod__grid {
+  grid-template-columns: minmax(292px, 0.95fr) minmax(0, 1.2fr);
+  gap: 11px;
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] .sf-rod__grid--design {
+  max-height: none;
+  overflow: visible;
+  scrollbar-gutter: auto;
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__row--tri {
+  grid-template-columns: minmax(0, 1fr) minmax(86px, 156px) minmax(22px, auto);
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__reqLine {
+  grid-template-columns: minmax(0, 1fr) minmax(68px, 106px) minmax(24px, auto);
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] .sf-tbRef__reqLbl {
+  overflow-wrap: break-word;
 }
 
 .sf-comp--tensionRod .sf-rod__left,
@@ -6534,25 +6758,163 @@
 
 .sf-comp--tensionRod .sf-rod__right {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .sf-comp--tensionRod .sf-rod__status {
   text-align: center;
 }
 
+.sf-comp--tensionRod .sf-tbRef__card {
+  border-radius: 14px;
+  padding: 9px 11px 10px;
+}
+
+.sf-comp--tensionRod .sf-tbRef__methodRow {
+  margin-bottom: 5px;
+  gap: 8px;
+}
+
+.sf-comp--tensionRod .sf-tbRef__methodSel {
+  min-height: 29px;
+  font-size: 0.8rem;
+  padding: 0 26px 0 10px;
+}
+
+.sf-comp--tensionRod .sf-tbRef__paramsHdr {
+  margin: 7px 0 5px;
+  font-size: 0.73rem;
+}
+
+.sf-comp--tensionRod .sf-tbRef__paramsHdr--sub {
+  margin-top: 9px;
+  font-size: 0.69rem;
+}
+
+.sf-comp--tensionRod .sf-tbRef__row {
+  margin-bottom: 4px;
+  gap: 6px 8px;
+  font-size: 0.68rem;
+}
+
+.sf-comp--tensionRod .sf-tbRef__row--select {
+  grid-template-columns: minmax(0, 1fr) minmax(94px, 1.16fr);
+}
+
+.sf-comp--tensionRod .sf-tbRef__inp,
+.sf-comp--tensionRod .sf-tbRef__sel {
+  min-height: 27px;
+  font-size: 0.74rem;
+  padding: 3px 8px;
+}
+
+.sf-comp--tensionRod .sf-tbRef__pillIce {
+  min-height: 24px;
+  font-size: 0.72rem;
+}
+
+.sf-comp--tensionRod .sf-tbRef__reqLine {
+  margin-bottom: 4px;
+  gap: 6px;
+  font-size: 0.67rem;
+}
+
+.sf-comp--tensionRod .sf-tbRef__outIce,
+.sf-comp--tensionRod .sf-tbRef__outYellow {
+  min-height: 24px;
+  font-size: 0.73rem;
+}
+
+.sf-comp--tensionRod .sf-tbRef__heroPill {
+  min-height: 36px;
+  font-size: 0.86rem;
+  padding: 6px 16px;
+}
+
+.sf-comp--tensionRod .sf-tbRef__u {
+  font-size: 0.63rem;
+}
+
+.sf-comp--tensionRod .sf-rod__hint {
+  margin: 0 0 6px;
+  font-size: 0.66rem;
+  line-height: 1.28;
+}
+
 .sf-comp--tensionRod .sf-tbRef__heroPill {
   min-width: 88px;
+}
+
+/* Tension Rod (analysis/design): strict anti-overlap guards */
+.sf-comp--tensionRod .sf-rod__left,
+.sf-comp--tensionRod .sf-rod__right,
+.sf-comp--tensionRod .sf-tbRef__card,
+.sf-comp--tensionRod .sf-tbRef__card > * {
+  min-width: 0;
+}
+
+.sf-comp--tensionRod .sf-tbRef__methodPick,
+.sf-comp--tensionRod .sf-tbRef__methodPick--wide {
+  width: 100%;
+  max-width: 100%;
+}
+
+.sf-comp--tensionRod .sf-tbRef__methodSel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sf-comp--tensionRod .sf-tbRef__row--tri {
+  grid-template-columns: minmax(0, 1.1fr) minmax(70px, 130px) minmax(22px, auto);
+}
+
+.sf-comp--tensionRod .sf-tbRef__reqLine {
+  grid-template-columns: minmax(0, 1fr) minmax(58px, 92px) minmax(22px, auto);
+}
+
+.sf-comp--tensionRod .sf-tbRef__lab,
+.sf-comp--tensionRod .sf-tbRef__reqLbl {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sf-comp--tensionRod .sf-tbRef__u {
+  justify-self: end;
+}
+
+.sf-comp--tensionRod .sf-tbRef__outIce,
+.sf-comp--tensionRod .sf-tbRef__outYellow {
+  width: 100%;
+  max-width: 92px;
+  min-width: 58px;
+}
+
+/* Keep Fy/Fu row compact without clipping the ksi unit */
+.sf-comp--tensionRod .sf-tbRef__propsGrid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 8px;
+}
+
+.sf-comp--tensionRod .sf-tbRef__kv {
+  grid-template-columns: minmax(14px, auto) minmax(0, 1fr) minmax(18px, auto);
+  gap: 4px;
+  min-width: 0;
+}
+
+.sf-comp--tensionRod .sf-tbRef__kv .sf-tbRef__pillIce {
+  width: 100%;
+  min-width: 0;
 }
 
 /* ===== Bending design parity layout (client reference) ===== */
 /* Default: compact 3-column grid with explicit placement */
 .sf-comp--bending .sf-bendRef__designGrid {
   display: grid;
-  grid-template-columns: 1.08fr 1.18fr 1fr;
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, 1.14fr) minmax(0, 1fr);
   grid-auto-flow: row dense;
-  gap: 2px;
-  padding: 0 1px 2px;
+  gap: 6px;
+  padding: 2px 2px 4px;
   align-items: start;
 }
 
@@ -6566,7 +6928,7 @@
 
 .sf-comp--bending .sf-bendRef__card {
   border-radius: 16px;
-  padding: 4px 5px 5px;
+  padding: 6px 7px 7px;
 }
 
 .sf-comp--bending .sf-bendRef__params,
@@ -6623,15 +6985,17 @@
 /* Make card internals dense like the client reference (no wasted vertical rhythm) */
 .sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__reqLine {
   margin-bottom: 4px;
-  gap: 6px;
+  gap: 6px 8px;
+  grid-template-columns: minmax(0, 1fr) minmax(58px, 96px) minmax(22px, auto);
 }
 
 .sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__row {
   margin-bottom: 4px;
+  gap: 6px 8px;
 }
 
 .sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__paramsHdr {
-  margin: 4px 0 2px;
+  margin: 4px 0 3px;
 }
 
 .sf-comp--bending .sf-bendRef__renders {
@@ -6658,25 +7022,33 @@
 .sf-comp--bending .sf-bendRef__formulaChip {
   min-width: 118px;
   font-size: 0.66rem;
+  max-width: 100%;
 }
 
 .sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__reqLbl {
-  font-size: 0.6rem;
+  font-size: 0.62rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__u {
   font-size: 0.62rem;
+  justify-self: end;
+  min-width: 0;
 }
 
 .sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__outIce,
 .sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__outYellow {
-  min-height: 24px;
+  min-height: 23px;
+  min-width: 58px;
+  max-width: 96px;
+  width: 100%;
   padding: 2px 8px;
   font-size: 0.67rem;
 }
 
 .sf-comp--bending .sf-bendRef__compact .sf-tbRef__row--out {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(64px, 102px);
   gap: 8px;
 }
 
@@ -6707,6 +7079,14 @@
   margin: 2px 0 2px;
 }
 
+.sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__lab,
+.sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__inp,
+.sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__sel,
+.sf-comp--bending .sf-bendRef__designGrid .sf-tbRef__chip,
+.sf-comp--bending .sf-bendRef__designGrid .sf-bendRef__formulaChip {
+  min-width: 0;
+}
+
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__assumed2 {
   min-height: 0;
 }
@@ -6732,12 +7112,12 @@
 
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__loadWo {
   grid-column: 1;
-  grid-row: 3 / span 3;
+  grid-row: 3 / span 2;
 }
 
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__assumed2 {
   grid-column: 2;
-  grid-row: 3 / span 2;
+  grid-row: 3;
 }
 
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__defl {
@@ -6759,6 +7139,39 @@
 .sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__cap { grid-column: 2; grid-row: 3; }
 .sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__final { grid-column: 3; grid-row: 3; }
 .sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadW { grid-column: 2 / span 2; grid-row: 4; }
+
+/* With deflection: reduce excessive height pressure */
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__loadWo,
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__assumed1,
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__compact,
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__assumed2,
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__defl,
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__cap,
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__final {
+  min-height: 0;
+}
+
+/* Remarks rows: allow wider message pill and avoid tall stacked text */
+.sf-comp--bending .sf-bendRef__assumed1 .sf-tbRef__reqLine:last-child,
+.sf-comp--bending .sf-bendRef__final .sf-tbRef__reqLine:last-child {
+  grid-template-columns: minmax(78px, 0.8fr) minmax(0, 1.2fr);
+  align-items: start;
+}
+
+.sf-comp--bending #sfBendDesAss1Rm,
+.sf-comp--bending #sfBendDesRmN {
+  width: 100%;
+  max-width: 100%;
+  min-height: 30px;
+  border-radius: 10px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+  justify-content: flex-start;
+  line-height: 1.2;
+  padding: 6px 8px;
+  font-size: 0.63rem;
+}
 
 @media (max-width: 1200px) {
   .sf-tbRef__anaGrid,

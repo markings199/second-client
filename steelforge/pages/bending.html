@@ -192,7 +192,7 @@
             </div>
             <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ULTIMATE MOMENT (M<sub>u</sub>) =</span><span class="sf-tbRef__outIce sf-bendRef__formulaChip">WL²/8</span><span class="sf-tbRef__u"> </span></div>
             <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">MAX DEFLECTION (Δ<sub>max</sub>) =</span><span class="sf-tbRef__outIce sf-bendRef__formulaChip">WL⁴/185EI</span><span class="sf-tbRef__u"> </span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE MOMENT OF INERTIA I<sub>x</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm">—</span><span class="sf-tbRef__u">in⁴</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE MOMENT OF INERTIA I<sub>x</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesIxReqChip">—</span><span class="sf-tbRef__u">in⁴</span></div>
           </div>
         </section>
 
@@ -209,33 +209,33 @@
         <section class="sf-tbRef__card sf-bendRef__card sf-bendRef__loadWo" aria-label="Load without beam weight">
           <div class="sf-tbRef__paramsHdr">LOAD W/O BEAM WEIGHT</div>
           <div class="sf-bendDes__branch sf-bendDes__branch--noDefl">
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.2DL + 1.6LL =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips/ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.4DL =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips/ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">W<sub>u</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.2DL + 1.6LL =</span><span class="sf-tbRef__outIce" id="sfBendDesN_c12">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.4DL =</span><span class="sf-tbRef__outIce" id="sfBendDesN_c14">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">W<sub>u</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesN_Wu">—</span><span class="sf-tbRef__u">kips/ft</span></div>
             <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ULTIMATE MOMENT (M<sub>u</sub>) =</span><span class="sf-tbRef__outIce" id="sfBendDesMuN"></span><span class="sf-tbRef__u">kips·ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">DL+LL =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips/ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">W<sub>a</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">DL+LL =</span><span class="sf-tbRef__outIce" id="sfBendDesN_dlll">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">W<sub>a</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesN_Wa">—</span><span class="sf-tbRef__u">kips/ft</span></div>
             <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE MOMENT (M<sub>a</sub>) =</span><span class="sf-tbRef__outIce" id="sfBendDesMaN"></span><span class="sf-tbRef__u">kips·ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ASSUMING COMPACTION FOR Z<sub>x</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">in³</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ASSUMING COMPACTION FOR Z<sub>x</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesN_ZxReq">—</span><span class="sf-tbRef__u">in³</span></div>
           </div>
           <div class="sf-bendDes__branch sf-bendDes__branch--defl">
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.2DL + 1.6LL =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips/ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.4DL =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips/ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">W<sub>u</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.2DL + 1.6LL =</span><span class="sf-tbRef__outIce" id="sfBendDesY_c12">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">1.4DL =</span><span class="sf-tbRef__outIce" id="sfBendDesY_c14">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">W<sub>u</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesY_Wu">—</span><span class="sf-tbRef__u">kips/ft</span></div>
             <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ULTIMATE MOMENT (M<sub>u</sub>) =</span><span class="sf-tbRef__outIce" id="sfBendDesMuY"></span><span class="sf-tbRef__u">kips·ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">DL+LL =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips/ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">W<sub>a</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">DL+LL =</span><span class="sf-tbRef__outIce" id="sfBendDesY_dlll">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">W<sub>a</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesY_Wa">—</span><span class="sf-tbRef__u">kips/ft</span></div>
             <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE MOMENT (M<sub>a</sub>) =</span><span class="sf-tbRef__outIce" id="sfBendDesMaY"></span><span class="sf-tbRef__u">kips·ft</span></div>
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ASSUMING COMPACTION FOR Z<sub>x</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">in³</span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ASSUMING COMPACTION FOR Z<sub>x</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesY_ZxReq">—</span><span class="sf-tbRef__u">in³</span></div>
           </div>
         </section>
 
         <section class="sf-tbRef__card sf-bendRef__card sf-bendRef__loadW" aria-label="Load with beam weight">
           <div class="sf-tbRef__paramsHdr">LOAD WITH BEAM WEIGHT</div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ULTIMATE WEIGHT W<sub>u</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips/ft</span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ULTIMATE MOMENT M<sub>u</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips·ft</span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE WEIGHT W<sub>a</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips/ft</span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE MOMENT M<sub>a</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">kips·ft</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ULTIMATE WEIGHT W<sub>u</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesLwWu">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ULTIMATE MOMENT M<sub>u</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesLwMu">—</span><span class="sf-tbRef__u">kips·ft</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE WEIGHT W<sub>a</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesLwWa">—</span><span class="sf-tbRef__u">kips/ft</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE MOMENT M<sub>a</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesLwMa">—</span><span class="sf-tbRef__u">kips·ft</span></div>
         </section>
         </div>
 
@@ -247,49 +247,49 @@
           <div class="sf-bendDes__branch sf-bendDes__branch--defl">
             <div class="sf-tbRef__paramsHdr">ASSUMED SECTION BY Z<sub>x</sub></div>
           </div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">STEEL SECTION =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm">—</span><span class="sf-tbRef__u"></span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">STEEL SECTION =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesAss1Sec">—</span><span class="sf-tbRef__u"></span></div>
           <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">PLASTIC MODULUS Z<sub>x</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesZxY"></span><span class="sf-tbRef__u">in³</span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">WEIGHT W =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">lb/ft</span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ELASTIC SECTION S<sub>x</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">in³</span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">λ<sub>f</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">-</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">WEIGHT W =</span><span class="sf-tbRef__outIce" id="sfBendDesAss1W">—</span><span class="sf-tbRef__u">lb/ft</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ELASTIC SECTION S<sub>x</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesAss1Sx">—</span><span class="sf-tbRef__u">in³</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">λ<sub>f</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesAss1Lf">—</span><span class="sf-tbRef__u">-</span></div>
           <div class="sf-bendDes__branch sf-bendDes__branch--defl">
-            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">REMARKS =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm">—</span><span class="sf-tbRef__u"></span></div>
+            <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">REMARKS =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesAss1Rm">—</span><span class="sf-tbRef__u"></span></div>
           </div>
         </section>
 
         <section class="sf-tbRef__card sf-bendRef__card sf-bendRef__compact" aria-label="Check compactness">
           <div class="sf-tbRef__paramsHdr">CHECK COMPACTNESS</div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">λ<sub>pf</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u"></span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">λ<sub>rf</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u"></span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">λ<sub>pf</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesLpf">—</span><span class="sf-tbRef__u"></span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">λ<sub>rf</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesLrf">—</span><span class="sf-tbRef__u"></span></div>
           <div class="sf-tbRef__row sf-tbRef__row--out">
             <span class="sf-tbRef__lab">VERDICT</span>
-            <span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm">COMPACT FLANGE</span>
+            <span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesVerdict">COMPACT FLANGE</span>
             <span class="sf-tbRef__u"></span>
           </div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">NOMINAL MOMENT STRENGTH M<sub>n</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm">—</span><span class="sf-tbRef__u">kips·ft</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">NOMINAL MOMENT STRENGTH M<sub>n</sub> =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesMn">—</span><span class="sf-tbRef__u">kips·ft</span></div>
         </section>
 
         <section class="sf-tbRef__card sf-bendRef__card sf-bendRef__defl" aria-label="Deflection checks">
           <div class="sf-tbRef__paramsHdr">DEFLECTION</div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE DEFLECTION</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u"></span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">ALLOWABLE DEFLECTION</span><span class="sf-tbRef__outIce" id="sfBendDesAllowDefl">—</span><span class="sf-tbRef__u"></span></div>
           <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">MAX DEFLECTION</span><span class="sf-tbRef__outIce" id="sfBendDesDeflY"></span><span class="sf-tbRef__u"></span></div>
         </section>
 
         <section class="sf-tbRef__card sf-bendRef__card sf-bendRef__assumed2" aria-label="Assumed section by inertia">
           <div class="sf-tbRef__paramsHdr">ASSUMED SECTION BY I<sub>x</sub></div>
           <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">STEEL SECTION =</span><span class="sf-tbRef__outYellow sf-tbRef__outYellow--sm" id="sfBendDesSecY"></span><span class="sf-tbRef__u"></span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">PLASTIC MODULUS Z<sub>x</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">in³</span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">SECTION MODULUS S<sub>x</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">in³</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">PLASTIC MODULUS Z<sub>x</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesIxZx">—</span><span class="sf-tbRef__u">in³</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">SECTION MODULUS S<sub>x</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesIxSx">—</span><span class="sf-tbRef__u">in³</span></div>
           <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">MOMENT OF INERTIA I<sub>x</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesIxY"></span><span class="sf-tbRef__u">in⁴</span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">λ<sub>f</sub> =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">-</span></div>
-          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">WEIGHT W =</span><span class="sf-tbRef__outIce">—</span><span class="sf-tbRef__u">lb/ft</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">λ<sub>f</sub> =</span><span class="sf-tbRef__outIce" id="sfBendDesIxLf">—</span><span class="sf-tbRef__u">-</span></div>
+          <div class="sf-tbRef__reqLine"><span class="sf-tbRef__reqLbl">WEIGHT W =</span><span class="sf-tbRef__outIce" id="sfBendDesIxW">—</span><span class="sf-tbRef__u">lb/ft</span></div>
         </section>
 
         <section class="sf-tbRef__card sf-bendRef__card sf-bendRef__cap" aria-label="Bending capacity">
           <div class="sf-tbRef__paramsHdr">BENDING CAPACITY</div>
           <div class="sf-tbRef__capHero">
-            <span class="sf-tbRef__capHeroSym">M<sub>u</sub> =</span>
-            <span class="sf-tbRef__capHeroOval">—</span>
+            <span class="sf-tbRef__capHeroSym" id="sfBendDesCapSym">M<sub>u</sub> =</span>
+            <span class="sf-tbRef__capHeroOval" id="sfBendDesCapVal">—</span>
             <span class="sf-tbRef__capHeroUnit">kips·ft</span>
           </div>
         </section>

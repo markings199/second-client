@@ -34,20 +34,15 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   position: relative;
   color: var(--ink);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Dashboard-only fullscreen lock (do not affect other pages) */
 body.dash-fullscreen {
-  overflow: hidden;
-  height: 100%;
-}
-
-/* Steel Grade only: remove browser/page scrollbar */
-html.steelgrade-fullscreen,
-body.steelgrade-fullscreen {
   overflow: hidden;
   height: 100%;
 }
@@ -73,11 +68,12 @@ body::before {
 .notebook-full {
   position: relative;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
   background: var(--paper);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   z-index: 2;
   box-shadow: none;
   border: none;
@@ -440,13 +436,15 @@ body::before {
 
 /* dynamic content panel — clean area with calculation preview */
 .content-panel {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   background: #dfeaf1;
   margin: 0;
   border-radius: 0;
   border: 0;
   box-shadow: none;
-  overflow-y: auto;
+  overflow-y: visible;
+  overflow-x: visible;
   padding: 18px 22px;
   font-family: 'Inter', monospace;
 }
@@ -520,38 +518,13 @@ body::before {
    We reuse the existing comp-panel borders/texture, but for non-compression pages
    we enable scrolling + padding via .comp-shell. */
 .content-panel.comp-panel.comp-shell {
-  overflow-y: auto;
+  overflow-y: visible;
   overflow-x: hidden;
   padding: 18px 76px;
   display: block;
 }
 
-.content-panel.steelgrade-no-scroll {
-  overflow: hidden !important;
-}
-
-.content-panel.secprops-no-scroll {
-  overflow: hidden !important;
-}
-
-/* Hard-stop any remaining Section Props scrollbars */
-.content-panel.comp-panel:has(.sf-secprops) {
-  overflow: hidden !important;
-}
-
-html.secprops-fullscreen,
-body.secprops-fullscreen,
-.content-panel.secprops-no-scroll {
-  scrollbar-width: none; /* Firefox */
-}
-
-html.secprops-fullscreen::-webkit-scrollbar,
-body.secprops-fullscreen::-webkit-scrollbar,
-.content-panel.secprops-no-scroll::-webkit-scrollbar {
-  width: 0 !important;
-  height: 0 !important;
-  display: none !important;
-}
+/* Section Props: allow normal scrolling via .comp-shell (no fullscreen lock). */
 
 .content-panel.comp-panel.comp-shell > * {
   position: relative;
@@ -576,39 +549,39 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-grade {
   /* Manual sizing knobs (edit these values anytime) */
   --sf-grade-gray-w: 1120px; /* overall gray box width cap */
-  --sf-grade-gray-h: 560; /* set e.g. 560px to force height */
-  --sf-grade-gray-pad: 45px 45px; /* inner padding of gray box */
-  --sf-grade-cols-minh: 480px; /* inside grid minimum height */
-  --sf-grade-col-gap: 22px; /* space between left and right */
-  --sf-grade-right-gap: 14px; /* space between the 2 right white boxes */
+  --sf-grade-gray-min-h: 560px; /* desktop card height; grows on small screens */
+  --sf-grade-gray-pad: 26px 26px 22px; /* inner padding of gray box */
+  --sf-grade-cols-minh: 500px; /* inside grid minimum height */
+  --sf-grade-col-gap: 16px; /* space between left and right */
+  --sf-grade-right-gap: 12px; /* space between the 2 right white boxes */
 
   /* Manual table formatting knobs (left panel) */
-  --sf-grade-table-max-w: 460px; /* inset table width like your reference */
-  --sf-grade-table-pad: 8px; /* white margin around the table */
-  --sf-grade-table-font: 0.70rem; /* smaller = denser table */
-  --sf-grade-table-cell-pad-y: 5.8px; /* increase to make table taller */
+  --sf-grade-table-max-w: 100%;
+  --sf-grade-table-pad: 6px;
+  --sf-grade-table-font: 0.74rem;
+  --sf-grade-table-cell-pad-y: 5px;
   --sf-grade-table-cell-pad-x: 8px;
 
   /* Manual sizing knobs: right-top panel control widths */
-  --sf-grade-top-select-w: 235px; /* ASTM Designation dropdown width */
-  --sf-grade-mini-select-w: 145px; /* Fy dropdown width */
-  --sf-grade-blue-answer-w: 220px; /* blue answer pill width */
-  --sf-grade-selected-label-w: 120px; /* width of Designation/Fy/Fu label column */
-  --sf-grade-selected-gap: 10px; /* gap between label and yellow pill */
+  --sf-grade-top-select-w: 240px; /* ASTM Designation dropdown width */
+  --sf-grade-mini-select-w: 84%; /* Fy dropdown width */
+  --sf-grade-blue-answer-w: 84%; /* blue answer pill width */
+  --sf-grade-selected-label-w: 96px; /* width of Designation/Fy/Fu label column */
+  --sf-grade-selected-gap: 12px; /* gap between label and yellow pill */
 
   /* Manual text sizing knobs: "What is ASTM?" card */
-  --sf-grade-astm-title-size: 0.92rem;
-  --sf-grade-astm-body-size: 1.0rem;
-  --sf-grade-astm-body-lh: 1.40image.png;
+  --sf-grade-astm-title-size: 0.9rem;
+  --sf-grade-astm-body-size: 0.92rem;
+  --sf-grade-astm-body-lh: 1.4;
 
   /* Manual sizing knobs: the 3 white boxes inside the gray box */
-  --sf-grade-left-h:  487px; /* left table box height (set px if you want fixed) */
-  --sf-grade-right-top-h: 313px; /* right top box height */
-  --sf-grade-right-bottom-h: 158px; /* right bottom box height */
+  --sf-grade-left-h: 495px; /* left table box height (set px if you want fixed) */
+  --sf-grade-right-top-h: 350px; /* right top box height */
+  --sf-grade-right-bottom-h: 162px; /* right bottom box height */
 
   /* Manual sizing knobs: column widths (controls the overall size of the 3 boxes) */
-  --sf-grade-left-w: 0.5fr; /* left white box width */
-  --sf-grade-right-w: 0.5fr; /* right column width (top+bottom boxes) */
+  --sf-grade-left-w: 1.15fr; /* left white box width */
+  --sf-grade-right-w: 1fr; /* right column width (top+bottom boxes) */
 
   /* Manual positioning knobs (move the whole gray box) */
   --sf-grade-offset-x: 0px; /* +right / -left */
@@ -617,7 +590,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   --sf-grade-pad-bottom: 24px; /* space below the gray box */
 
   /* Manual positioning knobs: move each WHITE box (x/y) */
-  --sf-grade-left-box-x: 10px;
+  --sf-grade-left-box-x: 0px;
   --sf-grade-left-box-y: 0px;
   --sf-grade-right-top-box-x: 0px;
   --sf-grade-right-top-box-y: 0px;
@@ -633,10 +606,12 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 .sf-grade__card {
   width: min(var(--sf-grade-gray-w), 100%);
-  height: var(--sf-grade-gray-h);
+  min-height: var(--sf-grade-gray-min-h);
+  height: auto;
+  box-sizing: border-box;
   background: rgba(151, 148, 140, 0.95);
   border: 1px solid rgba(90, 86, 78, 0.25);
-  border-radius: 16px;
+  border-radius: 14px;
   box-shadow: 0 8px 18px rgba(0,0,0,0.10);
   padding: var(--sf-grade-gray-pad);
   position: relative;
@@ -669,7 +644,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 .sf-grade__panel {
   background: rgba(255,255,255,0.96);
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.06);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.60);
   min-height: 0;
@@ -678,12 +653,17 @@ body.secprops-fullscreen::-webkit-scrollbar,
 /* Manual height hooks for the 3 inner boxes */
 .sf-grade__panel--table {
   height: var(--sf-grade-left-h);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   transform: translate(var(--sf-grade-left-box-x), var(--sf-grade-left-box-y));
 }
 
 .sf-grade__panel--select {
-  height: var(--sf-grade-right-top-h);
+  min-height: var(--sf-grade-right-top-h);
+  height: auto;
   transform: translate(var(--sf-grade-right-top-box-x), var(--sf-grade-right-top-box-y));
+  overflow: hidden;
 }
 
 .sf-grade__panelInner {
@@ -691,24 +671,30 @@ body.secprops-fullscreen::-webkit-scrollbar,
   padding: 12px;
 }
 
-/* Left table panel: don't force extra empty space below the table */
+/* Left table panel: fill panel height so the table region scrolls inside */
 .sf-grade__panel--table .sf-grade__panelInner {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   height: auto;
 }
 
 .sf-grade__panelInner--select {
-  padding: 14px 14px 12px;
+  padding: 14px 14px 14px;
   /* keep right panel content tidy + consistent like reference */
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-sizing: border-box;
 }
 
 .sf-grade__tableWrap {
-  height: auto;
-  max-height: 100%;
+  flex: 1;
+  min-height: 0;
   /* keep the outer border from getting clipped */
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: 10px;
   background: #ffffff;
   display: flex;
@@ -725,17 +711,16 @@ body.secprops-fullscreen::-webkit-scrollbar,
   font-family: 'Inter', sans-serif;
   font-size: var(--sf-grade-table-font);
   color: #111;
-  table-layout: fixed;
+  table-layout: auto;
   border: 1px solid #111;
   box-sizing: border-box;
 }
 
 .sf-grade__table thead th {
-  position: sticky;
-  top: 0;
+  position: static;
   background: #fff;
   padding: var(--sf-grade-table-cell-pad-y) var(--sf-grade-table-cell-pad-x);
-  font-weight: 900;
+  font-weight: 800;
   text-align: center;
   white-space: nowrap;
   border: 1px solid #111;
@@ -752,9 +737,26 @@ body.secprops-fullscreen::-webkit-scrollbar,
   text-align: left;
 }
 
+.sf-grade__table tbody tr {
+  cursor: pointer;
+}
+
+.sf-grade__table tbody tr:hover {
+  background: rgba(142, 172, 203, 0.18);
+}
+
+.sf-grade__table tbody tr.sf-grade__row--active {
+  background: rgba(255, 235, 153, 0.45);
+}
+
+.sf-grade__table tbody tr:focus-visible {
+  outline: 2px solid rgba(62, 55, 49, 0.55);
+  outline-offset: -2px;
+}
+
 .sf-grade__row {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
+  grid-template-columns: 160px minmax(0, 1fr);
   gap: 10px;
   align-items: center;
 }
@@ -762,13 +764,13 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-grade__label {
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: rgba(62, 55, 49, 0.78);
 }
 
 .sf-grade__select {
   width: 100%;
-  height: 26px;
+  height: 30px;
   border-radius: 999px;
   border: 0;
   outline: none;
@@ -777,26 +779,27 @@ body.secprops-fullscreen::-webkit-scrollbar,
   padding: 0 12px;
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   color: rgba(62, 55, 49, 0.88);
 }
 
 .sf-grade__select--mini {
-  height: 24px;
+  height: 30px;
 }
 
 .sf-grade__triple {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 14px;
-  margin-top: -10px;
+  gap: 10px;
+  margin-top: 0;
   align-items: start;
 }
 
 .sf-grade__tripleCol {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   justify-items: stretch;
+  min-width: 0;
 }
 
 .sf-grade__select,
@@ -815,7 +818,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 /* Right-top panel: match the reference layout (full-width controls) */
 .sf-grade__panel--select .sf-grade__row {
-  grid-template-columns: 160px 1fr;
+  grid-template-columns: 200px 1fr;
   align-items: center;
 }
 
@@ -826,20 +829,45 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .sf-grade__panel--select .sf-grade__select {
-  height: 30px;
+  height: 32px;
+  border-radius: 18px;
+  line-height: 32px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .sf-grade__panel--select .sf-grade__select--mini {
-  height: 26px;
+  height: 32px;
+  line-height: 32px;
+}
+
+/* Steel Grade: hide dropdown indicator only for Fy field */
+.sf-grade__panel--select #sfGradeFy {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none !important;
+  padding-right: 12px; /* keep text inset after removing arrow */
+}
+
+.sf-grade__panel--select #sfGradeFy::-ms-expand {
+  display: none;
 }
 
 .sf-grade__panel--select .sf-grade__pill--blue {
-
-  height: 42px;
+  height: 40px;
   border-radius: 14px;
-  width: 160px;      /* <-- make shorter (try 180px–260px) */
+  width: var(--sf-grade-blue-answer-w);
   max-width: 100%;
-
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 12px;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: rgba(62, 55, 49, 0.92);
+  line-height: 1;
 }
 
 /* Make only specific controls shorter (override the full-width rule above) */
@@ -852,32 +880,56 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-grade__panel--select .sf-grade__select--mini {
   width: var(--sf-grade-mini-select-w);
   max-width: 100%;
+  justify-self: stretch;
+}
+
+.sf-grade__panel--select .sf-grade__tripleCol .sf-grade__select--mini,
+.sf-grade__panel--select .sf-grade__tripleCol .sf-grade__pill--blue {
+  width: var(--sf-grade-mini-select-w);
+  max-width: 100%;
   justify-self: start;
 }
 
 .sf-grade__panel--select .sf-grade__selectedTitle {
-  margin-top: 2px;
+  margin-top: 4px;
   width: var(--sf-grade-selected-label-w);
   max-width: none;
-  text-align: right; /* align with "Designation" label */
+  text-align: left;
 }
 
 .sf-grade__panel--select .sf-grade__selRow {
   grid-template-columns: var(--sf-grade-selected-label-w) 1fr;
   gap: var(--sf-grade-selected-gap);
   align-items: center;
+  min-width: 0;
 }
 
 .sf-grade__panel--select .sf-grade__selLabel {
   text-align: right;
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0.1px;
 }
 
 .sf-grade__panel--select .sf-grade__selRow .sf-grade__pill--yl {
-  width: min(280px, 100%);
+  width: 100%;
+  max-width: 100%;
+  height: 36px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: rgba(62, 55, 49, 0.94);
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .sf-grade__pill {
-  height: 30px;
+  height: 32px;
   border-radius: 999px;
   border: 0;
   background: rgba(142, 172, 203, 0.28);
@@ -893,7 +945,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .sf-grade__selected {
-  margin-top: 2px;
+  margin-top: 6px;
   display: grid;
   gap: 8px;
 }
@@ -901,8 +953,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-grade__selectedTitle {
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.76rem;
-  letter-spacing: 0.6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.8px;
   color: rgba(62, 55, 49, 0.70);
   margin-bottom: 2px;
 }
@@ -917,7 +969,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-grade__selLabel {
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: 0.76rem;
+  font-size: 0.9rem;
   color: rgba(62, 55, 49, 0.78);
   text-align: left;
 }
@@ -926,7 +978,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   height: var(--sf-grade-right-bottom-h);
   transform: translate(var(--sf-grade-right-bottom-box-x), var(--sf-grade-right-bottom-box-y));
   background: rgba(255,255,255,0.92);
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.06);
   box-shadow: 0 6px 16px rgba(0,0,0,0.06);
   display: grid;
@@ -934,6 +986,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   gap: 12px;
   padding: 14px 14px;
   align-items: start;
+  overflow: hidden;
 }
 
 .sf-grade__infoIcon {
@@ -960,11 +1013,17 @@ body.secprops-fullscreen::-webkit-scrollbar,
   line-height: var(--sf-grade-astm-body-lh);
   color: rgba(62, 55, 49, 0.70);
   font-weight: 400;
-  text-align: justify;
-  text-justify: inter-word;
+  text-align: left;
+  max-height: 112px;
+  overflow: auto;
+  padding-right: 4px;
 }
 
 @media (max-width: 980px) {
+  .sf-grade {
+    --sf-grade-gray-pad: 18px 16px 16px;
+    --sf-grade-col-gap: 12px;
+  }
   .sf-grade__cols {
     grid-template-columns: 1fr;
     min-height: unset;
@@ -972,9 +1031,29 @@ body.secprops-fullscreen::-webkit-scrollbar,
   .sf-grade__right {
     grid-template-rows: auto auto;
   }
+  .sf-grade__panel--table {
+    height: auto;
+    min-height: min(420px, 58vh);
+    max-height: 58vh;
+  }
+  .sf-grade__panel--select {
+    height: auto;
+    min-height: 320px;
+  }
+  .sf-grade__info {
+    height: auto;
+    min-height: var(--sf-grade-right-bottom-h);
+  }
 }
 
 @media (max-width: 560px) {
+  .sf-grade {
+    --sf-grade-selected-label-w: 90px;
+    --sf-grade-selected-gap: 8px;
+    --sf-grade-top-select-w: 100%;
+    --sf-grade-mini-select-w: 100%;
+    --sf-grade-blue-answer-w: 100%;
+  }
   .sf-grade__card {
     padding: 14px 14px 14px;
   }
@@ -984,6 +1063,20 @@ body.secprops-fullscreen::-webkit-scrollbar,
   }
   .sf-grade__selRow {
     grid-template-columns: 90px 1fr;
+  }
+  .sf-grade__triple {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .sf-grade__panel--select .sf-grade__selRow {
+    grid-template-columns: 78px 1fr;
+  }
+  .sf-grade__panel--select .sf-grade__selRow .sf-grade__pill--yl {
+    height: 34px;
+    font-size: 0.9rem;
+  }
+  .sf-grade__table {
+    font-size: 0.71rem;
   }
 }
 
@@ -1008,7 +1101,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 /* ===== Compression: fit-to-screen (no scroll, no unused gaps) ===== */
 .content-panel.comp-panel {
-  overflow: hidden;
+  overflow-y: visible;
+  overflow-x: visible;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -1027,9 +1121,9 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .content-panel.comp-panel > .sf-comp {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
-  height: 100%;
+  height: auto;
   width: 100%;
   max-width: none;
   margin: 0;
@@ -1048,7 +1142,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .content-panel.comp-panel > .sf-comp > .sf-comp__mode {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
 }
 
@@ -1060,9 +1154,32 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .content-panel.comp-panel > .sf-comp > .sf-comp__mode.is-active > .sf-comp__card {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
-  max-height: 100%;
+  max-height: none;
+}
+
+/* System-wide: disable inner "main container" scrollbars; use page-level scroll */
+.content-panel,
+.content-panel.comp-panel,
+.content-panel.comp-panel.comp-shell,
+.content-panel.comp-panel > .sf-comp,
+.content-panel.comp-panel > .sf-comp > .sf-comp__mode,
+.content-panel.comp-panel > .sf-comp > .sf-comp__mode.is-active,
+.content-panel.comp-panel > .sf-comp > .sf-comp__mode.is-active > .sf-comp__card {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.content-panel::-webkit-scrollbar,
+.content-panel.comp-panel::-webkit-scrollbar,
+.content-panel.comp-panel.comp-shell::-webkit-scrollbar,
+.content-panel.comp-panel > .sf-comp::-webkit-scrollbar,
+.content-panel.comp-panel > .sf-comp > .sf-comp__mode::-webkit-scrollbar,
+.content-panel.comp-panel > .sf-comp > .sf-comp__mode.is-active::-webkit-scrollbar,
+.content-panel.comp-panel > .sf-comp > .sf-comp__mode.is-active > .sf-comp__card::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 /* ===== Manual gray card height (Compression only) =====
@@ -1092,8 +1209,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
   --sf-compression-tabs-offset-top: 5px;
   /* Gray shell: sidebar + top row (compact + photos + CHECKING CAPACITY) + slenderness */
   /* Wide enough for PARAMETERS + ~400px slenderness table + rail + LIGHTEST without crushing columns */
-  --sf-compression-gray-w: 1420px;
-  --sf-compression-gray-h: 540px;
+  --sf-compression-gray-w: 100%;
+  --sf-compression-gray-h: 530px;
   /* DESIGN COMPRESSION — taupe outer shell height (default; same family as analysis gray shell) */
   --sf-compression-gray-h-design: 600px;
   /* Cap shell height — smaller chrome reserve = taller gray box (room + scroll inside taupe) */
@@ -1104,9 +1221,9 @@ body.secprops-fullscreen::-webkit-scrollbar,
     WHITE BOX WIDTH (analysis form panel: METHOD → LENGTH).
     Edit px only — larger = wider panel (try 340–440). Applied via width on .sf-compAna__sidebar.
   */
-  --sf-compAna-sidebar-w: 310px;
+  --sf-compAna-sidebar-w: 300px;
   /* Move panel sideways inside gray area (+ = right). */
-  --sf-compAna-sidebar-shift-x: 25px;
+  --sf-compAna-sidebar-shift-x: 20px;
   /* Whole right column (CHECK COMPACTNESS + Critical Slenderness): +Y = down */
   --sf-compAna-compact-shift-y: 0px;
   /* Pin column height: stretch = fill taupe row so slenderness table can grow; flex-start = content-height only */
@@ -1118,32 +1235,32 @@ body.secprops-fullscreen::-webkit-scrollbar,
   /* Space below slenderness card (capacity sits beside photos; keep 0 unless you stack extra blocks below) */
   --sf-compAna-gap-after-critical: 0px;
   /* Horizontal gap between compact | beam imgs | checking columns */
-  --sf-compAna-compact-grid-col-gap: 10px;
+  --sf-compAna-compact-grid-col-gap: 8px;
   /* Middle column width (beam visuals) */
-  --sf-compAna-beam-img-col-w: 240px;
+  --sf-compAna-beam-img-col-w: 232px;
   /* CHECKING CAPACITY column width (top row, right of beam photos) */
-  --sf-compAna-capacity-card-w: 275px;
+  --sf-compAna-capacity-card-w: 266px;
   /* Fine-tune CHECKING CAPACITY vertically inside top row (+ = down) */
   --sf-compAna-capacity-shift-y: 10px;
   /* CHECK COMPACTNESS gray card only: move without moving Critical Slenderness (+right / +down) */
   --sf-compAna-compact-card-shift-x: 0px;
   --sf-compAna-compact-card-shift-y: 5px;
   /* Right compactness card manual size */
-  --sf-compAna-compact-card-w: 308px;
+  --sf-compAna-compact-card-w: 300px;
   --sf-compAna-compact-card-min-h: 130px;
   /*
     CHECK COMPACTNESS height — edit ONLY this line to make the card taller/shorter (e.g. 200px, 220px).
     Use `auto` again if you want the card to shrink to content height.
   */
-  --sf-compAna-compact-card-h: 200px;
+  --sf-compAna-compact-card-h: 194px;
   /* Adds on top of min-height when you want a little extra without guessing total height */
   --sf-compAna-compact-card-extra-h: 0px;
   /* Fine-tune verdict pills vertically (+ = down) if needed after layout fixes */
   --sf-compAna-compact-badge-nudge-flange: 0px;
   --sf-compAna-compact-badge-nudge-web: 0px;
-  --sf-compAna-compact-title-font-size: 20px;
+  --sf-compAna-compact-title-font-size: 19px;
   /* Critical Slenderness card manual size/scale */
-  --sf-compAna-critical-card-w: 550px;
+  --sf-compAna-critical-card-w: 536px;
   /* Box height: keep `auto` for natural height; or set e.g. 480px / 52vh for a fixed tall box */
   --sf-compAna-critical-card-h: auto;
   /* Use min-content so the card cannot shrink shorter than rows + footer (0px caused overlap with CHECKING CAPACITY) */
@@ -1154,8 +1271,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
   /* Bottom padding inside beige card */
   --sf-compAna-critical-pad-bottom: 10px;
   --sf-compAna-critical-title-font-size: 12px;
-  --sf-compAna-critical-grid-cols: 44px 148px 52px 70px 56px 104px;
-  --sf-compAna-critical-col-gap: 6px;
+  --sf-compAna-critical-grid-cols: 42px 142px 50px 66px 54px 100px;
+  --sf-compAna-critical-col-gap: 5px;
   --sf-compAna-critical-row-gap: 2.5px;
   --sf-compAna-critical-select-h: 19px;
   --sf-compAna-critical-pill-h: 18px;
@@ -1204,7 +1321,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   height: auto;
   min-height: min(var(--sf-compression-gray-h-design), var(--sf-compression-gray-max-h-design));
   max-height: none;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: visible;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
@@ -1240,7 +1357,10 @@ body.secprops-fullscreen::-webkit-scrollbar,
   gap: 12px;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  /* Allow vertical scroll when viewport is small (analysis content can exceed the fixed gray shell height). */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   min-height: 0;
 }
 
@@ -1261,23 +1381,23 @@ body.secprops-fullscreen::-webkit-scrollbar,
     (Previously mid column minmax(min(100%,280px),1fr) + safeTable min-width could force overlap when space was tight.)
   */
   grid-template-columns:
-    minmax(0, min(var(--sf-compDes-stack-w, 358px), 100%))
+    minmax(0, min(var(--sf-compDes-stack-w, 344px), 100%))
     minmax(0, 1fr)
-    minmax(0, var(--sf-compDes-viz-w, clamp(220px, 22vw, 304px)));
+    minmax(0, var(--sf-compDes-viz-w, clamp(210px, 20vw, 286px)));
   grid-template-rows: auto auto;
-  column-gap: 12px;
-  row-gap: 10px;
+  column-gap: 10px;
+  row-gap: 8px;
   align-items: start;
   justify-items: stretch;
   /*
     Inset via padding — NOT margin on grid items (margin on grid children overflows into adjacent tracks → DEMAND/SAFE overlap).
     Extra padding-top so straddle tab pills (translateY(-50%)) stay inside the scrollport.
   */
-  padding: 14px 0 10px;
+  padding: 10px 0 8px;
   padding-inline-start: var(--sf-compAna-sidebar-shift-x, 25px);
   padding-inline-end: var(--sf-compAna-sidebar-shift-x, 25px);
   box-sizing: border-box;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: visible;
   max-width: 100%;
   min-height: 0;
@@ -1332,10 +1452,10 @@ body.secprops-fullscreen::-webkit-scrollbar,
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 6px 0;
+  gap: 4px 0;
   margin-left: 0;
-  width: var(--sf-compDes-sidebar-w, 404px);
-  max-width: min(var(--sf-compDes-sidebar-w, 404px), 100%);
+  width: var(--sf-compDes-sidebar-w, 390px);
+  max-width: min(var(--sf-compDes-sidebar-w, 390px), 100%);
   height: var(--sf-compDes-panel-h, auto);
   flex: 0 0 auto;
   align-self: flex-start;
@@ -1347,8 +1467,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
   background: transparent;
   border: none;
   box-shadow: none;
-  --sf-compAna-kv-label-w: 8.6rem;
-  --sf-compAna-input-w: 76px;
+  --sf-compAna-kv-label-w: 8.1rem;
+  --sf-compAna-input-w: 70px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compDes__sidebar.sf-compAna__sidebar::before {
@@ -1358,7 +1478,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compDes__sidebar .sf-compDes__paramsTitle {
   position: relative;
   z-index: 1;
-  margin: 4px 0 5px;
+  margin: 2px 0 4px;
   font-weight: 900;
   font-size: 0.82rem;
   letter-spacing: 0.65px;
@@ -1376,7 +1496,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compDes__sidebar .sf-compDes__steelBlock {
   padding-left: 0;
   margin-top: 2px;
-  gap: 4px;
+  gap: 3px;
   display: flex;
   flex-direction: column;
 }
@@ -1437,7 +1557,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
@@ -1464,14 +1584,14 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compDes__slenderRail .sf-compDes__beamPhotoTray {
   flex: 0 0 auto;
-  padding: 11px;
-  gap: 9px;
+  padding: 9px;
+  gap: 7px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compDes__slenderRail .sf-compDes__beamPhotoCard {
-  padding: 9px;
+  padding: 7px;
   aspect-ratio: 3 / 4;
-  max-height: min(40vh, 236px);
+  max-height: min(37vh, 216px);
 }
 
 /* Slenderness: horizontal scroll only; SAFE: see design .midScroll--safe block below. */
@@ -2263,9 +2383,9 @@ body.secprops-fullscreen::-webkit-scrollbar,
   margin-top: calc(var(--sf-compAna-compact-margin-top, 6px) + var(--sf-compAna-compact-shift-y, 0px));
   display: grid;
   grid-template-columns:
-    var(--sf-compAna-compact-card-w, 308px)
-    var(--sf-compAna-beam-img-col-w, 240px)
-    minmax(0, var(--sf-compAna-capacity-card-w, 275px));
+    minmax(var(--sf-compAna-compact-card-w, 308px), 1.08fr)
+    minmax(var(--sf-compAna-beam-img-col-w, 240px), 0.9fr)
+    minmax(var(--sf-compAna-capacity-card-w, 275px), 1fr);
   grid-template-rows: auto auto;
   column-gap: var(--sf-compAna-compact-grid-col-gap, 10px);
   row-gap: var(--sf-compAna-compact-stack-gap, 10px);
@@ -2274,7 +2394,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact > .sf-compCap {
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1;
   justify-self: stretch;
   margin-top: var(--sf-compAna-capacity-shift-y, 0px);
@@ -2291,7 +2411,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   grid-column: 1;
   grid-row: 1;
   justify-self: stretch;
-  width: var(--sf-compAna-compact-card-w, 240px);
+  width: 100%;
   height: var(--sf-compAna-compact-card-h, auto);
   min-height: calc(var(--sf-compAna-compact-card-min-h, 0px) + var(--sf-compAna-compact-card-extra-h, 0px));
   box-sizing: border-box;
@@ -2467,12 +2587,13 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact > .sf-compAnaCompact__imgCard {
-  grid-column: 2;
-  grid-row: 1;
+  grid-column: 3;
+  grid-row: 2;
   justify-self: stretch;
   width: 100%;
   max-width: 100%;
   min-height: var(--sf-compAna-compact-card-min-h, 75px);
+  margin-top: -12px;
   background: #d9d9d9;
   border-radius: 16px;
   padding: 6px;
@@ -2600,7 +2721,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 /* Bottom-right cell under CHECKING CAPACITY (grid col 3 row 2 — does not shift CRITICAL SLENDERNESS). */
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact > .sf-compAnaCompact__slotRightBelow {
   grid-column: 3;
-  grid-row: 2;
+  grid-row: 1;
   align-self: start;
   width: 100%;
   box-sizing: border-box;
@@ -2679,9 +2800,9 @@ body.secprops-fullscreen::-webkit-scrollbar,
   flex-direction: column;
   gap: var(--sf-compAna-critical-row-gap, 4px);
   align-self: start;
-  justify-self: start;
+  justify-self: stretch;
   min-height: var(--sf-compAna-critical-card-min-h, min-content);
-  width: min(var(--sf-compAna-critical-card-w, 500px), 100%);
+  width: 100%;
   max-width: 100%;
   height: var(--sf-compAna-critical-card-h, auto);
   margin-bottom: var(--sf-compAna-gap-after-critical, 0px);
@@ -2872,23 +2993,23 @@ body.secprops-fullscreen::-webkit-scrollbar,
   /* Head rows: label column hugs text; kv rows: fixed label width so “=” columns align (see reference) */
   --sf-compAna-kv-label-w: 5.1rem;
   --sf-compAna-kv-coord-label-w: 3.05rem;
-  --sf-compAna-input-w: 78px;
+  --sf-compAna-input-w: 72px;
   --sf-compAna-props-indent: 10px;
   /* LENGTH x|y gutter (overridden inside .sf-compAna__lengthBlock) */
-  --sf-compAna-length-col-gap: 24px;
+  --sf-compAna-length-col-gap: 16px;
   /* Head rows (method/shape/AISC): fixed columns so labels & pills stack + stay inside panel */
   --sf-compAna-head-label-col: 9.25rem;
   /* Second column width for method/shape/AISC pills (wider = room for tall LRFD chip) */
-  --sf-compAna-head-select-col: 132px;
+  --sf-compAna-head-select-col: 122px;
   /* Manual: ANALYSIS METHOD chip text (only row 1 label) */
   --sf-compAna-method-label-font-size: 0.8rem;
   /* Manual: LRFD / ASD — text + pill height (edit these for bigger/smaller) */
   --sf-compAna-method-select-font-size: 1.12rem;
-  --sf-compAna-method-select-height: 42px;
+  --sf-compAna-method-select-height: 38px;
   /* Manual: STEEL GRADE label + long-option dropdown */
   --sf-compAna-steel-label-font-size: 0.64rem;
   --sf-compAna-steel-select-font-size: 0.68rem;
-  --sf-compAna-steel-select-height: 30px;
+  --sf-compAna-steel-select-height: 28px;
   --sf-compAna-steel-select-wrap-w: min(204px, 100%);
   /* Manual: move STEEL GRADE row left/right (negative = left, positive = right) */
   --sf-compAna-steel-row-shift-x: -10px;
@@ -5388,21 +5509,21 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-secprops {
   /* ===== Manual size controls (edit these values) ===== */
   /* Match STEEL GRADE gray box sizing behavior */
-  --sf-secprops-gray-w: 1250px; /* overall gray box width cap */
-  --sf-secprops-gray-h: 560px; /* fixed gray box height */
+  --sf-secprops-gray-w: 1210px; /* overall gray box width cap */
+  --sf-secprops-gray-h: 540px; /* fixed gray box height */
   --sf-secprops-offset-x: 0px; /* +right / -left */
   --sf-secprops-offset-y: 0px; /* +down / -up */
   --sf-secprops-card-h: var(--sf-secprops-gray-h);
   --sf-secprops-card-w: min(var(--sf-secprops-gray-w), 100%);
   --sf-secprops-card-pad: 18px 20px 14px;
-  --sf-secprops-content-gap: 18px;
+  --sf-secprops-content-gap: 14px;
   --sf-secprops-left-right-ratio: 1.02fr 0.98fr;
   /* Inner padding (with fixed card + flex content height, left panel % height resolves — padding no longer “inflates” the white box). */
   --sf-secprops-left-pad-top: 10px;
-  --sf-secprops-left-pad-right: 80px;
-  --sf-secprops-left-pad-bottom: 80px;
+  --sf-secprops-left-pad-right: 20px;
+  --sf-secprops-left-pad-bottom: 20px;
   --sf-secprops-left-pad-left: 12px;
-  --sf-secprops-left-w: 92%;
+  --sf-secprops-left-w: 100%;
   /* Height of the left WHITE box (% of the gray row, or px). If it “does nothing”, set --sf-secprops-left-min-h to 0 — min-height wins over height when it is larger. */
   --sf-secprops-left-h: 100%;
   /* Floor height only: use 0 unless you need a minimum (e.g. 480px). Must be ≤ your target height or height: 10% etc. will not shrink the box. */
@@ -5411,9 +5532,9 @@ body.secprops-fullscreen::-webkit-scrollbar,
   --sf-secprops-left-max-h: none;
   /* No scrollbar inside the left white box (use hidden; was auto). */
   --sf-secprops-left-overflow-y: hidden;
-  --sf-secprops-left-offset-x: -3px;
+  --sf-secprops-left-offset-x: 0px;
   --sf-secprops-left-offset-y: 0px;
-  --sf-secprops-shape-h: 200px; /* main height for all 4 right boxes */
+  --sf-secprops-shape-h: 188px; /* main height for all 4 right boxes */
   --sf-secprops-shape-min-h: var(--sf-secprops-shape-h);
   --sf-secprops-shape1-h: var(--sf-secprops-shape-h); /* W-SHAPES */
   --sf-secprops-shape2-h: var(--sf-secprops-shape-h); /* ANGLES */
@@ -5429,8 +5550,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
   --sf-secprops-shape-art-pad: 6px;
   --sf-secprops-shape-img-fit: contain; /* contain = whole image visible (no crop) */
   --sf-secprops-shape-img-pos: center center;
-  --sf-secprops-shape-img-scale: 1.5;
-  --sf-secprops-shape-img-scale-x: 1.5; /* width stretch: >1 wider, <1 narrower */
+  --sf-secprops-shape-img-scale: 1.4;
+  --sf-secprops-shape-img-scale-x: 1.4; /* width stretch: >1 wider, <1 narrower */
   --sf-secprops-shape-img-scale-y: 1; /* height stretch: >1 taller, <1 shorter */
   --sf-secprops-shape-label-pad: 6px 8px 7px;
   --sf-secprops-shape-label-h: 34px;
@@ -5440,7 +5561,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   --sf-secprops-dyk-gap: 10px;
   --sf-secprops-dyk-title-size: 2rem;
   --sf-secprops-dyk-text-size: 0.74rem;
-  --sf-secprops-dyk-min-h: 80px;
+  --sf-secprops-dyk-min-h: 74px;
 
   /* ===== SECTION PROPERTIES — layout (rows, pills, gaps) =====
      Rows (Weight, Area, …):  label | blue pill | unit
@@ -5454,17 +5575,17 @@ body.secprops-fullscreen::-webkit-scrollbar,
      - Move whole left white panel: --sf-secprops-left-offset-x / -y (transform; box w/h unchanged)
      - Padding inside white box:   --sf-secprops-left-pad-left (shifts all content right; box w/h unchanged)
   */
-  --sf-secprops-form-offset-x: 50px;
-  --sf-secprops-form-offset-y: 50px;
-  --sf-secprops-form-scale-y: 1.2;
-  --sf-secprops-row-label-min: 13.25rem;
+  --sf-secprops-form-offset-x: 0px;
+  --sf-secprops-form-offset-y: 8px;
+  --sf-secprops-form-scale-y: 1;
+  --sf-secprops-row-label-min: 11.4rem;
   --sf-secprops-row-label-col: minmax(var(--sf-secprops-row-label-min), 1fr);
-  --sf-secprops-row-pill-w: 132px;
+  --sf-secprops-row-pill-w: 124px;
   --sf-secprops-row-unit-min: 3.25rem;
   --sf-secprops-row-gap-x: 14px;
   --sf-secprops-form-row-gap: 4px;
   --sf-secprops-form-row-min-h: 0px;
-  --sf-secprops-pill-h: 18px;
+  --sf-secprops-pill-h: 17px;
 
   /* ===== SECTION PROPERTIES — MANUAL TEXT SIZES (edit these only) =====
      File: steelforge/css/style.css  →  selector: .sf-secprops { ... }
@@ -5474,20 +5595,20 @@ body.secprops-fullscreen::-webkit-scrollbar,
      - Search field typing text:      --sf-secprops-search-font
      - Search magnifying glass icon:  --sf-secprops-search-icon-font
   */
-  --sf-secprops-title-size: 1.2rem;
+  --sf-secprops-title-size: 1.12rem;
   --sf-secprops-title-line-height: 1.1;
-  --sf-secprops-label-size: 1.16rem;
-  --sf-secprops-unit-size: 1.16rem;
+  --sf-secprops-label-size: 1.08rem;
+  --sf-secprops-unit-size: 1.08rem;
   --sf-secprops-search-font: 0.88rem;
   --sf-secprops-search-icon-font: 0.82rem;
   --sf-secprops-search-icon-offset-x: 0px; /* +right / -left (icon only) */
   --sf-secprops-search-icon-offset-y: 0px; /* +down / -up (icon only) */
   --sf-secprops-search-icon-left: 0px; /* +right / -left (icon only, direct) */
   --sf-secprops-search-h: 28px;
-  --sf-secprops-search-w: 250px;
-  --sf-secprops-search-offset-x: 5px; /* +right / -left */
-  --sf-secprops-search-offset-y: 1px; /* +down / -up */
-  --sf-secprops-shape-label-size: 1.25rem;
+  --sf-secprops-search-w: 240px;
+  --sf-secprops-search-offset-x: 0px; /* +right / -left */
+  --sf-secprops-search-offset-y: 0px; /* +down / -up */
+  --sf-secprops-shape-label-size: 1.14rem;
 
   --sf-secprops-card-bg: #aca59a;
   --sf-secprops-panel-bg: #ffffff;
@@ -5575,7 +5696,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-secprops__titleRow .sf-secprops__searchWrap {
   flex: 0 0 auto;
   align-self: flex-start;
-  margin-top: 2px;
+  margin-top: 0;
   margin-left: auto;
   transform: translate(
     var(--sf-secprops-search-offset-x),
@@ -5598,6 +5719,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .sf-secprops__searchWrap {
+  position: relative;
   width: var(--sf-secprops-search-w);
   height: var(--sf-secprops-search-h);
   border-radius: 999px;
@@ -5608,6 +5730,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   padding: 0 8px 0 10px;
   color: #51616f;
   gap: 6px;
+  z-index: 40;
 }
 
 .sf-secprops__search {
@@ -5634,7 +5757,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-secprops__form {
   display: grid;
   /* Equal row bands so the 12 properties stretch to fill the white box (no scroll; overflow hidden on panel). */
-  grid-template-rows: repeat(12, minmax(var(--sf-secprops-form-row-min-h), 1fr));
+  grid-template-rows: repeat(9, minmax(var(--sf-secprops-form-row-min-h), 1fr));
   gap: var(--sf-secprops-form-row-gap);
   margin-top: calc(2px + var(--sf-secprops-form-offset-y));
   margin-left: var(--sf-secprops-form-offset-x);
@@ -5685,6 +5808,59 @@ body.secprops-fullscreen::-webkit-scrollbar,
   justify-self: start;
 }
 
+.sf-secprops__suggest {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: 180px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid rgba(74, 71, 64, 0.22);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  -webkit-overflow-scrolling: touch;
+}
+
+.sf-secprops__suggestItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: var(--sf-secprops-search-font);
+  font-family: 'Inter', sans-serif;
+  color: var(--sf-secprops-text);
+}
+
+.sf-secprops__suggestItem:hover {
+  background: rgba(127, 158, 191, 0.22);
+}
+
+.sf-secprops__suggestEmpty {
+  padding: 8px 12px;
+  font-size: var(--sf-secprops-search-font);
+  font-family: 'Inter', sans-serif;
+  color: rgba(74, 71, 64, 0.75);
+}
+
+input.sf-secprops__val {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  line-height: var(--sf-secprops-pill-h);
+  padding: 0 6px;
+  cursor: default;
+}
+
+input.sf-secprops__val:focus {
+  outline: none;
+}
+
 .sf-secprops__unit {
   font-size: var(--sf-secprops-unit-size);
   color: #4f4b43;
@@ -5729,6 +5905,11 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-secprops__shape:nth-child(2) { height: var(--sf-secprops-shape2-h); }
 .sf-secprops__shape:nth-child(3) { height: var(--sf-secprops-shape3-h); }
 .sf-secprops__shape:nth-child(4) { height: var(--sf-secprops-shape4-h); }
+
+.sf-secprops__shape--active {
+  border-color: rgba(26, 45, 92, 0.5);
+  box-shadow: 0 0 0 2px rgba(74, 122, 180, 0.28);
+}
 
 .sf-secprops__shapeArt {
   flex: 1;
@@ -5839,7 +6020,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   /* Manual controls */
   /* Copy SECTION PROPS gray card size */
   --sf-shear-card-w: 1700px; /* max width cap (shrink/grow) */
-  --sf-shear-card-h: 570px;  /* fixed height */
+  --sf-shear-card-h: 540px;  /* fixed height */
   --sf-shear-card-min-w: 0px; /* optional minimum width */
 
   /* Shear gray box sizing + position (edit freely) */
@@ -5867,11 +6048,11 @@ body.secprops-fullscreen::-webkit-scrollbar,
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 340px 350px 1fr;
-  gap: 16px;
-  padding: 12px 14px 10px;
+  grid-template-columns: 320px 336px 1fr;
+  gap: 12px;
+  padding: 10px 10px 8px;
   align-items: stretch;
-  margin-left: 32px; /* <-- edit this number */
+  margin-left: 16px; /* <-- edit this number */
 
 }
 
@@ -5884,8 +6065,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
   max-width: none;
   min-height: 0;
   height: 100%;
-  border-radius: 14px;
-  padding: 12px 12px 10px;
+  border-radius: 12px;
+  padding: 10px 10px 8px;
   overflow: hidden;
 }
 
@@ -5908,8 +6089,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 8px;
   padding: 0 4px;
 }
 
@@ -5932,7 +6113,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 .sf-comp--shear .sf-shearAna__methodWrap {
   position: relative;
-  width: 86px;
+  width: 80px;
   flex: 0 0 auto;
 }
 
@@ -5940,7 +6121,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 24px;
+  height: 22px;
   border-radius: 8px;
   border: 1px solid rgba(105, 100, 90, 0.18);
   outline: none;
@@ -5951,7 +6132,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   padding: 0 24px 0 12px;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.92rem;
+  font-size: 0.84rem;
   letter-spacing: 0.2px;
   color: rgba(0,0,0,0.88);
   line-height: 1;
@@ -5972,29 +6153,29 @@ body.secprops-fullscreen::-webkit-scrollbar,
   position: relative;
   padding-top: 2px;
   /* Manual: push the input list down/up */
-  --sf-webcond-body-offset: 30px; /* increase to move DOWN, negative to move UP */
+  --sf-webcond-body-offset: 14px; /* increase to move DOWN, negative to move UP */
   /* Manual: spacing + sizing for the WEB CONDITION input list */
-  --sf-webcond-row-gap: 8px;        /* space between rows */
-  --sf-webcond-col-gap: 10px;       /* gap between label / input / unit */
+  --sf-webcond-row-gap: 6px;        /* space between rows */
+  --sf-webcond-col-gap: 8px;       /* gap between label / input / unit */
   --sf-webcond-label-w: 1fr;        /* label column width */
-  --sf-webcond-input-w: 130px;      /* input pill width */
-  --sf-webcond-unit-w: 34px;        /* unit column width */
-  --sf-webcond-input-h: 18px;       /* input pill height */
+  --sf-webcond-input-w: 122px;      /* input pill width */
+  --sf-webcond-unit-w: 30px;        /* unit column width */
+  --sf-webcond-input-h: 17px;       /* input pill height */
   --sf-webcond-input-font: 0.82rem; /* input text size */
 }
 
 /* WEB CONDITION header row (match reference pill look) */
 .sf-comp--shear .sf-shearAna__webHead {
   /* Manual sizing controls (edit these numbers) */
-  --sf-webcond-select-w: 175px; /* dropdown width */
-  --sf-webcond-select-h: 38px;  /* dropdown height */
+  --sf-webcond-select-w: 166px; /* dropdown width */
+  --sf-webcond-select-h: 34px;  /* dropdown height */
   --sf-webcond-font: 0.72rem;   /* dropdown text size */
 
   display: grid;
   grid-template-columns: 1fr var(--sf-webcond-select-w);
   gap: 12px;
   align-items: center;
-  margin: 2px 0 10px;
+  margin: 2px 0 8px;
   padding: 0 4px;
 }
 
@@ -6031,7 +6212,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   color: rgba(62, 55, 49, 0.88);
   outline: none;
   /* Manual: move WEB CONDITION answer field left/right */
-  margin-left: -15px; /* more negative = more LEFT, positive = RIGHT */
+  margin-left: -9px; /* more negative = more LEFT, positive = RIGHT */
 }
 
 .sf-comp--shear .sf-shearAna__webSelect:focus {
@@ -6324,31 +6505,31 @@ body.secprops-fullscreen::-webkit-scrollbar,
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: 6px 0 0;
+  padding: 4px 0 0;
 }
 
 .sf-comp--shear .sf-shearAna__imgBox {
   /* Manual controls (edit these anytime) */
-  --sf-shear-imgbox-maxw: 380px;
-  --sf-shear-imgbox-h: 240px;
-  --sf-shear-imgbox-gap: 10px;
-  --sf-shear-imgbox-pad: 14px;
+  --sf-shear-imgbox-maxw: 340px;
+  --sf-shear-imgbox-h: 206px;
+  --sf-shear-imgbox-gap: 8px;
+  --sf-shear-imgbox-pad: 10px;
   --sf-shear-imgbox-radius: 14px;
 
   --sf-shear-tile-radius: 12px;
 
   /* Left image (plain) controls */
-  --sf-shear-plain-w: 100px;       /* e.g. 140px | auto */
+  --sf-shear-plain-w: 88px;       /* e.g. 140px | auto */
   --sf-shear-plain-h: 100%;       /* e.g. 100% | 160px */
   --sf-shear-plain-fit: contain;  /* contain | cover */
   --sf-shear-plain-zoom: 1.00;    /* 1.0 = normal */
   --sf-shear-plain-pos: center;   /* e.g. center | 50% 40% */
 
   /* Right image (stiffened) controls */
-  --sf-shear-stiff-w: 100px;
+  --sf-shear-stiff-w: 88px;
   --sf-shear-stiff-h: 100%;
   --sf-shear-stiff-fit: contain;
   --sf-shear-stiff-zoom: 1.00;
@@ -6443,21 +6624,21 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 .sf-comp--shear .sf-shearAna__cap {
   width: 100%;
-  max-width: 300px;
+  max-width: 286px;
 }
 
 .sf-comp--shear .sf-shearAna__capTitle {
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  height: 22px;
+  height: 20px;
   border-radius: 999px;
   padding: 0 14px;
   background: rgba(245, 242, 229, 0.96);
   color: rgba(29, 120, 179, 0.95);
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   letter-spacing: 0.7px;
   text-transform: uppercase;
   margin-left: 0;
@@ -6468,24 +6649,24 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .sf-comp--shear .sf-shearAna__capBox {
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(246, 246, 246, 0.92);
   border: 2px solid rgba(255,255,255,0.90);
   box-shadow: inset 0 0 0 1px rgba(183, 196, 211, 0.45);
-  padding: 12px 12px 10px;
+  padding: 10px 10px 8px;
 }
 
 .sf-comp--shear .sf-shearAna__capRow {
   display: grid;
-  grid-template-columns: auto 132px auto;
+  grid-template-columns: minmax(0, 1fr) 120px auto;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .sf-comp--shear .sf-shearAna__capSym {
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   color: rgba(62, 55, 49, 0.88);
   white-space: nowrap;
 }
@@ -6505,7 +6686,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-comp--shear .sf-shearAna__capUnit {
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.95rem;
+  font-size: 0.84rem;
   color: rgba(62, 55, 49, 0.80);
   white-space: nowrap;
 }
@@ -6515,16 +6696,53 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .sf-comp--shear .sf-shearAna__capRow:first-child .sf-shear__input {
-  height: 30px;
+  height: 28px;
   border-radius: 999px;
   border: 0;
   background: rgba(255, 132, 28, 0.96);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.32);
   color: rgba(28, 22, 15, 0.96);
-  font-size: 1.02rem;
+  font-size: 0.94rem;
   font-weight: 900;
   text-align: center;
   padding: 0 12px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shear__label,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__capSym,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__capUnit {
+  min-width: 0;
+}
+
+/* Final strict cleanup: Analysis Shear page only */
+.content-panel.comp-panel > .sf-comp.sf-comp--shear > .sf-comp__mode[data-comp-mode-pane="analysis"].is-active > .sf-comp__card {
+  --sf-shear-card-h: 508px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shear__cols {
+  grid-template-columns: minmax(280px, 1fr) minmax(292px, 1fr) minmax(260px, 1fr);
+  gap: 10px;
+  padding: 8px 8px 6px;
+  margin-left: 0;
+  justify-content: stretch;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__right {
+  gap: 8px;
+  padding-top: 2px;
+  align-self: start;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__imgBox {
+  --sf-shear-imgbox-maxw: 258px;
+  --sf-shear-imgbox-h: 158px;
+  --sf-shear-imgbox-pad: 8px;
+  --sf-shear-plain-w: 78px;
+  --sf-shear-stiff-w: 78px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__cap {
+  max-width: 100%;
 }
 
 .sf-comp--shear .sf-shearAna__capRow:first-child .sf-shear__input::placeholder {
@@ -7230,28 +7448,28 @@ body.secprops-fullscreen::-webkit-scrollbar,
 /* ===== DESIGN SHEAR starter box (top-left only) ===== */
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__start {
   /* ===== SIZE CONTROLS (edit these only) ===== */
-  --des-box-w: 300px;          /* outer white box width */
+  --des-box-w: 286px;          /* outer white box width */
   --des-box-pad: 5px;          /* outer white box inner padding */
-  --des-box-min-h: 175px;      /* outer white box minimum height */
-  --des-top-gap: 12px;         /* top row spacing */
-  --des-steel-box-w: 410px;    /* assumed section box width */
-  --des-steel-box-offset-x: 40px; /* assumed section move left/right */
-  --des-steel-box-offset-y: 10px; /* assumed section move up/down */
-  --des-steel-box-min-h: 175px;/* assumed section box min height */
-  --des-steel-box-pad-x: 12px; /* assumed section horizontal padding */
-  --des-steel-box-pad-y: 9px;  /* assumed section vertical padding */
-  --des-steel-title-size: 0.96rem; /* assumed section title size */
-  --des-light-box-w: 320px;    /* lightest section box width */
-  --des-light-box-min-h: 100px; /* lightest section box height */
-  --des-light-box-offset-x: 50px; /* lightest section move left/right */
-  --des-light-box-offset-y: 35px; /* lightest section vertical offset */
-  --des-light-right-w: 220px;  /* lightest right panel width */
-  --des-light-left-w: 160px;   /* lightest left label panel width */
-  --des-light-left-h: 148px;   /* lightest left label panel height only */
-  --des-light-eq-size: 1.65rem;/* lightest '=' size */
-  --des-light-label-size: 1rem; /* lightest left text size */
-  --des-light-value-size: 1.75rem; /* lightest right value size */
-  --des-inner-min-h: 104px;    /* inner parameters box minimum height */
+  --des-box-min-h: 166px;      /* outer white box minimum height */
+  --des-top-gap: 10px;         /* top row spacing */
+  --des-steel-box-w: 390px;    /* assumed section box width */
+  --des-steel-box-offset-x: 24px; /* assumed section move left/right */
+  --des-steel-box-offset-y: 8px; /* assumed section move up/down */
+  --des-steel-box-min-h: 166px;/* assumed section box min height */
+  --des-steel-box-pad-x: 10px; /* assumed section horizontal padding */
+  --des-steel-box-pad-y: 8px;  /* assumed section vertical padding */
+  --des-steel-title-size: 0.9rem; /* assumed section title size */
+  --des-light-box-w: 292px;    /* lightest section box width */
+  --des-light-box-min-h: 88px; /* lightest section box height */
+  --des-light-box-offset-x: 22px; /* lightest section move left/right */
+  --des-light-box-offset-y: 30px; /* lightest section vertical offset */
+  --des-light-right-w: 192px;  /* lightest right panel width */
+  --des-light-left-w: 132px;   /* lightest left label panel width */
+  --des-light-left-h: 126px;   /* lightest left label panel height only */
+  --des-light-eq-size: 1.35rem;/* lightest '=' size */
+  --des-light-label-size: 0.86rem; /* lightest left text size */
+  --des-light-value-size: 1.4rem; /* lightest right value size */
+  --des-inner-min-h: 96px;    /* inner parameters box minimum height */
   --des-input-h: 16px;         /* input/select box height */
   --des-param-label-w: 122px;  /* PARAMETERS label column width (DL/LL/LENGTH alignment) */
   --des-fy-label-w: 34px;      /* Fy row label width */
@@ -7264,13 +7482,13 @@ body.secprops-fullscreen::-webkit-scrollbar,
   --des-fy-label-nudge: 0px;     /* Fy label: extra push toward right */
   --des-field-size: 0.72rem;   /* input/select text size */
   --des-base-row-w: calc(var(--des-box-w) + var(--des-steel-box-w) + var(--des-top-gap)); /* width of first two top boxes */
-  --des-beam-box-w: 390px;      /* BEAM LOAD box width */
-  --des-beam-box-min-h: 100px; /* BEAM LOAD box minimum height */
+  --des-beam-box-w: 370px;      /* BEAM LOAD box width */
+  --des-beam-box-min-h: 92px; /* BEAM LOAD box minimum height */
   --des-beam-box-max-w: 100%;  /* BEAM LOAD box max width */
   --des-beam-box-offset-y: 10px;  /* BEAM LOAD move up/down */
   --des-beam-box-offset-x: -2px;  /* BEAM LOAD move left/right */
-  --des-beam-box-pad-y: 12px;  /* BEAM LOAD box vertical padding */
-  --des-beam-box-pad-x: 9px;   /* BEAM LOAD box horizontal padding */
+  --des-beam-box-pad-y: 10px;  /* BEAM LOAD box vertical padding */
+  --des-beam-box-pad-x: 8px;   /* BEAM LOAD box horizontal padding */
   --des-beam-title-top: -9px;  /* BEAM LOAD title vertical position */
   --des-beam-title-left: 8px;  /* BEAM LOAD title horizontal position */
   --des-beam-title-h: 18px;    /* BEAM LOAD title height */
@@ -7318,21 +7536,21 @@ body.secprops-fullscreen::-webkit-scrollbar,
   --des-steeltype-select-w: 90px; /* STEEL TYPE dropdown width */
   --des-steeltype-select-h: 18px;  /* STEEL TYPE dropdown height */
   --des-steeltype-row-gap: 8px;    /* STEEL TYPE label/dropdown gap */
-  --des-condition-box-w: 520px;    /* CONDITION CHECKING box width */
-  --des-condition-box-min-h: 152px;/* CONDITION CHECKING box height */
-  --des-condition-box-offset-x: 440px; /* CONDITION CHECKING move left/right */
-  --des-condition-box-offset-y: 20px;   /* CONDITION CHECKING move up/down */
-  --des-ultimate-box-w: 520px;     /* ULTIMATE SHEAR box width */
+  --des-condition-box-w: calc(100% - var(--des-condition-box-offset-x) - 166px);    /* CONDITION CHECKING box width */
+  --des-condition-box-min-h: 246px;/* CONDITION CHECKING box height */
+  --des-condition-box-offset-x: 392px; /* CONDITION CHECKING move left/right */
+  --des-condition-box-offset-y: 16px;   /* CONDITION CHECKING move up/down */
+  --des-ultimate-box-w: calc(100% - var(--des-ultimate-box-offset-x) - 166px);     /* ULTIMATE SHEAR box width */
   --des-ultimate-box-min-h: 25px;  /* ULTIMATE SHEAR box height */
-  --des-ultimate-box-offset-x: 405px; /* ULTIMATE SHEAR move left/right */
-  --des-ultimate-box-shift-x: 35px; /* extra manual right/left shift */
-  --des-ultimate-box-offset-y: 110px;  /* ULTIMATE SHEAR move up/down */
-  --des-shape-panel-w: 122px;      /* right shape panel width */
+  --des-ultimate-box-offset-x: 392px; /* ULTIMATE SHEAR move left/right */
+  --des-ultimate-box-shift-x: 0px; /* extra manual right/left shift */
+  --des-ultimate-box-offset-y: 22px;  /* ULTIMATE SHEAR move up/down */
+  --des-shape-panel-w: 110px;      /* right shape panel width */
   --des-shape-card-w: 100%;        /* each inner photo card width */
-  --des-shape-panel-gap-x: 14px;   /* gap from condition box */
-  --des-shape-panel-offset-x: 30px; /* move shape panel right/left */
-  --des-shape-panel-gap-y: 10px;   /* gap between shape cards */
-  --des-shape-panel-card-h: 135px; /* each shape card height */
+  --des-shape-panel-gap-x: 10px;   /* gap from condition box */
+  --des-shape-panel-offset-x: 0px; /* move shape panel right/left */
+  --des-shape-panel-gap-y: 8px;   /* gap between shape cards */
+  --des-shape-panel-card-h: 120px; /* each shape card height */
   --des-shape-img-zoom-top: 1;  /* top image zoom (1 = normal) */
   --des-shape-img-zoom-bottom: 1;  /* bottom image zoom (1 = normal) */
 
@@ -7341,21 +7559,22 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__layout {
   display: grid;
-  gap: 10px;
-  width: calc(var(--des-box-w) + var(--des-steel-box-w) + var(--des-light-box-w) + (var(--des-top-gap) * 2));
-  max-width: 100%;
+  gap: 8px;
+  width: 100%;
+  max-width: none;
   position: relative;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__topRow {
   display: grid;
-  grid-template-columns: var(--des-box-w) var(--des-steel-box-w) var(--des-light-box-w);
+  grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.3fr) minmax(280px, 1fr);
   gap: var(--des-top-gap);
   align-items: start;
+  width: 100%;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__miniCard {
-  width: var(--des-box-w);
+  width: 100%;
   border-radius: 16px;
   background: rgba(248, 246, 239, 0.98);
   border: 1px solid rgba(176, 168, 150, 0.30);
@@ -7372,7 +7591,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__methodLabel {
-  height: 28px;
+  height: 24px;
   border-radius: 9px 0 0 9px;
   padding: 0 12px;
   display: inline-flex;
@@ -7382,7 +7601,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   border-right: 0;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.70rem;
+  font-size: 0.66rem;
   letter-spacing: 0.45px;
   color: rgba(66, 62, 55, 0.86);
   text-transform: uppercase;
@@ -7390,20 +7609,20 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__methodWrap {
   position: relative;
-  width: 136px;
+  width: 124px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__methodSelect {
   appearance: none;
   width: 100%;
-  height: 40px;
+  height: 34px;
   border-radius: 0 10px 10px 0;
   border: 1px solid rgba(150, 156, 156, 0.95);
   background: rgba(205, 218, 232, 0.95);
   padding: 0 24px 0 9px;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 2.1rem;
+  font-size: 1.55rem;
   letter-spacing: 0;
   line-height: 1;
   color: rgba(0,0,0,0.92);
@@ -7683,9 +7902,9 @@ body.secprops-fullscreen::-webkit-scrollbar,
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestBox {
-  margin-left: var(--des-light-box-offset-x);
+  margin-left: 0;
   margin-top: var(--des-light-box-offset-y);
-  width: var(--des-light-box-w);
+  width: 100%;
   min-height: var(--des-light-box-min-h);
   position: relative;
 }
@@ -7765,12 +7984,14 @@ body.secprops-fullscreen::-webkit-scrollbar,
   left: var(--des-condition-box-offset-x);
   top: calc(var(--des-box-min-h) + var(--des-top-gap) + var(--des-condition-box-offset-y));
   width: var(--des-condition-box-w);
+  max-width: calc(100% - var(--des-condition-box-offset-x) - 150px);
   min-height: var(--des-condition-box-min-h);
   border-radius: 18px;
   border: 1px solid rgba(105, 100, 90, 0.18);
   background: rgba(248, 244, 234, 0.94);
   padding: 12px 14px 10px;
   z-index: 2;
+  overflow: hidden;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTitle {
@@ -7786,7 +8007,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   align-items: center;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   color: rgba(42, 70, 140, 0.95);
   text-transform: uppercase;
 }
@@ -7828,7 +8049,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionPillCol {
@@ -7918,6 +8139,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
     var(--des-condition-box-offset-y) + var(--des-ultimate-box-offset-y)
   );
   width: var(--des-ultimate-box-w);
+  max-width: calc(100% - var(--des-ultimate-box-offset-x) - 150px);
   min-height: var(--des-ultimate-box-min-h);
   border-radius: 18px;
   border: 1px solid rgba(105, 100, 90, 0.18);
@@ -7939,7 +8161,7 @@ body.secprops-fullscreen::-webkit-scrollbar,
   align-items: center;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   color: rgba(42, 70, 140, 0.95);
   text-transform: uppercase;
 }
@@ -8006,7 +8228,8 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
   position: absolute;
-  left: calc(var(--des-condition-box-offset-x) + var(--des-condition-box-w) + var(--des-shape-panel-gap-x) + var(--des-shape-panel-offset-x));
+  left: auto;
+  right: 8px;
   top: calc(var(--des-box-min-h) + var(--des-top-gap) + var(--des-condition-box-offset-y));
   width: var(--des-shape-panel-w);
   border-radius: 14px;
@@ -8046,6 +8269,121 @@ body.secprops-fullscreen::-webkit-scrollbar,
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapeCard:last-child .sf-shearDes__shapeImg {
   transform: scale(var(--des-shape-img-zoom-bottom));
   transform-origin: center;
+}
+
+/* Design Shear strict layout normalization (no overlap) */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.95fr) minmax(360px, 1.2fr) 112px;
+  grid-template-areas:
+    "top top top"
+    "beam condition shape"
+    "load condition shape"
+    "load ultimate ultimate";
+  gap: 10px;
+  width: 100%;
+  max-width: none;
+  align-items: start;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__topRow {
+  grid-area: top;
+  grid-template-columns: minmax(260px, 1fr) minmax(330px, 1.1fr) minmax(250px, 0.95fr);
+  width: 100%;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__miniCard,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__steelBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox {
+  grid-area: beam;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox {
+  grid-area: load;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
+  position: static;
+  left: auto;
+  top: auto;
+  right: auto;
+  width: 100%;
+  max-width: 100%;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox {
+  grid-area: condition;
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px 12px 8px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox {
+  grid-area: ultimate;
+  min-height: 0;
+  padding: 8px 12px 8px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTitle,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateTitle {
+  position: static;
+  top: auto;
+  left: auto;
+  display: inline-flex;
+  margin: 0 0 6px;
+  height: 20px;
+  padding: 0 10px;
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionGrid,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
+  margin-top: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow {
+  grid-template-columns: auto minmax(86px, 110px) auto;
+  gap: 6px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow--remarks {
+  align-self: center;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSubTitle {
+  font-size: 0.78rem;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionPill {
+  font-size: 0.72rem;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
+  min-height: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
+  grid-area: shape;
+  align-self: stretch;
+  padding: 6px;
+  border-width: 3px;
+  grid-template-rows: 1fr 1fr;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox {
@@ -8954,4 +9292,93 @@ body.secprops-fullscreen::-webkit-scrollbar,
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='design'].is-active > .sf-comp__card {
   --sf-shear-card-h: 620px;
+}
+
+/* ===== FINAL LOCK: Design Shear no-overlap layout ===== */
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__layout {
+  display: grid !important;
+  grid-template-columns: minmax(250px, 0.95fr) minmax(360px, 1.2fr) 112px !important;
+  grid-template-areas:
+    "top top top"
+    "beam condition shape"
+    "load condition shape"
+    "load ultimate ultimate" !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: none !important;
+  align-items: start !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__topRow {
+  grid-area: top !important;
+  display: grid !important;
+  grid-template-columns: minmax(260px, 1fr) minmax(330px, 1.1fr) minmax(250px, 0.95fr) !important;
+  width: 100% !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__miniCard,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__steelBox,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestBox,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox { grid-area: beam !important; }
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox { grid-area: load !important; }
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox {
+  grid-area: condition !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 10px 12px 8px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox {
+  grid-area: ultimate !important;
+  min-height: 0 !important;
+  padding: 8px 12px 8px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTitle,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateTitle {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  display: inline-flex !important;
+  margin: 0 0 6px !important;
+  height: 20px !important;
+  padding: 0 10px !important;
+  font-size: 0.82rem !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionGrid,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
+  margin-top: 0 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
+  grid-area: shape !important;
+  align-self: stretch !important;
+  padding: 6px !important;
+  border-width: 3px !important;
+  grid-template-rows: 1fr 1fr !important;
+}
+
+/* Ensure design shear main container fully fits all cards */
+.content-panel.comp-panel > .sf-comp.sf-comp--shear > .sf-comp__mode[data-comp-mode-pane="design"].is-active > .sf-comp__card {
+  --sf-shear-card-h: 700px !important;
 }
