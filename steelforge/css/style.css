@@ -19,11 +19,48 @@
   /* outer/background */
   --bg-outer: #dde9ef;
   --shadow: rgba(0,0,0,.06);
+
+  /* ========== HUB LAYOUT — edit only this block (Steel Grade + Section Props) ========== */
+  /* Shorter card so header+nav+gray box fit common laptop viewports; raise --sf-hub-gray-card-h if you have vertical room */
+  --sf-hub-gray-card-h: 520px;
+  --sf-hub-grade-gray-w: 1120px;
+  --sf-hub-grade-pad: 36px 26px 36px;
+  --sf-hub-grade-right-top: 296px;
+  --sf-hub-grade-right-bottom: 140px;
+  --sf-hub-grade-right-gap: 12px;
+  --sf-hub-secprops-gray-w: 1210px;
+  --sf-hub-secprops-pad: 14px 18px 22px;
+  --sf-hub-secprops-shape-h: 156px;
+  --sf-hub-secprops-dyk-min-h: 62px;
+  /* Less empty space above/below the gray card on the two hub pages */
+  --sf-hub-grade-outer-pad: 8px 0 12px;
+  --sf-hub-secprops-outer-pad: 12px 0 12px;
+
+  /* ========== COMPRESSION (Analysis + Design) — gray shell + compact table density ========== */
+  --sf-compression-gray-h: clamp(380px, calc(100vh - 232px), 500px);
+  --sf-compression-gray-h-design: min(500px, calc(100vh - 188px));
+  --sf-compression-gray-max-h-design: calc(100vh - 72px);
+  --sf-compression-empty-pane-pad: 6px 0 10px;
+  --sf-compAna-compact-card-h: 162px;
+  --sf-compAna-compact-stack-gap: 6px;
+  --sf-compAna-critical-row-gap: 1px;
+  --sf-compAna-critical-pad-y: 4px;
+  --sf-compAna-critical-pad-bottom: 4px;
+  --sf-compAna-critical-governing-reserve: 30px;
+  --sf-compAna-critical-select-h: 15px;
+  --sf-compAna-critical-pill-h: 14px;
 }
 
 html, body {
   height: 100%;
   width: 100%;
+}
+
+/* With Compression, Bending, or Tension Rod open, keep the app in one frame (pairs with .notebook-full:has(...)) */
+body:has(.sf-comp.sf-comp--compression),
+body:has(.sf-comp.sf-comp--bending),
+body:has(.sf-comp.sf-comp--tensionRod) {
+  overflow: hidden;
 }
 
 body {
@@ -78,6 +115,57 @@ body::before {
   box-shadow: none;
   border: none;
   border-radius: 0;
+}
+
+/* Compression page: keep app in one screen — no page scrollbar; inner panels handle overflow */
+.notebook-full:has(.sf-comp.sf-comp--compression) {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.notebook-full:has(.sf-comp.sf-comp--compression) > .content-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.notebook-full:has(.sf-comp.sf-comp--compression) > .content-panel > .sf-comp.sf-comp--compression {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bending page: fit gray card in viewport (same shell as Compression) */
+.notebook-full:has(.sf-comp.sf-comp--bending) {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.notebook-full:has(.sf-comp.sf-comp--bending) > .content-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.notebook-full:has(.sf-comp.sf-comp--bending) > .content-panel > .sf-comp.sf-comp--bending {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.notebook-full:has(.sf-comp.sf-comp--bending)
+  > .content-panel
+  > .sf-comp.sf-comp--bending
+  > .sf-comp__modeNav {
+  flex-shrink: 0;
 }
 
 /* ========== HEADER (SteelForge hero) ========== */
@@ -469,7 +557,7 @@ body::before {
   z-index: 1;
   opacity: 0.9;
   background-color: rgba(142, 172, 203, 0.10);
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="240" viewBox="0 0 64 240"><rect width="64" height="240" fill="none"/><g stroke="%238eaccb" stroke-width="4" opacity="0.85"><path d="M10 0 L54 44"/><path d="M54 44 L10 88"/><path d="M10 88 L54 132"/><path d="M54 132 L10 176"/><path d="M10 176 L54 220"/><path d="M54 220 L28 246"/></g><g stroke="%238eaccb" stroke-width="2" opacity="0.55"><path d="M28 0 L64 36"/><path d="M64 80 L28 116"/><path d="M28 160 L64 196"/></g><rect x="4" y="0" width="8" height="240" fill="%238eaccb" opacity="0.12"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="240" viewBox="0 0 64 240"><rect width="64" height="240" fill="none"/><g stroke="%238eaccb" stroke-width="4" opacity="0.85"><path d="M10 0 L54 44"/><path d="M54 44 L10 88"/><path d="M10 88 L54 132"/><path d="M54 132 L10 176"/><path d="M10 176 L54 220"/><path d="M54 220 L10 240"/></g><g stroke="%238eaccb" stroke-width="2" opacity="0.55"><path d="M28 0 L64 36"/><path d="M64 80 L28 116"/><path d="M28 160 L64 196"/></g><rect x="4" y="0" width="8" height="240" fill="%238eaccb" opacity="0.12"/></svg>');
   background-repeat: repeat-y;
   background-position: center top;
   box-shadow: inset 0 0 0 2px rgba(142, 172, 203, 0.25);
@@ -547,13 +635,13 @@ body::before {
 
 /* ========== STEEL GRADE (exact layout, scoped) ========== */
 .sf-grade {
-  /* Manual sizing knobs (edit these values anytime) */
-  --sf-grade-gray-w: 1120px; /* overall gray box width cap */
-  --sf-grade-gray-min-h: 560px; /* desktop card height; grows on small screens */
-  --sf-grade-gray-pad: 26px 26px 22px; /* inner padding of gray box */
-  --sf-grade-cols-minh: 500px; /* inside grid minimum height */
+  /* Manual sizing knobs — hub numbers live in :root (--sf-hub-*) */
+  --sf-grade-gray-w: var(--sf-hub-grade-gray-w);
+  --sf-grade-gray-min-h: var(--sf-hub-gray-card-h);
+  --sf-grade-gray-pad: var(--sf-hub-grade-pad);
+  --sf-grade-cols-minh: calc(var(--sf-hub-grade-right-top) + var(--sf-hub-grade-right-gap) + var(--sf-hub-grade-right-bottom));
   --sf-grade-col-gap: 16px; /* space between left and right */
-  --sf-grade-right-gap: 12px; /* space between the 2 right white boxes */
+  --sf-grade-right-gap: var(--sf-hub-grade-right-gap);
 
   /* Manual table formatting knobs (left panel) */
   --sf-grade-table-max-w: 100%;
@@ -575,9 +663,9 @@ body::before {
   --sf-grade-astm-body-lh: 1.4;
 
   /* Manual sizing knobs: the 3 white boxes inside the gray box */
-  --sf-grade-left-h: 495px; /* left table box height (set px if you want fixed) */
-  --sf-grade-right-top-h: 350px; /* right top box height */
-  --sf-grade-right-bottom-h: 162px; /* right bottom box height */
+  --sf-grade-left-h: calc(var(--sf-hub-grade-right-top) + var(--sf-hub-grade-right-gap) + var(--sf-hub-grade-right-bottom));
+  --sf-grade-right-top-h: var(--sf-hub-grade-right-top);
+  --sf-grade-right-bottom-h: var(--sf-hub-grade-right-bottom);
 
   /* Manual sizing knobs: column widths (controls the overall size of the 3 boxes) */
   --sf-grade-left-w: 1.15fr; /* left white box width */
@@ -586,8 +674,6 @@ body::before {
   /* Manual positioning knobs (move the whole gray box) */
   --sf-grade-offset-x: 0px; /* +right / -left */
   --sf-grade-offset-y: 0px; /* +down / -up */
-  --sf-grade-pad-top: 10px; /* space above the gray box */
-  --sf-grade-pad-bottom: 24px; /* space below the gray box */
 
   /* Manual positioning knobs: move each WHITE box (x/y) */
   --sf-grade-left-box-x: 0px;
@@ -601,7 +687,7 @@ body::before {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: var(--sf-grade-pad-top) 0 var(--sf-grade-pad-bottom);
+  padding: var(--sf-hub-grade-outer-pad);
 }
 
 .sf-grade__card {
@@ -616,6 +702,7 @@ body::before {
   padding: var(--sf-grade-gray-pad);
   position: relative;
   transform: translate(var(--sf-grade-offset-x), var(--sf-grade-offset-y));
+  overflow: hidden; /* square white panels respect the gray card radius */
 }
 
 .sf-grade__star {
@@ -1136,6 +1223,10 @@ body::before {
   z-index: 2; /* above decorations */
 }
 
+.content-panel.comp-panel > .sf-comp.sf-comp--compression {
+  padding: 6px clamp(20px, 5vw, 56px) 8px;
+}
+
 /* Make the calculator always fit the viewport area */
 .content-panel.comp-panel > .sf-comp > .sf-comp__topline {
   flex: 0 0 auto;
@@ -1185,8 +1276,7 @@ body::before {
 /* ===== Manual gray card height (Compression only) =====
    This overrides the flex-fill rule above so you can resize the gray box. */
 .content-panel.comp-panel > .sf-comp.sf-comp--compression > .sf-comp__mode.is-active > .sf-comp__card {
-  /* Change this ONE value anytime */
-  --sf-comp-gray-card-h: clamp(420px, 68vh, 560px);
+  --sf-comp-gray-card-h: clamp(380px, calc(100vh - 228px), 520px);
   flex: 0 0 auto;
   height: var(--sf-comp-gray-card-h);
   max-height: none;
@@ -1200,7 +1290,7 @@ body::before {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  padding: 10px 0 18px;
+  padding: var(--sf-compression-empty-pane-pad, 6px 0 10px);
   box-sizing: border-box;
 }
 
@@ -1210,11 +1300,7 @@ body::before {
   /* Gray shell: sidebar + top row (compact + photos + CHECKING CAPACITY) + slenderness */
   /* Wide enough for PARAMETERS + ~400px slenderness table + rail + LIGHTEST without crushing columns */
   --sf-compression-gray-w: 100%;
-  --sf-compression-gray-h: 530px;
-  /* DESIGN COMPRESSION — taupe outer shell height (default; same family as analysis gray shell) */
-  --sf-compression-gray-h-design: 600px;
-  /* Cap shell height — smaller chrome reserve = taller gray box (room + scroll inside taupe) */
-  --sf-compression-gray-max-h-design: calc(100vh - 64px);
+  /* --sf-compression-gray-h / design heights / compact+critical density → set in :root */
   /* Gray taupe box padding left/right (smaller = beige panel can sit closer to outer edges) */
   --sf-compression-gray-pad-x: 14px;
   /*
@@ -1230,16 +1316,15 @@ body::before {
   --sf-compAna-compact-align-self: stretch;
   /* Offset stack from top inside taupe row */
   --sf-compAna-compact-margin-top: 6px;
-  /* Vertical gap between CHECK COMPACTNESS and CRITICAL SLENDERNESS */
-  --sf-compAna-compact-stack-gap: 10px;
+  /* Vertical gap between CHECK COMPACTNESS and CRITICAL SLENDERNESS — default :root */
   /* Space below slenderness card (capacity sits beside photos; keep 0 unless you stack extra blocks below) */
   --sf-compAna-gap-after-critical: 0px;
   /* Horizontal gap between compact | beam imgs | checking columns */
-  --sf-compAna-compact-grid-col-gap: 8px;
+  --sf-compAna-compact-grid-col-gap: 6px;
   /* Middle column width (beam visuals) */
-  --sf-compAna-beam-img-col-w: 232px;
+  --sf-compAna-beam-img-col-w: 220px;
   /* CHECKING CAPACITY column width (top row, right of beam photos) */
-  --sf-compAna-capacity-card-w: 266px;
+  --sf-compAna-capacity-card-w: 220px;
   /* Fine-tune CHECKING CAPACITY vertically inside top row (+ = down) */
   --sf-compAna-capacity-shift-y: 10px;
   /* CHECK COMPACTNESS gray card only: move without moving Critical Slenderness (+right / +down) */
@@ -1248,11 +1333,7 @@ body::before {
   /* Right compactness card manual size */
   --sf-compAna-compact-card-w: 300px;
   --sf-compAna-compact-card-min-h: 130px;
-  /*
-    CHECK COMPACTNESS height — edit ONLY this line to make the card taller/shorter (e.g. 200px, 220px).
-    Use `auto` again if you want the card to shrink to content height.
-  */
-  --sf-compAna-compact-card-h: 194px;
+  /* CHECK COMPACTNESS height — default :root --sf-compAna-compact-card-h */
   /* Adds on top of min-height when you want a little extra without guessing total height */
   --sf-compAna-compact-card-extra-h: 0px;
   /* Fine-tune verdict pills vertically (+ = down) if needed after layout fixes */
@@ -1265,33 +1346,27 @@ body::before {
   --sf-compAna-critical-card-h: auto;
   /* Use min-content so the card cannot shrink shorter than rows + footer (0px caused overlap with CHECKING CAPACITY) */
   --sf-compAna-critical-card-min-h: min-content;
-  --sf-compAna-critical-pad-x: 12px;
-  /* Top padding inside beige card */
-  --sf-compAna-critical-pad-y: 10px;
-  /* Bottom padding inside beige card */
-  --sf-compAna-critical-pad-bottom: 10px;
+  --sf-compAna-critical-pad-x: 10px;
+  /* pad-y / pad-bottom — defaults :root */
   --sf-compAna-critical-title-font-size: 12px;
-  --sf-compAna-critical-grid-cols: 42px 142px 50px 66px 54px 100px;
-  --sf-compAna-critical-col-gap: 5px;
-  --sf-compAna-critical-row-gap: 2.5px;
-  --sf-compAna-critical-select-h: 19px;
-  --sf-compAna-critical-pill-h: 18px;
-  --sf-compAna-critical-font-size: 12px;
-  --sf-compAna-critical-governing-font-size: 13px;
-  /* Space under last row for absolutely positioned “Governing K·L/r” (raise only if overlap) */
-  --sf-compAna-critical-governing-reserve: 48px;
+  --sf-compAna-critical-grid-cols: 36px 126px 44px 58px 46px minmax(90px, 1fr);
+  --sf-compAna-critical-col-gap: 4px;
+  /* row-gap, select-h, pill-h — defaults :root */
+  --sf-compAna-critical-font-size: 10px;
+  --sf-compAna-critical-governing-font-size: 11px;
+  /* governing-reserve — default :root */
   /* Governing row inset from card bottom (+ = move yellow pill up, − = down toward edge) */
-  --sf-compAna-critical-governing-bottom: 25px;
+  --sf-compAna-critical-governing-bottom: 6px;
   /*
     “Governing K·L/r =” label only — horizontal nudge (− = move left, + = move right).
     Does not move the yellow value pill.
   */
-  --sf-compAna-critical-governing-lab-shift-x: -65px;
+  --sf-compAna-critical-governing-lab-shift-x: -62px;
   /*
     Yellow governing value pill only (footer) — horizontal nudge (− = move left, + = move right).
     Does not move the “Governing K·L/r =” label or the blue table cell.
   */
-  --sf-compAna-critical-governing-highlight-shift-x: -65px;
+  --sf-compAna-critical-governing-highlight-shift-x: -34px;
   /* Critical Slenderness card only: vertical nudge (+ = down, − = up); 0 = flush under compactness */
   --sf-compAna-critical-shift-y: 0px;
 }
@@ -1320,13 +1395,13 @@ body::before {
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__mode[data-comp-mode-pane="design"] .sf-comp__grayShell {
   height: auto;
   min-height: min(var(--sf-compression-gray-h-design), var(--sf-compression-gray-max-h-design));
-  max-height: none;
+  max-height: min(var(--sf-compression-gray-h-design), var(--sf-compression-gray-max-h-design));
   overflow-x: hidden;
-  overflow-y: visible;
+  overflow-y: auto;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
-  scrollbar-gutter: auto;
-  padding: 18px var(--sf-compression-gray-pad-x, 14px) 20px;
+  scrollbar-gutter: stable;
+  padding: 14px var(--sf-compression-gray-pad-x, 14px) 14px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__mode[data-comp-mode-pane="design"]
@@ -1357,10 +1432,9 @@ body::before {
   gap: 12px;
   padding: 0;
   box-sizing: border-box;
-  /* Allow vertical scroll when viewport is small (analysis content can exceed the fixed gray shell height). */
-  overflow-y: auto;
+  /* Page locked to viewport — scroll only inside Critical Slenderness card if needed */
+  overflow-y: hidden;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   min-height: 0;
 }
 
@@ -1386,14 +1460,14 @@ body::before {
     minmax(0, var(--sf-compDes-viz-w, clamp(210px, 20vw, 286px)));
   grid-template-rows: auto auto;
   column-gap: 10px;
-  row-gap: 8px;
+  row-gap: 6px;
   align-items: start;
   justify-items: stretch;
   /*
     Inset via padding — NOT margin on grid items (margin on grid children overflows into adjacent tracks → DEMAND/SAFE overlap).
     Extra padding-top so straddle tab pills (translateY(-50%)) stay inside the scrollport.
   */
-  padding: 10px 0 8px;
+  padding: 8px 0 6px;
   padding-inline-start: var(--sf-compAna-sidebar-shift-x, 25px);
   padding-inline-end: var(--sf-compAna-sidebar-shift-x, 25px);
   box-sizing: border-box;
@@ -2380,6 +2454,8 @@ body::before {
   flex: 1 1 auto;
   align-self: var(--sf-compAna-compact-align-self, stretch);
   min-height: 0;
+  height: 100%;
+  max-height: 100%;
   margin-top: calc(var(--sf-compAna-compact-margin-top, 6px) + var(--sf-compAna-compact-shift-y, 0px));
   display: grid;
   grid-template-columns:
@@ -2596,9 +2672,9 @@ body::before {
   margin-top: -12px;
   background: #d9d9d9;
   border-radius: 16px;
-  padding: 6px;
+  padding: 4px;
   display: flex;
-  gap: 6px;
+  gap: 4px;
   box-sizing: border-box;
 }
 
@@ -2725,6 +2801,7 @@ body::before {
   align-self: start;
   width: 100%;
   box-sizing: border-box;
+  margin-top: 8px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compGov {
@@ -2799,9 +2876,12 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: var(--sf-compAna-critical-row-gap, 4px);
-  align-self: start;
+  align-self: stretch;
   justify-self: stretch;
-  min-height: var(--sf-compAna-critical-card-min-h, min-content);
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+  -webkit-overflow-scrolling: touch;
   width: 100%;
   max-width: 100%;
   height: var(--sf-compAna-critical-card-h, auto);
@@ -2820,10 +2900,11 @@ body::before {
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__title {
   position: absolute;
-  top: -10px;
-  right: 10px;
+  top: -9px;
+  left: 10px;
+  right: auto;
   background: #ece9e2;
-  padding: 3px 11px;
+  padding: 3px 12px;
   border-radius: 999px;
   font-weight: 800;
   color: #2f5fa7;
@@ -2838,9 +2919,10 @@ body::before {
   grid-template-columns: var(--sf-compAna-critical-grid-cols, 44px 148px 52px 70px 56px 104px);
   column-gap: var(--sf-compAna-critical-col-gap, 6px);
   align-items: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   color: rgba(78, 72, 65, 0.88);
+  margin-top: 8px;
   margin-bottom: 0;
   letter-spacing: 0.02em;
 }
@@ -2865,7 +2947,7 @@ body::before {
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__element {
   justify-content: flex-start !important;
   align-self: center;
-  padding-left: 6px;
+  padding-left: 4px;
   font-weight: 700;
   color: #444;
   font-size: var(--sf-compAna-critical-font-size, 12px);
@@ -2882,7 +2964,7 @@ body::before {
   font-size: var(--sf-compAna-critical-font-size, 12px);
   font-weight: 700;
   text-align: center;
-  padding: 0 18px 0 8px;
+  padding: 0 16px 0 7px;
   color: rgba(44, 40, 36, 0.95);
 }
 
@@ -2944,7 +3026,7 @@ body::before {
   flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-start;
-  gap: 6px;
+  gap: 4px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__highlight {
@@ -3768,7 +3850,7 @@ body::before {
   z-index: 1;
   opacity: 0.9;
   background-color: rgba(142, 172, 203, 0.10);
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="240" viewBox="0 0 64 240"><rect width="64" height="240" fill="none"/><g stroke="%238eaccb" stroke-width="4" opacity="0.85"><path d="M10 0 L54 44"/><path d="M54 44 L10 88"/><path d="M10 88 L54 132"/><path d="M54 132 L10 176"/><path d="M10 176 L54 220"/><path d="M54 220 L28 246"/></g><g stroke="%238eaccb" stroke-width="2" opacity="0.55"><path d="M28 0 L64 36"/><path d="M64 80 L28 116"/><path d="M28 160 L64 196"/></g><rect x="4" y="0" width="8" height="240" fill="%238eaccb" opacity="0.12"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="240" viewBox="0 0 64 240"><rect width="64" height="240" fill="none"/><g stroke="%238eaccb" stroke-width="4" opacity="0.85"><path d="M10 0 L54 44"/><path d="M54 44 L10 88"/><path d="M10 88 L54 132"/><path d="M54 132 L10 176"/><path d="M10 176 L54 220"/><path d="M54 220 L10 240"/></g><g stroke="%238eaccb" stroke-width="2" opacity="0.55"><path d="M28 0 L64 36"/><path d="M64 80 L28 116"/><path d="M28 160 L64 196"/></g><rect x="4" y="0" width="8" height="240" fill="%238eaccb" opacity="0.12"/></svg>');
   background-repeat: repeat-y;
   background-position: center top;
   box-shadow: inset 0 0 0 2px rgba(142, 172, 203, 0.25);
@@ -5507,15 +5589,14 @@ body::before {
 
 /* ========== SECTION PROPS (match reference card layout) ========== */
 .sf-secprops {
-  /* ===== Manual size controls (edit these values) ===== */
-  /* Match STEEL GRADE gray box sizing behavior */
-  --sf-secprops-gray-w: 1210px; /* overall gray box width cap */
-  --sf-secprops-gray-h: 540px; /* fixed gray box height */
+  /* ===== Manual size controls — hub numbers live in :root (--sf-hub-*) ===== */
+  --sf-secprops-gray-w: var(--sf-hub-secprops-gray-w);
+  --sf-secprops-gray-h: var(--sf-hub-gray-card-h);
   --sf-secprops-offset-x: 0px; /* +right / -left */
   --sf-secprops-offset-y: 0px; /* +down / -up */
   --sf-secprops-card-h: var(--sf-secprops-gray-h);
   --sf-secprops-card-w: min(var(--sf-secprops-gray-w), 100%);
-  --sf-secprops-card-pad: 18px 20px 14px;
+  --sf-secprops-card-pad: var(--sf-hub-secprops-pad);
   --sf-secprops-content-gap: 14px;
   --sf-secprops-left-right-ratio: 1.02fr 0.98fr;
   /* Inner padding (with fixed card + flex content height, left panel % height resolves — padding no longer “inflates” the white box). */
@@ -5534,34 +5615,34 @@ body::before {
   --sf-secprops-left-overflow-y: hidden;
   --sf-secprops-left-offset-x: 0px;
   --sf-secprops-left-offset-y: 0px;
-  --sf-secprops-shape-h: 188px; /* main height for all 4 right boxes */
+  --sf-secprops-shape-h: 146px;
   --sf-secprops-shape-min-h: var(--sf-secprops-shape-h);
   --sf-secprops-shape1-h: var(--sf-secprops-shape-h); /* W-SHAPES */
   --sf-secprops-shape2-h: var(--sf-secprops-shape-h); /* ANGLES */
   --sf-secprops-shape3-h: var(--sf-secprops-shape-h); /* C-SHAPES */
   --sf-secprops-shape4-h: var(--sf-secprops-shape-h); /* HSS */
-  --sf-secprops-right-gap: 10px;
+  --sf-secprops-right-gap: 8px;
   --sf-secprops-right-w: 100%;
   --sf-secprops-right-offset-x: -10px;
-  --sf-secprops-right-offset-y: 0px;
+  --sf-secprops-right-offset-y: -8px;
   --sf-secprops-right-cols: 1fr 1fr;
   --sf-secprops-shape-radius: 10px;
   --sf-secprops-shape-art-font: 0.72rem;
   --sf-secprops-shape-art-pad: 6px;
   --sf-secprops-shape-img-fit: contain; /* contain = whole image visible (no crop) */
   --sf-secprops-shape-img-pos: center center;
-  --sf-secprops-shape-img-scale: 1.4;
-  --sf-secprops-shape-img-scale-x: 1.4; /* width stretch: >1 wider, <1 narrower */
+  --sf-secprops-shape-img-scale: 1.1;
+  --sf-secprops-shape-img-scale-x: 1.1; /* width stretch: >1 wider, <1 narrower */
   --sf-secprops-shape-img-scale-y: 1; /* height stretch: >1 taller, <1 shorter */
-  --sf-secprops-shape-label-pad: 6px 8px 7px;
-  --sf-secprops-shape-label-h: 34px;
+  --sf-secprops-shape-label-pad: 4px 8px 5px;
+  --sf-secprops-shape-label-h: 26px;
   --sf-secprops-dyk-col: 1 / -1; /* full width under right cards */
   --sf-secprops-dyk-w: 100%;
   --sf-secprops-dyk-pad: 8px 10px;
   --sf-secprops-dyk-gap: 10px;
-  --sf-secprops-dyk-title-size: 2rem;
+  --sf-secprops-dyk-title-size: 1.45rem; /* was 2rem — frees vertical space so layout fits fixed card */
   --sf-secprops-dyk-text-size: 0.74rem;
-  --sf-secprops-dyk-min-h: 74px;
+  --sf-secprops-dyk-min-h: var(--sf-hub-secprops-dyk-min-h, 62px);
 
   /* ===== SECTION PROPERTIES — layout (rows, pills, gaps) =====
      Rows (Weight, Area, …):  label | blue pill | unit
@@ -5608,7 +5689,7 @@ body::before {
   --sf-secprops-search-w: 240px;
   --sf-secprops-search-offset-x: 0px; /* +right / -left */
   --sf-secprops-search-offset-y: 0px; /* +down / -up */
-  --sf-secprops-shape-label-size: 1.14rem;
+  --sf-secprops-shape-label-size: 0.9rem;
 
   --sf-secprops-card-bg: #aca59a;
   --sf-secprops-panel-bg: #ffffff;
@@ -5618,7 +5699,7 @@ body::before {
 
   display: flex;
   justify-content: center;
-  padding: 24px 0 18px;
+  padding: var(--sf-hub-secprops-outer-pad);
 }
 
 .sf-secprops__card {
@@ -5634,6 +5715,7 @@ body::before {
   padding: var(--sf-secprops-card-pad);
   position: relative;
   transform: translate(var(--sf-secprops-offset-x), var(--sf-secprops-offset-y));
+  overflow: hidden; /* inner white panels + dots stay inside rounded rect */
 }
 
 .sf-secprops__star {
@@ -5898,6 +5980,7 @@ input.sf-secprops__val:focus {
   height: var(--sf-secprops-shape-min-h);
   display: flex;
   flex-direction: column;
+  position: relative;
   overflow: hidden;
 }
 
@@ -5905,6 +5988,16 @@ input.sf-secprops__val:focus {
 .sf-secprops__shape:nth-child(2) { height: var(--sf-secprops-shape2-h); }
 .sf-secprops__shape:nth-child(3) { height: var(--sf-secprops-shape3-h); }
 .sf-secprops__shape:nth-child(4) { height: var(--sf-secprops-shape4-h); }
+
+.sf-secprops__shape:nth-child(3),
+.sf-secprops__shape:nth-child(4) {
+  transform: translateY(40px);
+}
+
+.sf-secprops__shape:nth-child(1),
+.sf-secprops__shape:nth-child(2) {
+  transform: translateY(20px);
+}
 
 .sf-secprops__shape--active {
   border-color: rgba(26, 45, 92, 0.5);
@@ -5916,6 +6009,7 @@ input.sf-secprops__val:focus {
   display: grid;
   place-items: center;
   padding: var(--sf-secprops-shape-art-pad);
+  padding-bottom: calc(var(--sf-secprops-shape-label-h) + 8px);
   background:
     radial-gradient(circle at center, rgba(142, 172, 203, 0.18), rgba(142, 172, 203, 0.03) 62%),
     #f9fbfd;
@@ -5948,8 +6042,13 @@ input.sf-secprops__val:focus {
   min-height: var(--sf-secprops-shape-label-h);
   display: grid;
   place-items: center;
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: translateY(0);
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .sf-secprops__dyk {
@@ -5989,7 +6088,8 @@ input.sf-secprops__val:focus {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 4px;
+  margin-bottom: 3px; /* keeps dots off the bottom curve */
   padding-right: 2px;
   flex: 0 0 auto;
 }
@@ -6020,7 +6120,8 @@ input.sf-secprops__val:focus {
   /* Manual controls */
   /* Copy SECTION PROPS gray card size */
   --sf-shear-card-w: 1700px; /* max width cap (shrink/grow) */
-  --sf-shear-card-h: 540px;  /* fixed height */
+  --sf-shear-analysis-gray-height: clamp(510px, calc(100vh - 240px), 620px); /* +10 height */
+  --sf-shear-card-h: var(--sf-shear-analysis-gray-height);  /* fixed height */
   --sf-shear-card-min-w: 0px; /* optional minimum width */
 
   /* Shear gray box sizing + position (edit freely) */
@@ -6079,6 +6180,13 @@ input.sf-secprops__val:focus {
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shear__panel[aria-label="Parameters"],
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shear__panel[aria-label="Condition checking"] {
   background: rgba(255,255,255,0.96);
+  align-self: start;
+  height: clamp(375px, calc(100vh - 325px), 455px);
+  margin-top: 40px;
+  padding-top: 5px;
+  padding-bottom: 4px;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shear__panel {
@@ -6095,16 +6203,16 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-shearAna__headPill {
-  height: 22px;
+  height: 20px;
   border-radius: 999px;
   background: rgba(248, 244, 234, 0.95);
   border: 1px solid rgba(105, 100, 90, 0.16);
   display: inline-flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 10px;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.70rem;
+  font-size: 0.64rem;
   letter-spacing: 0.8px;
   text-transform: uppercase;
   color: rgba(62, 55, 49, 0.78);
@@ -6113,7 +6221,7 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-shearAna__methodWrap {
   position: relative;
-  width: 80px;
+  width: 70px;
   flex: 0 0 auto;
 }
 
@@ -6121,7 +6229,7 @@ input.sf-secprops__val:focus {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 22px;
+  height: 20px;
   border-radius: 8px;
   border: 1px solid rgba(105, 100, 90, 0.18);
   outline: none;
@@ -6132,7 +6240,7 @@ input.sf-secprops__val:focus {
   padding: 0 24px 0 12px;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.84rem;
+  font-size: 0.72rem;
   letter-spacing: 0.2px;
   color: rgba(0,0,0,0.88);
   line-height: 1;
@@ -6153,43 +6261,43 @@ input.sf-secprops__val:focus {
   position: relative;
   padding-top: 2px;
   /* Manual: push the input list down/up */
-  --sf-webcond-body-offset: 14px; /* increase to move DOWN, negative to move UP */
+  --sf-webcond-body-offset: 4px; /* increase to move DOWN, negative to move UP */
   /* Manual: spacing + sizing for the WEB CONDITION input list */
-  --sf-webcond-row-gap: 6px;        /* space between rows */
-  --sf-webcond-col-gap: 8px;       /* gap between label / input / unit */
+  --sf-webcond-row-gap: 3px;        /* space between rows */
+  --sf-webcond-col-gap: 6px;       /* gap between label / input / unit */
   --sf-webcond-label-w: 1fr;        /* label column width */
-  --sf-webcond-input-w: 122px;      /* input pill width */
-  --sf-webcond-unit-w: 30px;        /* unit column width */
-  --sf-webcond-input-h: 17px;       /* input pill height */
-  --sf-webcond-input-font: 0.82rem; /* input text size */
+  --sf-webcond-input-w: 106px;      /* input pill width */
+  --sf-webcond-unit-w: 26px;        /* unit column width */
+  --sf-webcond-input-h: 14px;       /* input pill height */
+  --sf-webcond-input-font: 0.70rem; /* input text size */
 }
 
 /* WEB CONDITION header row (match reference pill look) */
 .sf-comp--shear .sf-shearAna__webHead {
   /* Manual sizing controls (edit these numbers) */
-  --sf-webcond-select-w: 166px; /* dropdown width */
-  --sf-webcond-select-h: 34px;  /* dropdown height */
-  --sf-webcond-font: 0.72rem;   /* dropdown text size */
+  --sf-webcond-select-w: 148px; /* dropdown width */
+  --sf-webcond-select-h: 28px;  /* dropdown height */
+  --sf-webcond-font: 0.62rem;   /* dropdown text size */
 
   display: grid;
   grid-template-columns: 1fr var(--sf-webcond-select-w);
   gap: 12px;
   align-items: center;
-  margin: 2px 0 8px;
+  margin: 1px 0 4px;
   padding: 0 4px;
 }
 
 .sf-comp--shear .sf-shearAna__webTitle {
-  height: 22px;
+  height: 20px;
   border-radius: 999px;
   background: rgba(248, 244, 234, 0.95);
   border: 1px solid rgba(105, 100, 90, 0.16);
   display: inline-flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 10px;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   letter-spacing: 0.9px;
   text-transform: uppercase;
   color: rgba(62, 55, 49, 0.78);
@@ -6278,17 +6386,17 @@ input.sf-secprops__val:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 20px;
+  height: 18px;
   border-radius: 999px;
-  padding: 0 12px;
+  padding: 0 10px;
   background: rgba(255,255,255,0.92);
   color: rgba(29, 120, 179, 0.95);
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.74rem;
+  font-size: 0.66rem;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  margin: -4px auto 10px;
+  margin: -3px auto 6px;
   width: max-content;
   box-shadow: 0 2px 0 rgba(0,0,0,0.05);
 }
@@ -6307,20 +6415,20 @@ input.sf-secprops__val:focus {
 /* LIMITING SLENDERNESS: image + 3 result pills (client-requested) */
 .sf-comp--shear .sf-shearAna__slen {
   /* Manual controls */
-  --sf-slen-img-w: 135px;      /* equation image width */
-  --sf-slen-img-h: 125px;      /* equation image height (manual) */
-  --sf-slen-img-shift-x: 60px;  /* manual: move photo RIGHT (+) / LEFT (-) */
-  --sf-slen-gap: 16px;         /* gap between image and pills */
-  --sf-slen-bar-h: 20px;       /* pill height */
-  --sf-slen-bar-w: 160px;      /* pill width */
-  --sf-slen-bars-gap: 16px;    /* spacing between the 3 pills */
+  --sf-slen-img-w: 120px;      /* equation image width */
+  --sf-slen-img-h: 108px;      /* equation image height (manual) */
+  --sf-slen-img-shift-x: 52px;  /* manual: move photo RIGHT (+) / LEFT (-) */
+  --sf-slen-gap: 12px;         /* gap between image and pills */
+  --sf-slen-bar-h: 18px;       /* pill height */
+  --sf-slen-bar-w: 132px;      /* pill width */
+  --sf-slen-bars-gap: 10px;    /* spacing between the 3 pills */
   --sf-slen-bars-shift-x: 0px; /* negative = left, positive = right */
-  --sf-slen-bars-shift-y: 6px; /* negative = up, positive = down */
+  --sf-slen-bars-shift-y: 3px; /* negative = up, positive = down */
   display: grid;
   grid-template-columns: var(--sf-slen-img-w) var(--sf-slen-bar-w);
   column-gap: var(--sf-slen-gap);
   align-items: center;
-  margin: 2px 0 6px;
+  margin: 0 0 4px;
 }
 
 .sf-comp--shear .sf-shearAna__slenImg {
@@ -6716,13 +6824,14 @@ input.sf-secprops__val:focus {
 
 /* Final strict cleanup: Analysis Shear page only */
 .content-panel.comp-panel > .sf-comp.sf-comp--shear > .sf-comp__mode[data-comp-mode-pane="analysis"].is-active > .sf-comp__card {
-  --sf-shear-card-h: 508px;
+  --sf-shear-analysis-only-height: clamp(390px, calc(100vh - 330px), 460px); /* compact like reference screenshot */
+  --sf-shear-card-h: var(--sf-shear-analysis-only-height) !important;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shear__cols {
-  grid-template-columns: minmax(280px, 1fr) minmax(292px, 1fr) minmax(260px, 1fr);
-  gap: 10px;
-  padding: 8px 8px 6px;
+  grid-template-columns: minmax(270px, 1fr) minmax(282px, 1fr) minmax(232px, 0.84fr);
+  gap: 8px;
+  padding: 8px 6px 6px;
   margin-left: 0;
   justify-content: stretch;
 }
@@ -6730,15 +6839,39 @@ input.sf-secprops__val:focus {
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__right {
   gap: 8px;
   padding-top: 2px;
+  margin-top: 40px;
   align-self: start;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__imgBox {
-  --sf-shear-imgbox-maxw: 258px;
-  --sf-shear-imgbox-h: 158px;
-  --sf-shear-imgbox-pad: 8px;
-  --sf-shear-plain-w: 78px;
-  --sf-shear-stiff-w: 78px;
+  --sf-shear-imgbox-maxw: 200px;
+  --sf-shear-imgbox-h: 156px;
+  --sf-shear-imgbox-pad: 4px;
+  --sf-shear-imgbox-gap: 4px;
+  --sf-shear-plain-w: auto;
+  --sf-shear-plain-h: auto;
+  --sf-shear-plain-zoom: 0.81;
+  --sf-shear-stiff-w: auto;
+  --sf-shear-stiff-h: auto;
+  --sf-shear-stiff-zoom: 0.81;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__imgEl {
+  width: auto;
+  height: auto;
+  max-width: 86%;
+  max-height: 86%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Analysis image order: light section left, blue section right */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__img:first-child {
+  order: 2;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__img:last-child {
+  order: 1;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__cap {
@@ -6804,16 +6937,16 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__rowPill {
-  grid-template-columns: 100px 150px; /* label column, then answer field */
+  grid-template-columns: 92px 140px; /* label column, then answer field */
   justify-content: start;
-  column-gap: 12px;
+  column-gap: 8px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__rowPill .sf-shear__label {
   text-align: left;
   padding-right: 0;
   padding-left: 2px;
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   letter-spacing: 0.3px;
   text-transform: uppercase;
   font-weight: 900;
@@ -6821,7 +6954,7 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearAna__rowPill .sf-shear__select {
-  height: 20px;
+  height: 18px;
   border-radius: 999px;
   background: rgba(205, 218, 232, 0.85);
   box-shadow:
@@ -6829,7 +6962,7 @@ input.sf-secprops__val:focus {
     0 1px 0 rgba(0,0,0,0.06);
   border: 1px solid rgba(105, 100, 90, 0.16);
   padding: 0 28px 0 12px;
-  font-size: 0.70rem;
+  font-size: 0.63rem;
   font-weight: 900;
   color: rgba(62, 55, 49, 0.86);
 }
@@ -6844,7 +6977,7 @@ input.sf-secprops__val:focus {
 .sf-comp--shear .sf-shear__label {
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: 0.76rem;
+  font-size: 0.68rem;
   color: rgba(62, 55, 49, 0.78);
   text-align: right;
   padding-right: 6px;
@@ -6854,35 +6987,35 @@ input.sf-secprops__val:focus {
 .sf-comp--shear .sf-shear__input,
 .sf-comp--shear .sf-shear__select {
   width: 100%;
-  height: 18px;
+  height: 15px;
   border-radius: 999px;
   border: 0;
   outline: none;
   background: rgba(142, 172, 203, 0.35);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
-  padding: 0 10px;
+  padding: 0 8px;
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   color: rgba(62, 55, 49, 0.90);
 }
 
 .sf-comp--shear .sf-shear__select {
-  height: 22px;
+  height: 18px;
 }
 
 .sf-comp--shear .sf-shear__divider {
   height: 1px;
   background: rgba(105, 100, 90, 0.15);
-  margin: 6px 4px;
+  margin: 4px 3px;
 }
 
 /* Checks + bars */
 .sf-comp--shear .sf-shear__checks {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 2px 6px 4px;
+  gap: 7px;
+  padding: 1px 5px 3px;
   min-height: 0;
 }
 
@@ -7463,7 +7596,13 @@ input.sf-secprops__val:focus {
   --des-light-box-min-h: 88px; /* lightest section box height */
   --des-light-box-offset-x: 22px; /* lightest section move left/right */
   --des-light-box-offset-y: 30px; /* lightest section vertical offset */
+  --des-light-manual-x: 20px; /* LIGHTEST table manual move: +right / -left */
+  --des-light-left-manual-x: 30px; /* left table manual move: +right / -left */
+  --des-light-left-manual-y: 0px; /* left table manual move: +down / -up */
   --des-light-right-w: 192px;  /* lightest right panel width */
+  --des-light-right-shift-x: -14px; /* move right panel left/right (negative = closer to label) */
+  --des-light-right-manual-x: -15px; /* right table manual move: +right / -left */
+  --des-light-right-manual-y: 0px; /* right table manual move: +down / -up */
   --des-light-left-w: 132px;   /* lightest left label panel width */
   --des-light-left-h: 126px;   /* lightest left label panel height only */
   --des-light-eq-size: 1.35rem;/* lightest '=' size */
@@ -7494,7 +7633,7 @@ input.sf-secprops__val:focus {
   --des-beam-title-h: 18px;    /* BEAM LOAD title height */
   --des-beam-title-pad-x: 10px;/* BEAM LOAD title horizontal padding */
   --des-beam-title-size: 0.88rem;   /* BEAM LOAD title size */
-  --des-load-title-size: 0.88rem;   /* LOAD W/O BEAM WEIGHT title size */
+  --des-load-title-size: 0.80rem;   /* LOAD W/O BEAM WEIGHT title size */
   --des-beam-label-size: 0.68rem;   /* BEAM LOAD label text size */
   --des-beam-field-size: 0.68rem;   /* BEAM LOAD field text size */
   --des-beam-select-size: 0.54rem;  /* BEAM TYPE select text size */
@@ -7505,33 +7644,33 @@ input.sf-secprops__val:focus {
   --des-beam-pill-pad-x: 8px;       /* BEAM LOAD pill horizontal padding */
   --des-beam-field-w: 98px;         /* BEAM LOAD right field width */
   --des-beam-select-w: 240px;       /* BEAM TYPE select width */
-  --des-load-box-w: 400px;          /* LOAD W/O BEAM WEIGHT box width */
-  --des-load-box-min-h: 158px;     /* LOAD W/O BEAM WEIGHT minimum height */
+  --des-load-box-w: 330px;          /* LOAD W/O BEAM WEIGHT box width */
+  --des-load-box-min-h: 130px;     /* LOAD W/O BEAM WEIGHT minimum height */
   --des-load-box-offset-y: 18px;   /* LOAD box move down amount */
   --des-load-box-pad-y: 12px;      /* LOAD box vertical padding */
   --des-load-box-pad-x: 10px;      /* LOAD box horizontal padding */
   --des-load-title-top: -11px;     /* LOAD title vertical position */
   --des-load-title-left: 10px;     /* LOAD title horizontal position */
-  --des-load-title-h: 22px;        /* LOAD title height */
-  --des-load-title-pad-x: 10px;    /* LOAD title horizontal padding */
+  --des-load-title-h: 20px;        /* LOAD title height */
+  --des-load-title-pad-x: 8px;     /* LOAD title horizontal padding */
   --des-load-title-letter: 0.4px;  /* LOAD title letter spacing */
   --des-load-grid-top-mt: 6px;     /* LOAD grid top margin */
   --des-load-row-gap: 6px;         /* LOAD default row gap */
-  --des-load-grid-gap-x: 10px;     /* LOAD grid column gap */
-  --des-load-grid-gap-y: 3px;      /* LOAD grid row gap */
+  --des-load-grid-gap-x: 8px;      /* LOAD grid column gap */
+  --des-load-grid-gap-y: 2px;      /* LOAD grid row gap */
   --des-load-top-label-w: 88px;    /* top-left label width */
   --des-load-top-wu-label-w: 34px; /* Wu label width */
   --des-load-top-inner-gap: 4px;   /* top row item gap */
-  --des-load-pill-h: 19px;         /* LOAD result pill height */
-  --des-load-pill-w: 65px;         /* LOAD small pill width */
-  --des-load-wide-pill-w: 78px;    /* LOAD wide pill width */
-  --des-load-wide-label-w: 200px;  /* LOAD wide label width */
+  --des-load-pill-h: 17px;         /* LOAD result pill height */
+  --des-load-pill-w: 56px;         /* LOAD small pill width */
+  --des-load-wide-pill-w: 68px;    /* LOAD wide pill width */
+  --des-load-wide-label-w: 174px;  /* LOAD wide label width */
   --des-load-wide-gap: 5px;        /* LOAD wide row gap */
   --des-load-wide-offset-x: 0px;   /* LOAD wide rows move left/right */
-  --des-load-zx-pill-w: 126px;     /* LOAD Zx row pill width */
-  --des-load-label-size: 0.68rem;  /* LOAD label text size */
-  --des-load-pill-size: 0.70rem;   /* LOAD pill text size */
-  --des-load-unit-size: 0.68rem;   /* LOAD unit text size */
+  --des-load-zx-pill-w: 104px;     /* LOAD Zx row pill width */
+  --des-load-label-size: 0.56rem;  /* LOAD label text size */
+  --des-load-pill-size: 0.58rem;   /* LOAD pill text size */
+  --des-load-unit-size: 0.56rem;   /* LOAD unit text size */
   --des-steeltype-label-w: 86px;   /* STEEL TYPE label column width */
   --des-steeltype-select-w: 90px; /* STEEL TYPE dropdown width */
   --des-steeltype-select-h: 18px;  /* STEEL TYPE dropdown height */
@@ -7540,11 +7679,16 @@ input.sf-secprops__val:focus {
   --des-condition-box-min-h: 246px;/* CONDITION CHECKING box height */
   --des-condition-box-offset-x: 392px; /* CONDITION CHECKING move left/right */
   --des-condition-box-offset-y: 16px;   /* CONDITION CHECKING move up/down */
+  --des-condition-manual-x: 0px;   /* CONDITION CHECKING manual nudge: +right / -left */
+  --des-condition-manual-y: -28px; /* CONDITION CHECKING manual nudge: -up / +down */
   --des-ultimate-box-w: calc(100% - var(--des-ultimate-box-offset-x) - 166px);     /* ULTIMATE SHEAR box width */
   --des-ultimate-box-min-h: 25px;  /* ULTIMATE SHEAR box height */
   --des-ultimate-box-offset-x: 392px; /* ULTIMATE SHEAR move left/right */
   --des-ultimate-box-shift-x: 0px; /* extra manual right/left shift */
   --des-ultimate-box-offset-y: 22px;  /* ULTIMATE SHEAR move up/down */
+  --des-ultimate-manual-width: 68%; /* ULTIMATE SHEAR manual width (use % or px) */
+  --des-ultimate-manual-x: 0px; /* ULTIMATE SHEAR manual nudge: +right / -left */
+  --des-ultimate-manual-y: -70px; /* ULTIMATE SHEAR manual nudge: -up / +down */
   --des-shape-panel-w: 110px;      /* right shape panel width */
   --des-shape-card-w: 100%;        /* each inner photo card width */
   --des-shape-panel-gap-x: 10px;   /* gap from condition box */
@@ -7902,11 +8046,13 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestBox {
-  margin-left: 0;
+  margin-left: var(--des-light-box-offset-x);
   margin-top: var(--des-light-box-offset-y);
-  width: 100%;
+  width: var(--des-light-box-w);
+  max-width: 100%;
   min-height: var(--des-light-box-min-h);
   position: relative;
+  transform: translateX(var(--des-light-manual-x));
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestLabel {
@@ -7927,7 +8073,7 @@ input.sf-secprops__val:focus {
   display: flex;
   align-items: center;
   padding: 0 16px 0 18px;
-  transform: translateY(-50%);
+  transform: translate(var(--des-light-left-manual-x), calc(-50% + var(--des-light-left-manual-y)));
   z-index: 2;
 }
 
@@ -7948,8 +8094,8 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestValue {
   position: absolute;
-  right: 0;
-  top: 0;
+  right: calc(var(--des-light-right-shift-x) - var(--des-light-right-manual-x));
+  top: var(--des-light-right-manual-y);
   width: var(--des-light-right-w);
   height: var(--des-light-box-min-h);
   border-radius: 20px;
@@ -9291,7 +9437,7 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='design'].is-active > .sf-comp__card {
-  --sf-shear-card-h: 620px;
+  --sf-shear-card-h: unset;
 }
 
 /* ===== FINAL LOCK: Design Shear no-overlap layout ===== */
@@ -9345,12 +9491,22 @@ input.sf-secprops__val:focus {
   min-height: 0 !important;
   overflow: hidden !important;
   padding: 10px 12px 8px !important;
+  align-self: start !important;
+  justify-self: stretch !important;
+  transform: translate(var(--des-condition-manual-x), var(--des-condition-manual-y)) !important;
+  z-index: 6 !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox {
   grid-area: ultimate !important;
   min-height: 0 !important;
-  padding: 8px 12px 8px !important;
+  padding: 6px 10px 6px !important;
+  width: min(100%, var(--des-ultimate-manual-width)) !important;
+  max-width: min(100%, var(--des-ultimate-manual-width)) !important;
+  justify-self: start !important;
+  align-self: start !important;
+  transform: translate(var(--des-ultimate-manual-x), var(--des-ultimate-manual-y)) !important;
+  z-index: 6 !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTitle,
@@ -9370,15 +9526,74 @@ input.sf-secprops__val:focus {
   margin-top: 0 !important;
 }
 
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
+  gap: 8px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow {
+  grid-template-columns: auto 96px auto !important;
+  gap: 5px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateExpr,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRemarksLabel {
+  font-size: 0.8rem !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateUnit {
+  font-size: 0.78rem !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimatePill {
+  height: 20px !important;
+  font-size: 0.8rem !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow--remarks {
+  grid-template-columns: auto 96px !important;
+}
+
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
   grid-area: shape !important;
   align-self: stretch !important;
   padding: 6px !important;
   border-width: 3px !important;
   grid-template-rows: 1fr 1fr !important;
+  transform: translateY(-45px) !important;
 }
 
-/* Ensure design shear main container fully fits all cards */
-.content-panel.comp-panel > .sf-comp.sf-comp--shear > .sf-comp__mode[data-comp-mode-pane="design"].is-active > .sf-comp__card {
-  --sf-shear-card-h: 700px !important;
+/* Design uses same gray-card height as analysis (shared value above) */
+
+
+/* ===== LOCKED DESIGN SHEAR LAYOUT (fixed values) ===== */
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__start {
+  --des-light-box-w: 292px !important;
+  --des-light-box-min-h: 88px !important;
+  --des-light-box-offset-x: 22px !important;
+  --des-light-box-offset-y: 30px !important;
+  --des-light-manual-x: 20px !important;
+  --des-light-left-manual-x: 30px !important;
+  --des-light-left-manual-y: 0px !important;
+  --des-light-right-w: 192px !important;
+  --des-light-right-shift-x: -14px !important;
+  --des-light-right-manual-x: -15px !important;
+  --des-light-right-manual-y: 0px !important;
+  --des-ultimate-manual-width: 68% !important;
+  --des-ultimate-manual-x: 0px !important;
+  --des-ultimate-manual-y: -115px !important;
+  --des-condition-manual-x: 0px !important;
+  --des-condition-manual-y: -28px !important;
+}
+
+/* Disable page scroll when SHEAR tab is active (analysis/design) */
+html:has(.sf-comp.sf-comp--shear .sf-comp__mode.is-active),
+body:has(.sf-comp.sf-comp--shear .sf-comp__mode.is-active) {
+  overflow-y: hidden !important;
+}
+
+body:has(.sf-comp.sf-comp--shear .sf-comp__mode.is-active) .notebook-full,
+body:has(.sf-comp.sf-comp--shear .sf-comp__mode.is-active) .content-panel,
+body:has(.sf-comp.sf-comp--shear .sf-comp__mode.is-active) .content-panel.comp-panel,
+body:has(.sf-comp.sf-comp--shear .sf-comp__mode.is-active) .content-panel.sheet-panel {
+  overflow-y: hidden !important;
 }

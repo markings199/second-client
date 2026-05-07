@@ -9,11 +9,108 @@
   padding: 10px var(--sf-shear-side-pad) 14px;
 }
 
+/* ===== ANALYSIS BENDING - replica from user reference ===== */
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active > .sf-comp__card > .sf-tbRef__bendShell {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  gap: 25px !important;
+  align-items: flex-start !important;
+  width: 1100px !important;
+  max-width: calc(100% - 32px) !important;
+  margin: 22px auto 0 !important;
+  padding: 0 !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-comp__star,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-comp__solveSlot {
+  display: none !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft {
+  width: 55% !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 18px !important;
+  padding: 18px 16px 14px !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendRight {
+  width: 45% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCompact,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 18px !important;
+  padding: 15px 20px !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__methodRow {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  margin-bottom: 8px !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__pillLbl {
+  background: #d9d9d9 !important;
+  border-radius: 10px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__methodSel {
+  background: #e6e6e6 !important;
+  border-radius: 10px !important;
+  min-height: 32px !important;
+  font-weight: 700 !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__paramsHdr,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__lab,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__reqLbl {
+  color: #2c4e8a !important;
+  font-weight: 700 !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__inp--rect,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__pillIce--rect,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__pillIce--pill,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__sel--rect,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__outIce {
+  background: #d9d9d9 !important;
+  border-radius: 8px !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictPill,
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__outYellow {
+  background: #f4d46c !important;
+  color: #222 !important;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__capHeroOval {
+  background: #ff7a00 !important;
+  color: #111 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
 /* NOTE: selector is intentionally very specific to override comp-panel defaults */
 .content-panel.comp-panel > .sf-comp.sf-comp--tension > .sf-comp__mode.is-active > .sf-comp__card {
   /* Manual controls */
   --sf-shear-card-w: min(1700px, 100%);
   --sf-shear-card-min-w: 0px;
+  --sf-shear-analysis-gray-height: 580px; /* manual control: change this to resize gray table */
 
   box-sizing: border-box;
   width: 100% !important;
@@ -27,7 +124,7 @@
   flex: 0 0 auto !important;
   max-height: none !important;
   height: auto !important;
-  min-height: min(520px, 74vh);
+  min-height: var(--sf-shear-analysis-gray-height) !important;
   overflow: visible;
 }
 
@@ -2478,20 +2575,45 @@
   width: 100% !important;
   max-width: var(--sf-shear-card-w) !important;
   min-width: var(--sf-shear-card-min-w) !important;
-  padding: 14px 18px 16px;
+  padding: var(--sf-bending-gray-shell-pad, 22px 26px 26px);
 
   margin-left: 0;
   margin-right: auto;
 
-  flex: 0 0 auto !important;
+  /* Fill space below mode nav inside 100vh notebook (no page scroll, no min-height forcing overflow) */
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
   max-height: none !important;
   height: auto !important;
-  min-height: min(480px, 72vh);
-  overflow: visible;
+  overflow: hidden !important;
 }
 
+/*
+ * Design Bending + WITHOUT/WITH DEFLECTION: tall grid — scroll *inside* the gray card only.
+ * Analysis Bending keeps overflow:hidden on the card (no inner scrollbar).
+ */
+.content-panel.comp-panel
+  > .sf-comp.sf-comp--bending
+  > .sf-comp__mode[data-comp-mode-pane="design"].is-active
+  > .sf-comp__card {
+  max-height: calc(100vh - 210px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
 
+/* SHEAR analysis gray table height (active selector) */
+.content-panel.comp-panel > .sf-comp.sf-comp--shear > .sf-comp__mode[data-comp-mode-pane="analysis"].is-active > .sf-comp__card {
+  --sf-shear-analysis-gray-height: 580px; /* manual control: change this value */
+  min-height: var(--sf-shear-analysis-gray-height) !important;
+}
 
+/* BENDING > ANALYSIS: outer gray shell inset only (does not set inner panel heights) */
+:root {
+  --sf-bending-analysis-left-table-width: 610px;
+  --sf-bending-gray-shell-pad: 22px 26px 26px;
+}
 
 .sf-comp--bending .sf-shear__cols {
   flex: 1;
@@ -6295,9 +6417,12 @@
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__bendShell {
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 12px;
-  padding: 8px 10px 6px;
+  grid-template-columns: 300px 302px;
+  gap: 18px;
+  width: fit-content;
+  max-width: calc(100% - 30px);
+  margin: 18px auto 0;
+  padding: 0;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__bendLeft,
@@ -6307,6 +6432,45 @@
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__bendLeft {
   padding-top: 0;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-comp__star {
+  display: none !important;
+}
+
+/* Method row match to reference (small label + compact ASD inline) */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__methodRow {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  margin-bottom: 6px !important;
+  flex-wrap: nowrap !important;
+}
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__pillLbl {
+  font-size: 0.62rem !important;
+  letter-spacing: 0.35px !important;
+  padding: 3px 10px !important;
+  line-height: 1 !important;
+}
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__methodPick {
+  min-width: 0 !important;
+  width: auto !important;
+}
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__methodSel {
+  width: 92px !important;
+  min-width: 92px !important;
+  min-height: 34px !important;
+  padding: 0 24px 0 10px !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  border-radius: 9px !important;
+}
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__caret {
+  right: 8px !important;
+  font-size: 0.75rem !important;
 }
 
 .sf-comp--tension .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__anaLeft > .sf-tbRef__card:first-of-type {
@@ -6374,7 +6538,7 @@
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__card {
-  padding: 10px 12px 11px;
+  padding: 9px 11px 10px;
   border-radius: 14px;
 }
 
@@ -6385,7 +6549,7 @@
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__paramsHdr {
-  margin: 7px 0 5px;
+  margin: 5px 0 4px;
   font-size: 0.74rem;
 }
 
@@ -6394,6 +6558,36 @@
   justify-content: center;
   align-self: stretch;
   min-height: 100%;
+  border-radius: 10px;
+  padding: 8px 8px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__bendCompactTop {
+  grid-template-columns: minmax(0, 1fr) 106px;
+  gap: 8px 10px;
+  margin-bottom: 2px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__bendCompactFormulas {
+  gap: 2px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__formulaBlock {
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 5px 8px;
+  margin-bottom: 4px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__formulaImg {
+  width: 100%;
+  max-width: 205px;
+  height: auto;
+  display: block;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__formulaSpacer {
+  display: block;
+  min-height: 1px;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__inp--rect,
@@ -6416,23 +6610,26 @@
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__verdictPill {
-  min-width: 92px;
-  min-height: 34px;
-  font-size: 0.72rem;
+  min-width: 78px;
+  min-height: 30px;
+  padding: 5px 10px;
+  font-size: 0.62rem;
+  line-height: 1.08;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__mnRow {
   gap: 6px 8px;
-  margin-top: 4px;
+  margin-top: 1px;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__mnVal {
-  min-width: 88px;
+  min-width: 96px;
+  min-height: 26px;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capHero {
-  gap: 8px 10px;
-  margin: 8px 0 10px;
+  gap: 8px;
+  margin: 5px 0 6px;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capHeroSym {
@@ -6440,14 +6637,37 @@
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capHeroOval {
-  min-width: 108px;
-  min-height: 46px;
-  padding: 7px 20px;
-  font-size: 1.02rem;
+  min-width: 92px;
+  min-height: 38px;
+  padding: 6px 16px;
+  font-size: 0.98rem;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capHeroUnit {
-  font-size: 0.71rem;
+  font-size: 0.68rem;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__verdictLbl {
+  font-size: 0.58rem;
+  letter-spacing: 0.35px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__mnLbl {
+  font-size: 0.65rem;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__bendCap .sf-tbRef__paramsHdr {
+  margin-bottom: 1px;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capLrfdRow {
+  gap: 6px;
+  font-size: 0.68rem;
+}
+
+.sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__capLrfdRow .sf-tbRef__outIce--cap {
+  min-width: 88px;
+  min-height: 24px;
 }
 
 .sf-comp--bending .sf-comp__mode[data-comp-mode-pane='analysis'] .sf-tbRef__propsGrid--bend .sf-tbRef__kv,
@@ -6703,8 +6923,13 @@
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--tensionRod > .sf-comp__mode.is-active > .sf-comp__card {
-  min-height: min(560px, 78vh);
+  min-height: 500px;
   height: auto !important;
+  overflow: hidden;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--tensionRod > .sf-comp__mode.is-active {
+  overflow: hidden;
 }
 
 .sf-comp--tensionRod .sf-rod__grid {
@@ -6713,19 +6938,20 @@
   gap: 10px;
   align-items: start;
   padding: 6px 2px 4px;
+  overflow: hidden;
 }
 
 .sf-comp--tensionRod .sf-rod__grid--design {
-  max-height: min(72vh, 820px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-gutter: stable;
+  max-height: none;
+  overflow: hidden;
+  -webkit-overflow-scrolling: auto;
+  scrollbar-gutter: auto;
 }
 
 /* Design tension rod: use full panel height (no cramped inner scroll) */
 .content-panel.comp-panel > .sf-comp.sf-comp--tensionRod > .sf-comp__mode[data-comp-mode-pane='design'].is-active > .sf-comp__card {
-  min-height: min(600px, 82vh);
+  min-height: min(515px, 78vh);
+  max-height: min(515px, 78vh);
 }
 
 .sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] .sf-rod__grid {
@@ -6763,6 +6989,53 @@
 
 .sf-comp--tensionRod .sf-rod__status {
   text-align: center;
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] section[aria-label='Design status'] {
+  width: calc(70% - 40px);
+  box-sizing: border-box;
+  margin-left: 100px;
+  transform: translateY(-130px);
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] section[aria-label='Design area checks'] {
+  margin-left: 0;
+  margin-top: 10px;
+  transform: translateX(-460px);
+  width: 80%;
+  box-sizing: border-box;
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] section[aria-label='Design area checks'] {
+  padding: 7px 9px 8px;
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] section[aria-label='Design area checks'] .sf-tbRef__paramsHdr {
+  margin: 4px 0 4px;
+  font-size: 0.68rem;
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] section[aria-label='Design area checks'] .sf-tbRef__reqLine {
+  margin-bottom: 2px;
+  gap: 5px;
+  font-size: 0.63rem;
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] section[aria-label='Design area checks'] .sf-tbRef__row {
+  margin-bottom: 2px;
+  gap: 4px 6px;
+  font-size: 0.63rem;
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] section[aria-label='Design area checks'] .sf-tbRef__outIce,
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] section[aria-label='Design area checks'] .sf-tbRef__outYellow {
+  min-height: 20px;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+}
+
+.sf-comp--tensionRod .sf-comp__mode[data-comp-mode-pane='design'] section[aria-label='Design area checks'] .sf-tbRef__u {
+  font-size: 0.58rem;
 }
 
 .sf-comp--tensionRod .sf-tbRef__card {
@@ -6918,6 +7191,7 @@
   align-items: start;
 }
 
+
 /* Flatten structural wrappers so cards can pack densely across columns */
 .sf-comp--bending .sf-bendRef__topRow,
 .sf-comp--bending .sf-bendRef__bottomRow,
@@ -6950,7 +7224,8 @@
 .sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__compact { min-height: 126px; }
 .sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadW { min-height: 118px; }
 .sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__cap { min-height: 92px; }
-.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__final { min-height: 94px; }
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__final { min-height: 165px; }
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__params { min-height: calc(90% + 10px); }
 
 /* Occupy remaining gray tracks in with-deflection layout */
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__loadWo { min-height: 248px; }
@@ -6978,6 +7253,11 @@
 .sf-comp--bending .sf-bendRef__cap { grid-column: 2; grid-row: 3; }
 .sf-comp--bending .sf-bendRef__final { grid-column: 3; grid-row: 3; }
 .sf-comp--bending .sf-bendRef__loadW { grid-column: 2 / span 2; grid-row: 4; }
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadW {
+  width: calc(100% - 320px);
+  box-sizing: border-box;
+  justify-self: start;
+}
 
 .sf-comp--bending .sf-bendRef__assumed2 { grid-column: 2; grid-row: 5; }
 .sf-comp--bending .sf-bendRef__defl { grid-column: 3; grid-row: 5; }
@@ -7006,7 +7286,7 @@
 
 .sf-comp--bending .sf-bendRef__render {
   width: 100%;
-  height: 74px;
+  height: 110px;
   border-radius: 13px;
   border: 1px solid rgba(26, 45, 92, 0.12);
   background: rgba(214, 228, 246, 0.5);
@@ -7108,11 +7388,20 @@
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__loadW {
   grid-column: 3;
   grid-row: 1;
+  width: 100%;
+  max-width: 100%;
+  justify-self: stretch;
+  min-height: 182px;
+}
+
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__compact {
+  min-height: 294px;
 }
 
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__loadWo {
   grid-column: 1;
-  grid-row: 3 / span 2;
+  grid-row: 2 / span 2;
+  transform: translateY(100px);
 }
 
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__assumed2 {
@@ -7127,18 +7416,72 @@
 
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__cap {
   grid-column: 3;
-  grid-row: 4;
+  grid-row: 5;
+  width: calc(100% - 70px);
+  max-width: calc(100% - 70px);
+  justify-self: start;
+  transform: translate(40px, -95px);
 }
 
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__final {
   grid-column: 2 / span 2;
-  grid-row: 5;
+  grid-row: 4;
+  width: calc(100% - 390px);
+  max-width: calc(100% - 390px);
+  justify-self: start;
+  transform: translate(380px, -100px);
+}
+
+/* With deflection: tighten packing to remove visible dead space */
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__designGrid {
+  gap: 4px;
+  padding: 2px 2px 2px;
+}
+
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__card {
+  padding: 5px 6px 6px;
 }
 
 .sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadWo { grid-column: 1; grid-row: 3 / span 2; }
-.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__cap { grid-column: 2; grid-row: 3; }
-.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__final { grid-column: 3; grid-row: 3; }
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__cap { grid-column: 3; grid-row: 3; }
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__final { grid-column: 2; grid-row: 3; }
 .sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadW { grid-column: 2 / span 2; grid-row: 4; }
+
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__cap {
+  transform: translateY(80px);
+}
+
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadWo {
+  transform: translateY(-20px);
+  min-height: 300px;
+  padding: 10px 10px 12px;
+}
+
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadWo .sf-tbRef__paramsHdr {
+  margin: 6px 0 6px;
+  font-size: 0.82rem;
+}
+
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadWo .sf-tbRef__reqLine {
+  margin-bottom: 6px;
+  gap: 8px;
+  font-size: 0.72rem;
+}
+
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadWo .sf-tbRef__reqLbl {
+  font-size: 0.70rem;
+}
+
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadWo .sf-tbRef__outIce,
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadWo .sf-tbRef__outYellow {
+  min-height: 27px;
+  max-width: 108px;
+  font-size: 0.76rem;
+}
+
+.sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendRef__loadWo .sf-tbRef__u {
+  font-size: 0.66rem;
+}
 
 /* With deflection: reduce excessive height pressure */
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__loadWo,
@@ -7149,6 +7492,16 @@
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__cap,
 .sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__final {
   min-height: 0;
+}
+
+/* Keep requested manual height for CHECK COMPACTNESS in WITH DEFLECTION */
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__compact {
+  min-height: 215px !important;
+}
+
+/* Add requested height for LOAD W/O BEAM WEIGHT in WITH DEFLECTION */
+.sf-comp--bending:has(#sfBendDefYes:checked) .sf-bendRef__loadWo {
+  min-height: 323px !important;
 }
 
 /* Remarks rows: allow wider message pill and avoid tall stacked text */
@@ -7171,6 +7524,313 @@
   line-height: 1.2;
   padding: 6px 8px;
   font-size: 0.63rem;
+}
+
+/* ===== BENDING ANALYSIS: match requested reference layout ===== */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active > .sf-comp__card {
+  background: #bdbdbf !important;
+  border: 8px solid rgba(147, 138, 127, 0.9) !important;
+  box-shadow: none !important;
+  border-radius: 20px !important;
+  min-height: 500px !important;
+  height: 500px !important;
+  padding: 14px 20px 14px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-comp__star,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-bendTopTabs {
+  display: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendShell {
+  display: grid !important;
+  grid-template-columns: 300px 300px !important;
+  gap: 22px !important;
+  width: min(624px, calc(100% - 44px)) !important;
+  max-width: min(624px, calc(100% - 44px)) !important;
+  margin: 26px auto 0 !important;
+  padding: 0 !important;
+  align-items: start !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendRight {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendRight {
+  min-width: 0 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__card {
+  border-radius: 16px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft {
+  padding: 12px 14px 12px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCompact {
+  padding: 10px 12px 9px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap {
+  padding: 8px 12px 8px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__paramsHdr {
+  font-size: 0.78rem !important;
+  margin: 1px 0 6px !important;
+  letter-spacing: 0.45px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__methodRow {
+  gap: 10px !important;
+  margin-bottom: 7px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__pillLbl {
+  font-size: 0.66rem !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__methodSel {
+  min-height: 36px !important;
+  min-width: 76px !important;
+  font-size: 2rem !important;
+  font-weight: 900 !important;
+  border-radius: 9px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCompactTop {
+  grid-template-columns: minmax(0, 1fr) 90px !important;
+  gap: 6px 8px !important;
+  margin-bottom: 3px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictPill {
+  min-width: 70px !important;
+  min-height: 30px !important;
+  font-size: 0.56rem !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__capHero {
+  margin: 2px 0 0 !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__capHeroOval {
+  min-width: 96px !important;
+  min-height: 26px !important;
+  padding: 3px 13px !important;
+  font-size: 1.05rem !important;
+  line-height: 1 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-comp__solveSlot {
+  display: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__formulaBlock {
+  grid-template-columns: 150px 56px !important;
+  gap: 4px 8px !important;
+  margin-bottom: 4px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__formulaImg {
+  width: 150px !important;
+  height: 18px !important;
+  object-fit: cover !important;
+  object-position: left 0 top 2px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__formulaSpacer {
+  display: block !important;
+  width: 150px !important;
+  height: 18px !important;
+  background: url('../assets/reference/bending-compactness-formulas-ref2.png') no-repeat left -20px top -20px / 150px auto !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLpfLim,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLrfLim {
+  min-width: 52px !important;
+  min-height: 12px !important;
+  border-radius: 999px !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  overflow: hidden !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnLbl {
+  font-size: 0.56rem !important;
+  letter-spacing: 0.3px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnVal {
+  min-width: 72px !important;
+  min-height: 14px !important;
+  font-size: 0 !important;
+  color: transparent !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnRow {
+  display: grid !important;
+  grid-template-columns: 1fr auto auto !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnRow .sf-tbRef__u {
+  white-space: nowrap !important;
+  font-size: 0.7rem !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__capLrfdRow {
+  display: none !important;
+}
+
+/* ===== BENDING ANALYSIS: ASD replica (requested layout) ===== */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active > .sf-comp__card {
+  background: #cfcfcf !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 20px !important;
+  box-shadow: none !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: var(--sf-bending-gray-shell-pad, 22px 26px 26px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendShell {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 18px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft {
+  width: 55% !important;
+  min-width: 0 !important;
+  background: #e7e4dc !important;
+  border-radius: 18px !important;
+  border: none !important;
+  padding: 18px 16px 16px !important;
+  overflow: hidden !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendRight {
+  width: 45% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  overflow: hidden !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCompact,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap {
+  background: #f2f2f2 !important;
+  border-radius: 18px !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 10px 12px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__methodRow {
+  gap: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__pillLbl {
+  background: #d9d9d9 !important;
+  border-radius: 10px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__methodSel {
+  min-height: 32px !important;
+  min-width: 88px !important;
+  border-radius: 10px !important;
+  background: #e6e6e6 !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #222 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__paramsHdr,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__lab,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__reqLbl,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnLbl,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictLbl {
+  color: #2c4e8a !important;
+  font-weight: 700 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__inp--rect,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__pillIce--rect,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__pillIce--pill,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__sel--rect,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__outIce {
+  background: #d9d9d9 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__formulaBlock {
+  grid-template-columns: minmax(150px, 1fr) 92px !important;
+  gap: 8px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLpfLim,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLrfLim {
+  min-width: 90px !important;
+  min-height: 10px !important;
+  border-radius: 999px !important;
+  background: #9bb3c9 !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  padding: 0 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictPill,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__outYellow {
+  background: #f4d46c !important;
+  color: #222 !important;
+  border-radius: 10px !important;
+  border: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__capHero {
+  justify-content: center !important;
+  gap: 10px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__capHeroOval {
+  min-width: 110px !important;
+  min-height: 30px !important;
+  border-radius: 10px !important;
+  background: #ff7a00 !important;
+  color: #111 !important;
+  box-shadow: none !important;
 }
 
 @media (max-width: 1200px) {
@@ -7217,4 +7877,415 @@
     justify-content: center;
     flex-wrap: wrap;
   }
+
+  .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendShell {
+    flex-direction: column !important;
+  }
+
+  .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft,
+  .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendRight {
+    width: 100% !important;
+  }
+}
+
+/* ===== FINAL OVERRIDE: unhide + force ASD analysis layout ===== */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active > .sf-comp__card > .sf-tbRef__bendShell {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active > .sf-comp__card > .sf-comp__star,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active > .sf-comp__card > .sf-comp__solveSlot {
+  display: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active > .sf-comp__card {
+  background: #cfcfcf !important;
+  border-radius: 20px !important;
+  border: 6px solid rgba(147, 138, 127, 0.85) !important;
+  padding: var(--sf-bending-gray-shell-pad, 22px 26px 26px) !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active > .sf-comp__card > .sf-tbRef__bendShell {
+  width: min(1100px, 100%) !important;
+  max-width: 100% !important;
+  margin: 2px auto 0 !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft {
+  width: 55% !important;
+  background: #e7e4dc !important;
+  border-radius: 18px !important;
+  padding: 18px 16px 16px !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: hidden !important;
+  align-self: stretch !important;
+  transform: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendRight {
+  width: 45% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  overflow: hidden !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCompact,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap {
+  background: #f2f2f2 !important;
+  border-radius: 18px !important;
+  padding: 15px 20px !important;
+}
+
+/* Remove BENDING CAPACITY card (requested) */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap {
+  display: block !important;
+}
+
+/* CHECK COMPACTNESS exact-style pass (match user reference #2) */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCompact {
+  --sf-bend-compact-formula-row-height: 38px;
+  background: #f5f5f7 !important;
+  border-radius: 22px !important;
+  padding: 16px 16px 14px !important;
+  min-height: 0 !important;
+  /* Natural height from content — avoids huge blank gap from space-between + flex-grow */
+  flex: 0 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  transform: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCompact .sf-tbRef__paramsHdr {
+  display: inline-flex !important;
+  align-items: center !important;
+  margin: 0 0 10px !important;
+  padding: 6px 14px !important;
+  background: #efe9d9 !important;
+  border-radius: 999px !important;
+  color: #204a96 !important;
+  font-size: 0.98rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.25px !important;
+  line-height: 1.2 !important;
+  width: max-content !important;
+  max-width: fit-content !important;
+  align-self: flex-start !important;
+  white-space: nowrap !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  z-index: auto !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCompactTop {
+  grid-template-columns: 1fr 108px !important;
+  gap: 8px 10px !important;
+  margin-top: 0 !important;
+  margin-bottom: 8px !important;
+  align-items: stretch !important;
+  flex: 0 0 auto !important;
+  min-height: 0 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCompactFormulas {
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__formulaBlock {
+  grid-template-columns: 198px minmax(0, 1fr) !important;
+  gap: 6px 10px !important;
+  margin-bottom: 0 !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__formulaImg {
+  display: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__formulaSpacer {
+  display: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__formulaBlock::before {
+  content: "" !important;
+  display: block !important;
+  width: 100% !important;
+  height: var(--sf-bend-compact-formula-row-height) !important;
+  background: #f6f6f6 url("../assets/reference/bending-compactness-formulas-ref2.png") no-repeat left top / 198px 82px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__formulaBlock:nth-child(2)::before {
+  background-position: left bottom !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLpfLim,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLrfLim {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 22px !important;
+  border-radius: 999px !important;
+  background: #85a8c9 !important;
+  justify-self: stretch !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictBox {
+  border-radius: 10px !important;
+  background: #ebe7dc !important;
+  padding: 8px 8px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictLbl {
+  font-size: 0.62rem !important;
+  letter-spacing: 0.2px !important;
+  color: #5c5750 !important;
+  font-weight: 800 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictPill {
+  min-width: 92px !important;
+  min-height: 34px !important;
+  border-radius: 999px !important;
+  font-size: 0.55rem !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  background: #f4de78 !important;
+  padding: 5px 10px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnRow {
+  grid-template-columns: 1fr auto auto !important;
+  gap: 8px !important;
+  align-items: center !important;
+  margin-top: 0 !important;
+  padding-top: 6px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnLbl {
+  font-size: 0.82rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.2px !important;
+  color: #4f4a43 !important;
+  white-space: nowrap !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnVal {
+  min-width: 112px !important;
+  min-height: 26px !important;
+  border-radius: 999px !important;
+  background: #eddb83 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnRow .sf-tbRef__u {
+  font-size: 0.8rem !important;
+  font-weight: 800 !important;
+  color: #5a554d !important;
+}
+
+/* BENDING CAPACITY card under CHECK COMPACTNESS */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap {
+  flex: 0 0 auto !important;
+  margin-top: 0 !important;
+  background: #f5f5f7 !important;
+  border-radius: 22px !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 14px 18px 12px !important;
+  position: relative !important;
+  transform: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap .sf-tbRef__paramsHdr {
+  display: inline-flex !important;
+  align-items: center !important;
+  margin: 0 0 8px !important;
+  padding: 5px 12px !important;
+  border-radius: 999px !important;
+  background: #efe9d9 !important;
+  color: #204a96 !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.2px !important;
+  line-height: 1.2 !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap .sf-tbRef__capHero {
+  margin: 4px 0 0 !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap .sf-tbRef__capHeroSym {
+  font-size: 1.55rem !important;
+  font-weight: 900 !important;
+  color: #ef6f07 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap .sf-tbRef__capHeroOval {
+  min-width: 98px !important;
+  min-height: 28px !important;
+  padding: 4px 12px !important;
+  border-radius: 999px !important;
+  background: #ff7a00 !important;
+  color: #111 !important;
+  font-size: 1.45rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap .sf-tbRef__capHeroUnit {
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  color: #5a554d !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendCap .sf-tbRef__capLrfdRow {
+  display: none !important;
+}
+
+/* Left panel comfortable row rhythm (inner panel grows with content; outer gray pad is --sf-bending-gray-shell-pad) */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft {
+  font-size: 0.9rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__paramsHdr {
+  margin: 8px 0 10px !important;
+  font-size: 1.02rem !important;
+  letter-spacing: 0.2px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__row--select {
+  display: grid !important;
+  grid-template-columns: 220px minmax(190px, 1fr) !important;
+  gap: 8px 10px !important;
+  align-items: center !important;
+  margin-bottom: 10px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__propsGrid--bend {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px 12px !important;
+  margin: 6px 0 12px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__propsGrid--bend .sf-tbRef__kv {
+  grid-template-columns: auto minmax(86px, 1fr) auto !important;
+  gap: 6px !important;
+  align-items: center !important;
+  font-size: 0.95rem !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__propsGrid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px 10px !important;
+  margin-top: 8px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__propsGrid--3 .sf-tbRef__kv {
+  grid-template-columns: auto minmax(82px, 1fr) auto !important;
+  gap: 6px !important;
+  align-items: center !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__lab {
+  font-size: 0.95rem !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__sel--rect,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__inp--rect,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__pillIce--rect,
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__pillIce--pill {
+  min-height: 28px !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+/* Top method strip: match reference pill + larger visibility */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__methodRow {
+  --sf-bend-analysis-method-label-size: 1.02rem; /* manual size control for ANALYSIS METHOD */
+  --sf-bend-analysis-method-label-pad-y: 9px;
+  --sf-bend-analysis-method-label-pad-x: 18px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  margin-top: -20px !important; /* manual vertical move: more negative = move up, positive = move down */
+  margin-bottom: 12px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__pillLbl {
+  font-size: var(--sf-bend-analysis-method-label-size) !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.4px !important;
+  padding: var(--sf-bend-analysis-method-label-pad-y) var(--sf-bend-analysis-method-label-pad-x) !important;
+  border-radius: 999px !important;
+  background: #dfddd1 !important;
+  color: #4b4a45 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__methodPick {
+  position: relative !important;
+  width: 138px !important;
+  min-width: 138px !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__methodSel {
+  width: 138px !important;
+  min-width: 138px !important;
+  min-height: 44px !important;
+  border-radius: 10px !important;
+  padding: 0 28px 0 14px !important;
+  font-size: 2.1rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.3px !important;
+  background: #dce6ef !important;
+  border: 2px solid #aebbc8 !important;
+  color: #111 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__bendLeft .sf-tbRef__caret {
+  right: 9px !important;
+  font-size: 0.9rem !important;
+  color: #6e7276 !important;
 }

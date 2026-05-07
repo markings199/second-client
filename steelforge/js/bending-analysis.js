@@ -1,4 +1,7 @@
 (() => {
+  // #region agent log
+  fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'ea572d' }, body: JSON.stringify({ sessionId: 'ea572d', runId: 'layout-baseline', hypothesisId: 'H0', location: 'js/bending-analysis.js:top-level', message: 'script-loaded', data: { href: window.location.href }, timestamp: Date.now() }) }).catch(() => {});
+  // #endregion
   const CSV_NAME = 'exel program EWIWIWI(S(STEEL SELECTION)).csv';
   /** Column indices from steel selection workbook (0-based). */
   const COL = { type: 0, label: 2, lamF: 23, lamW: 24, Sx: 30, Zx: 33 };
@@ -212,12 +215,32 @@
     const capSym = pane.querySelector('.sf-tbRef__bendCap .sf-tbRef__capHeroSym');
     const capLrfdLbl = $('sfBendAnaCapLrfdLbl');
     const solveBtn = $('sfBendAnaSolve');
+    const shellEl = pane.querySelector('.sf-tbRef__bendShell');
+    const leftCardEl = pane.querySelector('.sf-tbRef__bendLeft');
+    const rightWrapEl = pane.querySelector('.sf-tbRef__bendRight');
+    const compactCardEl = pane.querySelector('.sf-tbRef__bendCompact');
+    const capacityCardEl = pane.querySelector('.sf-tbRef__bendCap');
+    const rootCardEl = pane.querySelector('.sf-comp__card');
 
     if (!methodEl || !shapeEl || !steelEl || !fyEl || !eEl || !mpEl) return;
 
     let wRows = [];
 
     const isManual = () => String(shapeEl.value || '') === 'manual';
+
+    // #region agent log
+    function sendLayoutDebugLog(runId, message) {
+      if (!rootCardEl || !shellEl || !leftCardEl || !rightWrapEl) return;
+      const rect = (el) => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { w: Number(r.width.toFixed(2)), h: Number(r.height.toFixed(2)), x: Number(r.x.toFixed(2)), y: Number(r.y.toFixed(2)) };
+      };
+      const cs = window.getComputedStyle(shellEl);
+      const rootCs = window.getComputedStyle(rootCardEl);
+      fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'ea572d' }, body: JSON.stringify({ sessionId: 'ea572d', runId, hypothesisId: 'H1,H2,H3,H4', location: 'js/bending-analysis.js:initBendingAnalysis', message, data: { viewport: { w: window.innerWidth, h: window.innerHeight }, shellCols: cs.gridTemplateColumns, shellGap: cs.gap, rootCardHeight: rootCs.height, rootCardMinHeight: rootCs.minHeight, rootCardRect: rect(rootCardEl), shellRect: rect(shellEl), leftRect: rect(leftCardEl), rightRect: rect(rightWrapEl), compactRect: rect(compactCardEl), capacityRect: rect(capacityCardEl) }, timestamp: Date.now() }) }).catch(() => {});
+    }
+    // #endregion
 
     function setGeomReadOnly(ro) {
       [lfEl, lwEl, zxEl, sxEl].forEach((el) => {
@@ -270,6 +293,9 @@
     }
 
     function recompute() {
+      // #region agent log
+      sendLayoutDebugLog('layout-baseline', 'recompute-before-values');
+      // #endregion
       normalizeInputs();
       syncSteel();
       if (eEl) eEl.value = String(E_DEFAULT);
@@ -312,6 +338,9 @@
 
       if (outMa) outMa.textContent = fmt(design, 3);
       if (outPhiMn) outPhiMn.textContent = fmt(design, 3);
+      // #region agent log
+      sendLayoutDebugLog('layout-baseline', 'recompute-after-values');
+      // #endregion
     }
 
     function buildShapeOptions() {
@@ -363,6 +392,10 @@
     syncSteel();
     buildShapeOptions();
     wire();
+    // #region agent log
+    sendLayoutDebugLog('layout-baseline', 'init-after-wire');
+    window.addEventListener('resize', () => sendLayoutDebugLog('layout-baseline', 'window-resize'));
+    // #endregion
 
     fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
       .then((r) => {
@@ -389,9 +422,15 @@
           setGeomReadOnly(false);
         }
         recompute();
+        // #region agent log
+        sendLayoutDebugLog('layout-baseline', 'after-csv-loaded');
+        // #endregion
       })
       .catch(() => {
         recompute();
+        // #region agent log
+        sendLayoutDebugLog('layout-baseline', 'csv-load-failed');
+        // #endregion
       });
   };
 })();
