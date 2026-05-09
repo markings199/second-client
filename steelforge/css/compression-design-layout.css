@@ -1,0 +1,305 @@
+/*
+ * DESIGN COMPRESSION — matches ANALYSIS COMPRESSION (sf-compRed) theme; scoped under .compression-design-layout.
+ */
+
+.compression-design-layout {
+  /* Mirror .sf-comp.sf-comp--compression .sf-compRed */
+  --cd-bg: #f2ead6;
+  --cd-outer-frame: #a8a095;
+  --cd-outer-border: rgba(84, 79, 71, 0.24);
+  --cd-inner: #d6cec4;
+  --cd-panel: #efebe6;
+  --cd-surface: #f8f4ee;
+  --cd-card: #e7e1d6;
+  --cd-card-border: rgba(46, 40, 34, 0.08);
+  --cd-text: #322f29;
+  --cd-muted: #6a6358;
+  --cd-accent: #2e436c;
+  --cd-blue: #9cb6db;
+  --cd-blue-dark: #4d6a99;
+  --cd-yellow: #f0d26e;
+  --cd-orange: #f16d17;
+  --cd-pill-surface: #eef0f2;
+  --cd-pill-dark-bg: #f3f0ea;
+  --cd-border-soft: rgba(46, 40, 34, 0.15);
+  --cd-inset-highlight: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+  --cd-frame-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 14px 26px rgba(43, 38, 32, 0.1);
+}
+
+.compression-design-layout,
+.compression-design-layout * {
+  box-sizing: border-box;
+}
+
+.compression-design-layout {
+  margin: 0;
+  min-height: min-content;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  color: var(--cd-text);
+  background: transparent;
+  padding: 0;
+}
+
+.compression-design-layout .calculator-shell {
+  max-width: none;
+  margin: 0;
+  padding: 18px;
+  /* Same gray “table shell” as analysis active tab */
+  background: var(--cd-outer-frame) !important;
+  border: 2px solid var(--cd-outer-border) !important;
+  border-radius: 30px !important;
+  box-shadow: var(--cd-frame-shadow) !important;
+}
+
+.compression-design-layout .page-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.compression-design-layout .method-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--cd-pill-dark-bg);
+  border: 1px solid rgba(46, 40, 34, 0.16);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--cd-text);
+}
+
+.compression-design-layout .method-pill span {
+  color: var(--cd-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.compression-design-layout .method-pill strong {
+  font-weight: 800;
+}
+
+.compression-design-layout .main-layout {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 24px;
+}
+
+/* Column-like areas: no extra “app” panel — same as .sf-compRed__column */
+.compression-design-layout .panel {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.compression-design-layout .panel-header {
+  display: block;
+  padding: 0;
+  margin-bottom: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--cd-accent);
+  font-size: 0.92rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.compression-design-layout .card {
+  background: var(--cd-card);
+  border: 1px solid var(--cd-card-border);
+  border-radius: 32px;
+  padding: 18px;
+  margin-bottom: 0;
+  box-shadow: var(--cd-inset-highlight);
+}
+
+.compression-design-layout .data-table,
+.compression-design-layout .load-table,
+.compression-design-layout .ratio-table,
+.compression-design-layout .section-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.compression-design-layout .data-table th,
+.compression-design-layout .data-table td,
+.compression-design-layout .load-table th,
+.compression-design-layout .load-table td,
+.compression-design-layout .ratio-table th,
+.compression-design-layout .ratio-table td,
+.compression-design-layout .section-table th,
+.compression-design-layout .section-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(46, 40, 34, 0.1);
+  font-size: 0.88rem;
+}
+
+.compression-design-layout .data-table th,
+.compression-design-layout .data-table td {
+  color: var(--cd-text);
+}
+
+.compression-design-layout .data-table th {
+  width: 45%;
+  font-weight: 800;
+}
+
+.compression-design-layout .data-table td {
+  font-weight: 800;
+}
+
+.compression-design-layout .data-table tbody tr:nth-child(odd) td {
+  background: var(--cd-pill-surface);
+}
+
+.compression-design-layout .data-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.compression-design-layout .load-table th,
+.compression-design-layout .section-table th,
+.compression-design-layout .ratio-table th {
+  text-align: left;
+  color: var(--cd-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 800;
+  background: transparent;
+}
+
+.compression-design-layout .load-table td,
+.compression-design-layout .ratio-table td,
+.compression-design-layout .section-table td {
+  font-weight: 800;
+  color: var(--cd-text);
+}
+
+.compression-design-layout .load-table tbody tr:nth-child(odd) td,
+.compression-design-layout .section-table tbody tr:nth-child(odd) td,
+.compression-design-layout .ratio-table tbody tr:nth-child(odd) td {
+  background: var(--cd-pill-surface);
+}
+
+.compression-design-layout .load-table tbody tr:nth-child(even) td,
+.compression-design-layout .section-table tbody tr:nth-child(even) td,
+.compression-design-layout .ratio-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.compression-design-layout .summary-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 32px;
+  background: var(--cd-card);
+  border: 1px solid var(--cd-card-border);
+  box-shadow: var(--cd-inset-highlight);
+}
+
+.compression-design-layout .summary-label {
+  color: var(--cd-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 800;
+}
+
+.compression-design-layout .summary-value {
+  font-size: 1.15rem;
+  font-weight: 900;
+  padding: 14px 18px;
+  border-radius: 999px;
+  text-align: center;
+  background: var(--cd-blue);
+  color: var(--cd-blue-dark);
+  width: 100%;
+}
+
+.compression-design-layout .result-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  border-radius: 32px;
+  background: var(--cd-card);
+  border: 1px solid var(--cd-card-border);
+  box-shadow: var(--cd-inset-highlight);
+  margin-bottom: 0;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.compression-design-layout .result-caption {
+  font-size: 0.78rem;
+  color: var(--cd-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 800;
+}
+
+.compression-design-layout .result-code {
+  font-size: 1rem;
+  font-weight: 900;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--cd-yellow);
+  color: #4b3915;
+}
+
+.compression-design-layout .image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.compression-design-layout .image-box {
+  min-height: 130px;
+  border-radius: 24px;
+  border: 1px dashed rgba(46, 40, 34, 0.22);
+  background: rgba(255, 255, 255, 0.88);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: var(--cd-muted);
+  overflow: hidden;
+  padding: 12px;
+}
+
+.compression-design-layout .image-box img {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  max-height: min(240px, 42vh);
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (max-width: 1040px) {
+  .compression-design-layout .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .compression-design-layout .calculator-shell {
+    padding: 14px;
+  }
+
+  .compression-design-layout .image-grid {
+    grid-template-columns: 1fr;
+  }
+}

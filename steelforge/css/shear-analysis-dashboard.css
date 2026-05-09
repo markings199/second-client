@@ -1,0 +1,730 @@
+/* ANALYSIS SHEAR — bending-style frame: light gray shell + separate white sheets */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1f2937;
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  padding: clamp(14px, 2vw, 20px) clamp(10px, 1.4vw, 18px) clamp(16px, 2.2vw, 22px);
+  /* Align with DESIGN SHEAR outer `.sf-comp__card` chrome */
+  background: rgba(151, 148, 140, 0.95);
+  border: 1px solid rgba(90, 86, 78, 0.25);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash *,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash *::before,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash *::after {
+  box-sizing: border-box;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__header {
+  margin-bottom: 16px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__panelTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 280px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__label {
+  font-size: clamp(0.82rem, 1.15vw, 0.95rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 252, 248, 0.98);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__methodWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: 999px;
+  background: rgba(232, 227, 216, 0.98);
+  border: 1px solid rgba(105, 100, 90, 0.16);
+  padding: 0 16px 0 20px;
+  min-height: 52px;
+  box-shadow: 0 1px 2px rgba(62, 55, 49, 0.05);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__methodSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #111827;
+  padding: 14px 32px 14px 0;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__methodCaret {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 8px;
+  pointer-events: none;
+  color: #6b7280;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__workspace {
+  display: grid;
+  /* Give the results column enough room so limiting-slenderness + verdict do not overlap */
+  grid-template-columns: minmax(320px, 1.35fr) minmax(280px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__workspace {
+    grid-template-columns: minmax(400px, 1.25fr) minmax(480px, 1.15fr);
+    gap: 22px;
+  }
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__resultsStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Match DESIGN SHEAR `.sf-shearDes__miniCard` cream panels */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__sheet {
+  background: rgba(248, 246, 239, 0.98);
+  border: 1px solid rgba(176, 168, 150, 0.3);
+  border-radius: 16px;
+  padding: clamp(18px, 2.2vw, 24px);
+  box-shadow: 0 1px 2px rgba(62, 55, 49, 0.06);
+  min-width: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__sheet--slender {
+  overflow-x: visible;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__sectionHeading {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: rgba(42, 70, 140, 0.95);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__fieldGroup {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__fieldLabel {
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__selectInput {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  width: 100%;
+  padding: 0 36px 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(176, 168, 150, 0.35);
+  background: rgba(205, 218, 232, 0.55);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__selectInput select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+  min-height: 50px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__selectCaret {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 8px;
+  pointer-events: none;
+  color: #475569;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricCard {
+  min-height: 96px;
+  padding: 16px 14px;
+  border-radius: 16px;
+  background: rgba(248, 244, 234, 0.85);
+  border: 1px solid rgba(105, 100, 90, 0.18);
+  display: grid;
+  gap: 6px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricLabel {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #6b7280;
+  letter-spacing: 0.03em;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricInput {
+  border: 0;
+  background: transparent;
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #111827;
+  width: 100%;
+  padding: 0;
+  font-family: inherit;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricInput:focus {
+  outline: none;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__gradeInput {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 0 12px 0 14px;
+  min-height: 50px;
+  border-radius: 999px;
+  border: 1px solid rgba(176, 168, 150, 0.35);
+  background: rgba(205, 218, 232, 0.45);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__gradeChip {
+  flex-shrink: 0;
+  min-width: 52px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0057b8, #1e90ff);
+  color: #fff;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__steelSelect {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #111827;
+  padding: 12px 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__fyRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__fyInput {
+  width: 72px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(105, 100, 90, 0.2);
+  background: rgba(255, 255, 255, 0.92);
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__valuePill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 50px;
+  width: 100%;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(176, 168, 150, 0.35);
+  background: rgba(205, 218, 232, 0.45);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__valuePill input {
+  border: 0;
+  background: transparent;
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-weight: 700;
+  text-align: right;
+  color: #111827;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__valuePill input:focus {
+  outline: none;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__resultCard {
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__resultCard--flush {
+  padding: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__compactnessCard {
+  margin-bottom: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__resultTitle {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #4b5563;
+  background: #e5e7eb;
+  border: 1px solid #d1d5db;
+}
+
+/* Cream header pill + dark blue type (CHECK COMPACTNESS–style) */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__resultTitle--check {
+  background: #fef9e7;
+  color: #1e3a8a;
+  border: 1px solid #f5e6b3;
+  letter-spacing: 0.09em;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__compactnessLayout {
+  display: grid;
+  /*
+    Default: stack verdict under formulas — needs ~720px+ horizontal for side-by-side;
+    the results column is often ~380–520px wide, which caused overlap before.
+  */
+  grid-template-columns: 1fr;
+  gap: 18px;
+  align-items: stretch;
+  margin-bottom: 18px;
+}
+
+/* Side-by-side formulas + verdict only on very wide viewports (entire dash is wide enough). */
+@media (min-width: 1520px) {
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__compactnessLayout {
+    grid-template-columns: minmax(360px, 1fr) minmax(280px, 360px);
+    gap: 18px 24px;
+    align-items: stretch;
+  }
+}
+
+/* Figure + stacked value pills (reference: formula column + light-blue chips) */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(112px, max-content);
+  grid-template-rows: repeat(3, minmax(44px, 1fr));
+  gap: 10px 20px;
+  align-items: center;
+  padding: 18px 20px;
+  /* Match DESIGN SHEAR `.sf-shearDes__steelBox` inner tone */
+  background: rgba(248, 244, 234, 0.94);
+  border: 1px solid rgba(105, 100, 90, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(62, 55, 49, 0.05);
+  min-width: 0;
+  width: 100%;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaImg {
+  grid-column: 1;
+  grid-row: 1 / 4;
+  width: 100%;
+  max-width: min(360px, 100%);
+  height: auto;
+  object-fit: contain;
+  object-position: left center;
+  align-self: center;
+  justify-self: start;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual #sfShearAnaBar1 {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual #sfShearAnaBar2 {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual #sfShearAnaBar3 {
+  grid-column: 2;
+  grid-row: 3;
+  justify-self: end;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaBar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0;
+  min-width: 118px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.7rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaBar--stacked {
+  min-width: 130px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaBar--muted {
+  background: #e5e7eb;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaBar--accent {
+  background: #7c9fc4;
+  color: #ffffff;
+  border: 1px solid #5f82a8;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__verdictBox {
+  padding: 16px 14px;
+  border-radius: 16px;
+  background: #fef9e7;
+  border: 1px solid #f5e6b3;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  text-align: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  min-width: 0;
+  width: 100%;
+  position: relative;
+  z-index: auto;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__verdictTitle {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1e3a8a;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__verdictRow {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__verdictPill {
+  display: inline-flex;
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: #fce883;
+  color: #1e3a8a;
+  border: 1px solid #e6cc3a;
+  font-weight: 800;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  text-align: center;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__coefRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #4b5563;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__coefPill {
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: rgba(248, 246, 239, 0.98);
+  border: 1px solid rgba(176, 168, 150, 0.28);
+  box-shadow: 0 1px 2px rgba(62, 55, 49, 0.04);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__nominalFooter {
+  display: grid;
+  gap: 10px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__nominalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 999px;
+  background: rgba(232, 227, 216, 0.85);
+  border: 1px solid rgba(176, 168, 150, 0.35);
+  color: rgba(62, 55, 49, 0.82);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.65rem;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__nominalValue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 800;
+  font-size: 1.05rem;
+  gap: 6px;
+  border: 1px solid #fcd34d;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capHeroPill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 14px;
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
+  color: #ffffff;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35);
+  font-weight: 800;
+  font-size: clamp(1.25rem, 2.2vw, 1.85rem);
+  line-height: 1.2;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capHeroPill #sfShearAnaCapHeroLead {
+  color: #ffffff;
+  font-size: 0.92em;
+  font-weight: 800;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capHeroPill .sf-shearDash__capNum {
+  color: #ffffff;
+  font-size: 1.15em;
+  font-weight: 900;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capHeroUnit {
+  font-size: 0.72em;
+  font-weight: 700;
+  opacity: 0.95;
+  margin-top: 2px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capSub {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  width: 100%;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capSubRow {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.2fr) minmax(100px, auto) minmax(48px, auto);
+  align-items: center;
+  gap: 12px 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(248, 244, 234, 0.75);
+  border: 1px solid rgba(176, 168, 150, 0.28);
+  width: 100%;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capSubLabel {
+  min-width: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capSubVal {
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  min-width: 5.5rem;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capSubUnit {
+  color: #64748b;
+  font-weight: 700;
+  justify-self: end;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capDemand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capDemand input {
+  width: 120px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(105, 100, 90, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__remarks {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(232, 227, 216, 0.65);
+  border: 1px solid rgba(176, 168, 150, 0.3);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(62, 55, 49, 0.85);
+  line-height: 1.45;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 980px) {
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__panelTitle {
+    max-width: none;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 10px;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaImg {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: 100%;
+    justify-self: center;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual #sfShearAnaBar1 {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: stretch;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual #sfShearAnaBar2 {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: stretch;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual #sfShearAnaBar3 {
+    grid-column: 1;
+    grid-row: 4;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 640px) {
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * ANALYSIS SHEAR: no outer gray frame — only the inner dashboard (sf-shearDash__card) shows
+ * on the notebook panel. DESIGN SHEAR still uses the default .sf-comp__card chrome.
+ */
+.content-panel.comp-panel > .sf-comp.sf-comp--shear > .sf-comp__mode[data-comp-mode-pane="analysis"].is-active > .sf-comp__card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow-y: visible;
+  flex: 0 1 auto !important;
+}
+
+/* Use horizontal space for SHEAR (default comp-panel uses 76px side padding). */
+.content-panel.comp-panel > .sf-comp.sf-comp--shear {
+  padding-left: clamp(8px, 1.8vw, 28px);
+  padding-right: clamp(8px, 1.8vw, 28px);
+}

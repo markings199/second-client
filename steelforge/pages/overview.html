@@ -1,12 +1,68 @@
 <div class="sf-comp sf-comp--overview">
-  <div class="sf-comp__card" role="region" aria-label="Overview">
+  <div class="sf-comp__card sf-overLandingCard" role="region" aria-label="Steel design overview">
     <div class="sf-comp__star" aria-hidden="true">★</div>
+    <div class="sf-overLanding">
+      <section class="sf-overLanding__hero hero-section">
+        <div class="hero-top">
+          <div class="hero-badge">PRINCIPLES OF STEEL DESIGN</div>
+          <h1>Analysis &amp; Design Calculator</h1>
+        </div>
+        <div class="hero-copy">
+          <p>
+            This calculator supports tension, compression, bending, and shear checks in one workspace.
+            Use the cards below to open each module—choose Analysis or Design depending on your workflow.
+          </p>
+        </div>
+        <div class="hero-controls">
+          <div class="hero-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+      </section>
 
-    <div class="sf-overview__head">
-      <div class="sf-overview__title">PROJECT OVERVIEW</div>
-      <div class="sf-overview__sub">STEEL SELECTION SOURCE — exel program EWIWIWI(S(STEEL SELECTION)).csv · AISC MANUAL–STYLE PROPERTY TABLE</div>
+      <section class="sf-overLanding__calc calculator-section" aria-label="Calculator modules">
+        <div class="calculator-label">CALCULATOR</div>
+        <div class="calculator-grid">
+          <article class="calc-card">
+            <div class="calc-badge">TENSION</div>
+            <div class="calc-image tension">
+              <img src="./assets/beam-tension.png" alt="Wide-flange member under axial tension (visualization)" width="400" height="400" loading="lazy" decoding="async" />
+            </div>
+            <div class="calc-actions">
+              <button type="button" data-overview-page="tension">ANALYSIS</button>
+              <button type="button" data-overview-page="tension">DESIGN</button>
+            </div>
+          </article>
+          <article class="calc-card">
+            <div class="calc-badge">COMPRESSION</div>
+            <div class="calc-image compression">
+              <img src="./assets/beam-compression.png" alt="Wide-flange member under axial compression and buckling (visualization)" width="400" height="400" loading="lazy" decoding="async" />
+            </div>
+            <div class="calc-actions">
+              <button type="button" data-overview-page="compression">ANALYSIS</button>
+              <button type="button" data-overview-page="compression">DESIGN</button>
+            </div>
+          </article>
+          <article class="calc-card">
+            <div class="calc-badge">BENDING</div>
+            <div class="calc-image bending">
+              <img src="./assets/beam-bending.png" alt="Wide-flange member in bending (visualization)" width="400" height="400" loading="lazy" decoding="async" />
+            </div>
+            <div class="calc-actions">
+              <button type="button" data-overview-page="bending">ANALYSIS</button>
+              <button type="button" data-overview-page="bending">DESIGN</button>
+            </div>
+          </article>
+          <article class="calc-card">
+            <div class="calc-badge">SHEAR</div>
+            <div class="calc-image shear">
+              <img src="./assets/beam-shear.png" alt="Wide-flange member in shear (visualization)" width="400" height="400" loading="lazy" decoding="async" />
+            </div>
+            <div class="calc-actions">
+              <button type="button" data-overview-page="shear">ANALYSIS</button>
+              <button type="button" data-overview-page="shear">DESIGN</button>
+            </div>
+          </article>
+        </div>
+      </section>
     </div>
-
-    <div class="sf-overview__grid"></div>
   </div>
 </div>

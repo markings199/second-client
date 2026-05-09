@@ -594,6 +594,9 @@
       return;
     }
 
+    /* Static DESIGN COMPRESSION layout (pages/compression.html) — no sfCompDes wiring */
+    if (pane.querySelector('.compression-design-layout')) return;
+
     const input = (id) => pane.querySelector(`#${id}`);
     const CSV_NAME = 'exel program EWIWIWI(S(STEEL SELECTION)).csv';
     const COL = { type: 0, label: 2, weightLbFt: 4, Ag: 5, rx: 31, ry: 37 };
@@ -1733,21 +1736,26 @@
     const applySteelGradeProps = () => {
       const fyEl = input('sfShearAnaFy');
       const fuEl = input('sfShearAnaFu');
+      const chipEl = out('sfShearAnaFyChip');
       if (!steelEl || !fyEl) return;
       if (steelEl.value === 'custom') {
         if (fuEl) {
           fuEl.value = '';
           fuEl.readOnly = false;
         }
+        fyEl.readOnly = false;
+        if (chipEl) chipEl.textContent = '—';
         return;
       }
       const g = steelPropsFromStructuralGradeSelect(steelEl.value);
       if (g) {
         fyEl.value = String(g.fy);
+        fyEl.readOnly = true;
         if (fuEl) {
           fuEl.value = String(g.fu);
           fuEl.readOnly = true;
         }
+        if (chipEl) chipEl.textContent = String(g.fy);
       }
     };
 
@@ -1914,6 +1922,27 @@
       if (b1) b1.textContent = fmtShearLimit(lim224);
       if (b2) b2.textContent = fmtShearLimit(lambdaP);
       if (b3) b3.textContent = fmtShearLimit(lambdaR);
+
+      const verdictEl = out('sfShearAnaVerdictPill');
+      if (verdictEl) {
+        if (![lambdaWeb, lambdaP, lambdaR].every(Number.isFinite)) verdictEl.textContent = '—';
+        else if (lambdaWeb <= lambdaP) verdictEl.textContent = 'COMPACT WEB';
+        else if (lambdaWeb <= lambdaR) verdictEl.textContent = 'INELASTIC WEB';
+        else verdictEl.textContent = 'SLENDER WEB';
+      }
+
+      const fyChip = out('sfShearAnaFyChip');
+      if (fyChip) {
+        if (Number.isFinite(fy) && fy > 0) fyChip.textContent = String(Math.round(fy));
+        else fyChip.textContent = '—';
+      }
+
+      const heroLead = out('sfShearAnaCapHeroLead');
+      const heroNum = out('sfShearAnaCapHeroNum');
+      if (heroLead && heroNum) {
+        heroLead.innerHTML = isASD ? 'V<sub>n</sub>/Ω =' : 'ϕV<sub>n</sub> =';
+        heroNum.textContent = fmtNum(isASD ? asdCap : phiVn, 2);
+      }
 
       const remarksEl = out('sfShearAnaRemarks');
       const webCls = webShearSlendernessClass(lambdaWeb, lambdaP, lambdaR);
@@ -2380,6 +2409,9 @@
   }
 
   window.SteelForge.initTensionRod = (panelRoot) => {
+    if (window.SteelForge?.initTensionRodModern?.(panelRoot ?? document)) {
+      return;
+    }
     const compRoot =
       panelRoot?.querySelector?.('.sf-comp.sf-comp--tensionRod') ??
       panelRoot?.querySelector?.('.sf-comp') ??

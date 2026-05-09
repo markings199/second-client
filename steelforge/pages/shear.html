@@ -8,191 +8,176 @@
     </button>
   </div>
 
-  <!-- ANALYSIS MODE -->
+  <!-- ANALYSIS MODE — dashboard layout -->
   <div class="sf-comp__mode is-active" data-comp-mode-pane="analysis">
     <div class="sf-comp__card" role="region" aria-label="Shear analysis calculator">
-      <div class="sf-comp__star" aria-hidden="true">★</div>
-
-      <div class="sf-shear__cols">
-        <!-- LEFT: PARAMETERS -->
-        <section class="sf-comp__panel sf-shear__panel" aria-label="Parameters">
-          <div class="sf-shearAna__head">
-            <div class="sf-shearAna__headPill">ANALYSIS METHOD</div>
-            <div class="sf-shearAna__methodWrap">
-              <select class="sf-shearAna__methodSelect" id="sfShearAnaMethod" aria-label="Analysis method">
+      <div class="sf-shearDash">
+        <header class="sf-shearDash__header">
+          <div class="sf-shearDash__panelTitle">
+            <span class="sf-shearDash__label">Analysis method</span>
+            <div class="sf-shearDash__methodWrap">
+              <select class="sf-shearDash__methodSelect" id="sfShearAnaMethod" aria-label="Analysis method">
                 <option value="lrfd" selected>LRFD</option>
                 <option value="asd">ASD</option>
               </select>
-              <span class="sf-shearAna__methodCaret" aria-hidden="true">▾</span>
+              <svg class="sf-shearDash__methodCaret" viewBox="0 0 12 8" aria-hidden="true">
+                <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
             </div>
           </div>
+        </header>
 
-          <div class="sf-shear__form">
-            <div class="sf-shear__row sf-shear__row--select sf-shearAna__rowPill">
-              <span class="sf-shear__label">Steel section</span>
-              <select class="sf-shear__select" id="sfShearAnaShape" aria-label="Steel section">
-                <option value="">Manual entry</option>
-              </select>
-            </div>
+        <div class="sf-shearDash__workspace">
+          <section class="sf-shearDash__sheet sf-shearDash__sheet--params" aria-label="Parameters">
+              <div class="sf-shearDash__sectionHeading">Parameters:</div>
 
-            <div class="sf-shear__row sf-shear__row--select sf-shearAna__rowPill">
-              <span class="sf-shear__label">Steel Grade</span>
-              <select class="sf-shear__select" id="sfShearAnaSteel" aria-label="Steel grade (ASTM)"></select>
-            </div>
-
-            <div class="sf-shear__divider"></div>
-
-            <div class="sf-shearAna__block">
-              <div class="sf-shearAna__webHead">
-                <div class="sf-shearAna__webTitle">WEB CONDITION</div>
-                <select class="sf-shearAna__webSelect" id="sfShearAnaWebCond" aria-label="Web condition">
-                  <option value="stiffened">STIFFENED WEB</option>
-                  <option value="unstiffened" selected>UNSTIFFENED WEB</option>
-                </select>
+              <div class="sf-shearDash__fieldGroup">
+                <div class="sf-shearDash__fieldLabel">AISC manual selection</div>
+                <div class="sf-shearDash__selectInput">
+                  <select id="sfShearAnaShape" aria-label="Steel section">
+                    <option value="">Manual entry</option>
+                  </select>
+                  <svg class="sf-shearDash__selectCaret" viewBox="0 0 12 8" aria-hidden="true">
+                    <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
               </div>
 
-              <div class="sf-shearAna__webBody">
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">a =</span>
-                  <input class="sf-shear__input" id="sfShearAnaA" inputmode="decimal" />
-                  <span class="sf-shearAna__unit">in</span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">h =</span>
-                  <input class="sf-shear__input" id="sfShearAnaH" inputmode="decimal" />
-                  <span class="sf-shearAna__unit">in</span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">F<sub>y</sub> =</span>
-                  <input class="sf-shear__input" id="sfShearAnaFy" inputmode="decimal" title="Filled from grade; editable if Custom Fy is selected" />
-                  <span class="sf-shearAna__unit">ksi</span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">F<sub>u</sub> =</span>
-                  <input class="sf-shear__input" id="sfShearAnaFu" inputmode="decimal" readonly title="Tensile strength from grade catalog (ksi)" />
-                  <span class="sf-shearAna__unit">ksi</span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">λ<sub>f</sub> =</span>
-                  <input class="sf-shear__input" id="sfShearAnaLambdaF" inputmode="decimal" readonly title="Flange slenderness from section catalog" />
-                  <span class="sf-shearAna__unit sf-shearAna__unit--mute">—</span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">λ =</span>
-                  <input class="sf-shear__input" id="sfShearAnaLambda" inputmode="decimal" placeholder="h / tw" />
-                  <span class="sf-shearAna__unit sf-shearAna__unit--mute">—</span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">λ<sub>p</sub> =</span>
-                  <input class="sf-shear__input" id="sfShearAnaLambdaP" inputmode="decimal" readonly title="From E, Fy, and k_v" />
-                  <span class="sf-shearAna__unit sf-shearAna__unit--mute">—</span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">λ<sub>r</sub> =</span>
-                  <input class="sf-shear__input" id="sfShearAnaLambdaR" inputmode="decimal" readonly title="From E, Fy, and k_v" />
-                  <span class="sf-shearAna__unit sf-shearAna__unit--mute">—</span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">A<sub>w</sub> =</span>
-                  <input class="sf-shear__input" id="sfShearAnaAw" inputmode="decimal" />
-                  <span class="sf-shearAna__unit">in²</span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">k =</span>
-                  <input class="sf-shear__input" id="sfShearAnaKv" inputmode="decimal" />
-                  <span class="sf-shearAna__unit"></span>
-                </label>
-                <label class="sf-shearAna__row3">
-                  <span class="sf-shear__label">E =</span>
-                  <input class="sf-shear__input" id="sfShearAnaE" inputmode="decimal" />
-                  <span class="sf-shearAna__unit">ksi</span>
-                </label>
+              <div class="sf-shearDash__metricGrid">
+                <div class="sf-shearDash__metricCard">
+                  <span class="sf-shearDash__metricLabel">λ<sub>f</sub></span>
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaLambdaF" inputmode="decimal" readonly title="Flange slenderness from catalog" />
+                </div>
+                <div class="sf-shearDash__metricCard">
+                  <span class="sf-shearDash__metricLabel">λ<sub>w</sub></span>
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaLambda" inputmode="decimal" readonly title="Web slenderness h/t<sub>w</sub>" />
+                </div>
+                <div class="sf-shearDash__metricCard">
+                  <span class="sf-shearDash__metricLabel">A<sub>w</sub></span>
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaAw" inputmode="decimal" title="Web area (in²)" />
+                </div>
+                <div class="sf-shearDash__metricCard">
+                  <span class="sf-shearDash__metricLabel">h</span>
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaH" inputmode="decimal" title="Clear web depth (in)" />
+                </div>
               </div>
-            </div>
+
+              <div class="sf-shearDash__fieldGroup">
+                <div class="sf-shearDash__fieldLabel">Web condition</div>
+                <div class="sf-shearDash__selectInput">
+                  <select id="sfShearAnaWebCond" aria-label="Web condition">
+                    <option value="stiffened">Stiffened web</option>
+                    <option value="unstiffened" selected>Unstiffened web</option>
+                  </select>
+                  <svg class="sf-shearDash__selectCaret" viewBox="0 0 12 8" aria-hidden="true">
+                    <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="sf-shearDash__fieldGroup">
+                <div class="sf-shearDash__fieldLabel">Stiffener spacing a (in)</div>
+                <div class="sf-shearDash__valuePill">
+                  <span>a =</span>
+                  <input id="sfShearAnaA" inputmode="decimal" aria-label="Stiffener spacing a in inches" />
+                </div>
+              </div>
+
+              <div class="sf-shearDash__fieldGroup">
+                <div class="sf-shearDash__fieldLabel">Steel grade</div>
+                <div class="sf-shearDash__gradeInput">
+                  <span class="sf-shearDash__gradeChip" id="sfShearAnaFyChip" aria-hidden="true">—</span>
+                  <select class="sf-shearDash__steelSelect" id="sfShearAnaSteel" aria-label="Steel grade (ASTM)"></select>
+                </div>
+                <div class="sf-shearDash__fyRow">
+                  <span>F<sub>y</sub> (ksi)</span>
+                  <input class="sf-shearDash__fyInput" id="sfShearAnaFy" inputmode="decimal" title="Yield strength; editable when Custom Fy is selected" />
+                </div>
+              </div>
+
+              <div class="sf-shearDash__fieldGroup">
+                <div class="sf-shearDash__fieldLabel">Elastic modulus</div>
+                <div class="sf-shearDash__valuePill">
+                  <span>E =</span>
+                  <input id="sfShearAnaE" inputmode="decimal" readonly aria-label="Elastic modulus E in ksi" />
+                  <span>ksi</span>
+                </div>
+              </div>
+
+              <input type="hidden" id="sfShearAnaFu" />
+              <input type="hidden" id="sfShearAnaLambdaP" />
+              <input type="hidden" id="sfShearAnaLambdaR" />
+              <input type="hidden" id="sfShearAnaKv" />
+          </section>
+
+          <div class="sf-shearDash__resultsStack" aria-label="Shear check results">
+            <section class="sf-shearDash__sheet sf-shearDash__sheet--slender">
+              <div class="sf-shearDash__resultCard sf-shearDash__resultCard--flush sf-shearDash__compactnessCard">
+                <div class="sf-shearDash__resultTitle sf-shearDash__resultTitle--check">Limiting slenderness</div>
+                <div class="sf-shearDash__compactnessLayout">
+                  <div class="sf-shearDash__formulaVisual" aria-label="Limiting slenderness equations and values">
+                    <img
+                      class="sf-shearDash__formulaImg"
+                      src="../assets/shear/limiting-slenderness-clear.png"
+                      alt="2.24√(E/Fy), 1.10√(kvE/Fy), and 1.37√(kvE/Fy)"
+                    />
+                    <span class="sf-shearDash__formulaBar sf-shearDash__formulaBar--muted sf-shearDash__formulaBar--stacked" id="sfShearAnaBar1">—</span>
+                    <span class="sf-shearDash__formulaBar sf-shearDash__formulaBar--accent sf-shearDash__formulaBar--stacked" id="sfShearAnaBar2">—</span>
+                    <span class="sf-shearDash__formulaBar sf-shearDash__formulaBar--accent sf-shearDash__formulaBar--stacked" id="sfShearAnaBar3">—</span>
+                  </div>
+                  <div class="sf-shearDash__verdictBox">
+                    <div class="sf-shearDash__verdictTitle">Verdict</div>
+                    <div class="sf-shearDash__verdictRow">
+                      <div class="sf-shearDash__verdictPill" id="sfShearAnaVerdictPill">—</div>
+                    </div>
+                    <div class="sf-shearDash__coefRow">
+                      <span class="sf-shearDash__coefPill">C<sub>v</sub> = <span id="sfShearAnaCv">—</span></span>
+                      <span class="sf-shearDash__coefPill">ϕ<sub>v</sub> = <span id="sfShearAnaPhi">—</span></span>
+                      <span class="sf-shearDash__coefPill">Ω<sub>v</sub> = <span id="sfShearAnaOmega">—</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sf-shearDash__nominalFooter">
+                  <div class="sf-shearDash__nominalRow">
+                    <span>Nominal shear strength</span>
+                    <strong>V<sub>n</sub> =</strong>
+                  </div>
+                  <div class="sf-shearDash__nominalValue"><span id="sfShearAnaVn">—</span> kips</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="sf-shearDash__sheet sf-shearDash__sheet--capacity">
+              <div class="sf-shearDash__resultCard sf-shearDash__resultCard--flush">
+                <div class="sf-shearDash__resultTitle">Shear capacity</div>
+                <div class="sf-shearDash__capDemand">
+                  <span id="sfShearAnaDemandLabel">V<sub>u</sub> =</span>
+                  <input id="sfShearAnaVu" inputmode="decimal" aria-label="Shear demand" />
+                  <span>kips</span>
+                </div>
+                <div class="sf-shearDash__capHeroPill" id="sfShearAnaCapHero" aria-live="polite">
+                  <span id="sfShearAnaCapHeroLead">ϕV<sub>n</sub> =</span>
+                  <span class="sf-shearDash__capNum" id="sfShearAnaCapHeroNum">—</span>
+                  <span class="sf-shearDash__capHeroUnit">kips</span>
+                </div>
+                <div class="sf-shearDash__capSub">
+                  <div class="sf-shearDash__capSubRow">
+                    <span class="sf-shearDash__capSubLabel">LRFD ϕV<sub>n</sub></span>
+                    <span class="sf-shearDash__capSubVal" id="sfShearAnaPhiVn">—</span>
+                    <span class="sf-shearDash__capSubUnit">kips</span>
+                  </div>
+                  <div class="sf-shearDash__capSubRow">
+                    <span class="sf-shearDash__capSubLabel">ASD V<sub>n</sub>/Ω</span>
+                    <span class="sf-shearDash__capSubVal" id="sfShearAnaVnOverOmega">—</span>
+                    <span class="sf-shearDash__capSubUnit">kips</span>
+                  </div>
+                </div>
+                <div class="sf-shearDash__remarks" id="sfShearAnaRemarks">—</div>
+              </div>
+            </section>
           </div>
-
-          <div class="sf-shearAna__watermark" aria-hidden="true"></div>
-        </section>
-
-        <!-- MIDDLE: CONDITION CHECKING -->
-        <section class="sf-comp__panel sf-shear__panel" aria-label="Condition checking">
-          <div class="sf-shearAna__badge">CONDITION CHECKING</div>
-
-          <div class="sf-shear__checks">
-            <div class="sf-shearAna__subhead">LIMITING SLENDERNESS</div>
-            <div class="sf-shearAna__slen">
-              <img class="sf-shearAna__slenImg" src="../assets/shear/limiting-slenderness-clear.png" alt="Limiting slenderness equations" />
-              <div class="sf-shearAna__slenBars" aria-label="Limiting slenderness results">
-                <div class="sf-shear__bar" id="sfShearAnaBar1">—</div>
-                <div class="sf-shear__bar" id="sfShearAnaBar2">—</div>
-                <div class="sf-shear__bar" id="sfShearAnaBar3">—</div>
-              </div>
-            </div>
-
-            <div class="sf-shear__divider"></div>
-
-            <div class="sf-shear__miniRow">
-              <div class="sf-shear__miniLabel">Web Shear Strength Coefficient</div>
-              <div class="sf-shear__miniEq">C<sub>v</sub> =</div>
-              <div class="sf-shear__pill" id="sfShearAnaCv">—</div>
-            </div>
-            <div class="sf-shear__miniRow">
-              <div class="sf-shear__miniLabel">RESISTANCE FACTOR</div>
-              <div class="sf-shear__miniEq">ϕ<sub>v</sub> =</div>
-              <div class="sf-shear__pill" id="sfShearAnaPhi">—</div>
-            </div>
-            <div class="sf-shear__miniRow">
-              <div class="sf-shear__miniLabel">SAFETY FACTOR</div>
-              <div class="sf-shear__miniEq">Ω<sub>v</sub> =</div>
-              <div class="sf-shear__pill" id="sfShearAnaOmega">—</div>
-            </div>
-
-            <div class="sf-shear__divider"></div>
-
-            <div class="sf-shear__miniRow sf-shear__miniRow--center">
-              <div class="sf-shear__miniLabel">NOMINAL SHEAR STRENGTH</div>
-              <div class="sf-shear__miniEq">V<sub>n</sub> =</div>
-              <div class="sf-shearAna__vnPill" id="sfShearAnaVn">—</div>
-              <div class="sf-shearAna__vnUnit">kips</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- RIGHT: SECTION IMAGE + CAPACITY -->
-        <section class="sf-shearAna__right" aria-label="Section + capacity">
-          <div class="sf-shearAna__imgBox" role="group" aria-label="Section view">
-            <div class="sf-shearAna__img">
-              <img class="sf-shearAna__imgEl sf-shearAna__imgEl--plain" src="../assets/shear/shear-plain.png" alt="Beam section view" />
-            </div>
-            <div class="sf-shearAna__img">
-              <img class="sf-shearAna__imgEl sf-shearAna__imgEl--stiffened" src="../assets/shear/shear-stiffened.png" alt="Beam section view (stiffened)" />
-            </div>
-          </div>
-
-          <div class="sf-shearAna__cap" aria-label="Shear capacity">
-            <div class="sf-shearAna__capTitle">SHEAR CAPACITY:</div>
-            <div class="sf-shearAna__capBox">
-              <div class="sf-shearAna__capRow">
-                <div class="sf-shearAna__capSym" id="sfShearAnaDemandLabel">V<sub>u</sub> =</div>
-                <input class="sf-shear__input" id="sfShearAnaVu" inputmode="decimal" />
-                <div class="sf-shearAna__capUnit">kips</div>
-              </div>
-              <div class="sf-shearAna__capRow">
-                <div class="sf-shearAna__capSym">LRFD ϕV<sub>n</sub> =</div>
-                <div class="sf-shearAna__capVal" id="sfShearAnaPhiVn">—</div>
-                <div class="sf-shearAna__capUnit">kips</div>
-              </div>
-              <div class="sf-shearAna__capRow">
-                <div class="sf-shearAna__capSym">ASD V<sub>n</sub>/Ω =</div>
-                <div class="sf-shearAna__capVal" id="sfShearAnaVnOverOmega">—</div>
-                <div class="sf-shearAna__capUnit">kips</div>
-              </div>
-              <div class="sf-shearAna__capRow sf-shearAna__capRow--remark">
-                <div class="sf-shearAna__capRemark" id="sfShearAnaRemarks">—</div>
-              </div>
-            </div>
-          </div>
-        </section>
+        </div>
       </div>
     </div>
   </div>

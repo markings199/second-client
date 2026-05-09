@@ -1,0 +1,215 @@
+/* Overview landing — scoped to ANALYSIS & DESIGN calculator grid (loaded with overview.html only) */
+
+/* Same gray calculator shell as other modules (card + star); inner landing keeps cream hero/cards */
+.content-panel.comp-panel > .sf-comp.sf-comp--overview > .sf-comp__card.sf-overLandingCard {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.sf-comp--overview .sf-overLandingCard > .sf-overLanding {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.sf-comp--overview .sf-overLanding {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #2b3a55;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  gap: 28px;
+}
+
+.sf-comp--overview .sf-overLanding *,
+.sf-comp--overview .sf-overLanding *::before,
+.sf-comp--overview .sf-overLanding *::after {
+  box-sizing: border-box;
+}
+
+.sf-comp--overview .hero-section {
+  position: relative;
+  padding: 50px 46px 40px;
+  border-radius: 40px;
+  background: linear-gradient(180deg, #f7f5ef 0%, #e7e3d5 100%);
+  box-shadow: 0 28px 80px rgba(44, 51, 64, 0.12);
+  overflow: hidden;
+}
+
+.sf-comp--overview .hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, transparent 35%),
+    radial-gradient(circle, rgba(99, 126, 166, 0.08) 0%, transparent 24%),
+    radial-gradient(circle, rgba(99, 126, 166, 0.08) 0%, transparent 18%);
+  background-position: 10% 15%, 70% 20%, 50% 75%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.sf-comp--overview .hero-top,
+.sf-comp--overview .hero-copy,
+.sf-comp--overview .hero-controls {
+  position: relative;
+  z-index: 1;
+}
+
+.sf-comp--overview .hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: #d8d7c8;
+  color: #2c3a54;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin-bottom: 20px;
+}
+
+.sf-comp--overview .hero-section h1 {
+  margin: 0;
+  font-size: clamp(2.8rem, 4vw, 4.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: #212b3e;
+}
+
+.sf-comp--overview .hero-copy p {
+  max-width: 680px;
+  margin: 24px 0 28px;
+  color: #495670;
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.sf-comp--overview .hero-dots {
+  display: flex;
+  gap: 10px;
+}
+
+.sf-comp--overview .hero-dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #bbc8d8;
+  opacity: 0.7;
+}
+
+.sf-comp--overview .calculator-section {
+  display: grid;
+  gap: 24px;
+}
+
+.sf-comp--overview .calculator-label {
+  font-size: 0.92rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #2b3a55;
+  font-weight: 700;
+}
+
+.sf-comp--overview .calculator-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.sf-comp--overview .calc-card {
+  border-radius: 28px;
+  background: #f7f6f2;
+  padding: 24px 20px 18px;
+  box-shadow: 0 18px 40px rgba(34, 44, 64, 0.08);
+  display: grid;
+  gap: 22px;
+  text-align: center;
+}
+
+.sf-comp--overview .calc-badge {
+  display: inline-flex;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: #bec9db;
+  color: #162037;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 auto;
+}
+
+.sf-comp--overview .calc-image {
+  width: 100%;
+  min-height: 160px;
+  aspect-ratio: 1;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(216, 224, 240, 0.92));
+  border: 1px solid rgba(97, 116, 151, 0.18);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sf-comp--overview .calc-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
+.sf-comp--overview .calc-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.sf-comp--overview .calc-actions button {
+  min-height: 48px;
+  border: none;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #2a3b56;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(102, 116, 148, 0.12);
+  transition: transform 0.2s ease, background 0.2s ease;
+  font-family: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+
+.sf-comp--overview .calc-actions button:hover {
+  transform: translateY(-2px);
+  background: #f1f5fb;
+}
+
+.sf-comp--overview .calc-actions button:focus-visible {
+  outline: 2px solid #2f6eb5;
+  outline-offset: 2px;
+}
+
+@media (max-width: 1024px) {
+  .sf-comp--overview .calculator-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .sf-comp--overview .hero-section {
+    padding: 36px 22px 30px;
+  }
+
+  .sf-comp--overview .calculator-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--overview {
+  padding: 10px clamp(12px, 4vw, 76px) 14px;
+}
