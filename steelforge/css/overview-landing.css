@@ -1,6 +1,6 @@
 /* Overview landing — scoped to ANALYSIS & DESIGN calculator grid (loaded with overview.html only) */
 
-/* Same gray calculator shell as other modules (card + star); inner landing keeps cream hero/cards */
+/* Same gray calculator shell as other modules (card); inner landing keeps cream hero/cards */
 .content-panel.comp-panel > .sf-comp.sf-comp--overview > .sf-comp__card.sf-overLandingCard {
   flex: 1 1 auto;
   min-height: 0;
@@ -63,14 +63,24 @@
 .sf-comp--overview .hero-badge {
   display: inline-flex;
   align-items: center;
-  padding: 12px 20px;
+  justify-content: center;
+  padding: 10px 18px;
   border-radius: 999px;
-  background: #d8d7c8;
-  color: #2c3a54;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 8px rgba(19, 78, 138, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #f0f7ff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   margin-bottom: 20px;
+  max-width: 100%;
+  text-align: center;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .sf-comp--overview .hero-section h1 {
@@ -108,11 +118,26 @@
 }
 
 .sf-comp--overview .calculator-label {
-  font-size: 0.92rem;
-  letter-spacing: 0.2em;
+  display: block;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  margin-block: 0;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 8px rgba(19, 78, 138, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #2b3a55;
-  font-weight: 700;
+  text-align: center;
+  color: #f0f7ff;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .sf-comp--overview .calculator-grid {
@@ -133,13 +158,22 @@
 
 .sf-comp--overview .calc-badge {
   display: inline-flex;
-  padding: 12px 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 16px;
   border-radius: 999px;
-  background: #bec9db;
-  color: #162037;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 8px rgba(19, 78, 138, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #f0f7ff;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  text-transform: uppercase;
   margin: 0 auto;
+  line-height: 1.35;
 }
 
 .sf-comp--overview .calc-image {

@@ -1,0 +1,321 @@
+/* Tension ANALYSIS layout — scoped mockup (tables + 3-column grid) */
+.sf-comp--tension .sf-tensionAnalysisLayout {
+  --ta-bg: #eef1f4;
+  --ta-card: rgba(255, 255, 255, 0.96);
+  --ta-border: rgba(148, 163, 184, 0.24);
+  --ta-ink: #0f172a;
+  --ta-muted: #475569;
+  --ta-accent: #134e8a;
+  /* Section & table title color — dark navy (matches CRITICAL PATH bar reference) */
+  --ta-section-title: #1a365d;
+  --ta-radius: 18px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 4px 8px;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout__inp,
+.sf-comp--tension .sf-tensionAnalysisLayout__sel {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ta-ink);
+  background: rgba(248, 250, 252, 0.95);
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout__inp:focus,
+.sf-comp--tension .sf-tensionAnalysisLayout__sel:focus {
+  outline: 2px solid rgba(19, 78, 138, 0.35);
+  outline-offset: 1px;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout__out {
+  font-weight: 700;
+  color: var(--ta-ink);
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout__pillYellow {
+  display: inline-block;
+  min-width: 4rem;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(254, 243, 199, 0.95);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  font-weight: 800;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .card {
+  background: var(--ta-card);
+  border: 1px solid var(--ta-border);
+  border-radius: var(--ta-radius);
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .card-title {
+  display: block;
+  box-sizing: border-box;
+  margin: 0 0 14px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, var(--ta-accent) 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #f0f7ff;
+  line-height: 1.35;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout table th,
+.sf-comp--tension .sf-tensionAnalysisLayout table td {
+  text-align: left;
+  padding: 10px 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  font-size: 0.88rem;
+  vertical-align: middle;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout table th {
+  width: 46%;
+  color: var(--ta-section-title);
+  font-weight: 700;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout table td {
+  color: var(--ta-ink);
+  font-weight: 600;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .subsection {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .subheading {
+  display: block;
+  box-sizing: border-box;
+  margin: 0 0 12px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, var(--ta-accent) 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  color: #f0f7ff;
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .photo-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .photo-slot {
+  margin: 0;
+  min-height: 0;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .photo-slot__img {
+  width: 100%;
+  height: auto;
+  max-height: min(200px, 28vh);
+  object-fit: contain;
+  object-position: center center;
+  display: block;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .photo-slot figcaption,
+.sf-comp--tension .sf-tensionAnalysisLayout .photo-slot__cap {
+  display: none !important;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .subsection-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .subsection-block {
+  background: rgba(248, 250, 252, 0.9);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .subsection-block table th {
+  width: 38%;
+  font-size: 0.78rem;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .subsection-block table td {
+  font-size: 0.78rem;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .stagger-mini {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .stagger-mini th,
+.sf-comp--tension .sf-tensionAnalysisLayout .stagger-mini td {
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .stagger-mini input {
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  font-size: 0.78rem;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .outcome-row {
+  margin-top: 12px;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .wide-table th {
+  width: 52%;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .capacity-table {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .main-grid > .card.critical-path,
+.sf-comp--tension .sf-tensionAnalysisLayout .main-grid > .card.block-shear {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .capacity-inline {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.28);
+  width: 100%;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .capacity-inline__title {
+  display: block;
+  box-sizing: border-box;
+  margin: 0 0 12px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, var(--ta-accent) 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #f0f7ff;
+  line-height: 1.35;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .capacity-table--inline {
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .capacity-table--inline th {
+  width: 50%;
+  font-size: 0.68rem;
+  line-height: 1.25;
+  padding: 7px 6px 7px 0;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .capacity-table--inline td {
+  font-size: 0.78rem;
+  padding: 7px 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .capacity-table .governing-row th,
+.sf-comp--tension .sf-tensionAnalysisLayout .capacity-table .governing-row td {
+  color: #a50e0e;
+  font-weight: 800;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .sf-tensionLegacyHooks {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 1024px) {
+  .sf-comp--tension .sf-tensionAnalysisLayout .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sf-comp--tension .sf-tensionAnalysisLayout .photo-row,
+  .sf-comp--tension .sf-tensionAnalysisLayout .subsection-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mode tabs: use global .content-panel.comp-panel .sf-comp__modeNav pills (same as compression/bending) */
+
+.sf-comp--tension .sf-comp__card--tensionAnalysis {
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(221, 228, 235, 0.35) 100%);
+}

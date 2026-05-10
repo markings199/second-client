@@ -1573,7 +1573,10 @@
     if (window.SteelForge?.initTensionAnalysis) {
       window.SteelForge.initTensionAnalysis(panelRoot ?? document);
     }
-    if (window.SteelForge?.initTensionDesign) {
+    if (
+      window.SteelForge?.initTensionDesign &&
+      compRoot.querySelector('.sf-comp__mode[data-comp-mode-pane="design"]')
+    ) {
       window.SteelForge.initTensionDesign(panelRoot ?? document);
     }
   };
@@ -2423,6 +2426,9 @@
     }
     if (window.SteelForge?.initTensionRodDesign) {
       window.SteelForge.initTensionRodDesign(panelRoot ?? document);
+    }
+    if (window.SteelForge?.initTensionRodDesignUi) {
+      window.SteelForge.initTensionRodDesignUi(panelRoot ?? document);
     }
     const tr =
       compRoot?.classList?.contains?.('sf-comp--tensionRod') ? compRoot : compRoot?.querySelector?.('.sf-comp--tensionRod');

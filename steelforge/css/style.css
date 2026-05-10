@@ -76,12 +76,6 @@ body:has(.sf-comp.sf-comp--bending) {
   height: 100%;
 }
 
-/* Tension Rod: allow page scroll so bottom cards are fully visible on non-F11 windows */
-body:has(.sf-comp.sf-comp--tensionRod) {
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
 body {
   background: var(--bg-outer);
   font-family: 'Inter', 'Source Code Pro', monospace;
@@ -10042,12 +10036,23 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
 }
 
 .sf-comp.sf-comp--bending .sf-bendAna__panelTitle {
+  display: block;
+  box-sizing: border-box;
+  margin: 0 0 16px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
   font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-  margin-bottom: 16px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 800;
+  text-align: center;
+  color: #f0f7ff;
+  line-height: 1.35;
 }
 
 .sf-comp.sf-comp--bending .sf-bendAna__panelMethod {
@@ -10079,11 +10084,24 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
 }
 
 .sf-comp.sf-comp--bending .sf-bendAna__sectionLabel {
-  font-size: 0.86rem;
-  letter-spacing: 0.18em;
-  color: var(--accent);
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  color: #f0f7ff;
   font-weight: 800;
-  margin-bottom: 18px;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.35;
 }
 
 .sf-comp.sf-comp--bending .sf-bendAna__fieldGroup {
@@ -10093,10 +10111,24 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
 }
 
 .sf-comp.sf-comp--bending .sf-bendAna__fieldGroup label {
-  font-size: 0.76rem;
-  color: var(--muted);
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 8px rgba(19, 78, 138, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  font-size: 0.72rem;
+  color: #f0f7ff;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.35;
 }
 
 .sf-comp.sf-comp--bending .sf-bendAna__selectBox {
@@ -10173,17 +10205,25 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
 }
 
 .sf-comp.sf-comp--bending .sf-bendAna__cardTitle {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 20px;
   padding: 10px 16px;
-  background: #eceae3;
-  color: #6b89ac;
   border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
   font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin-bottom: 20px;
+  font-weight: 800;
+  text-align: center;
+  color: #f0f7ff;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .sf-comp.sf-comp--bending .sf-bendAna__compactItem {
@@ -10330,17 +10370,32 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
 
 .sf-comp.sf-comp--bending .sf-bendNoDef__panelHeader {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
-  gap: 14px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .sf-comp.sf-comp--bending .sf-bendNoDef__panelLabel {
-  font-size: 0.82rem;
-  letter-spacing: 0.18em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text);
+  color: #f0f7ff;
   font-weight: 800;
+  text-align: center;
+  line-height: 1.35;
 }
 
 .sf-comp.sf-comp--bending .sf-bendNoDef__methodChip {
@@ -10351,6 +10406,7 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   border-radius: 18px;
   background: var(--surface-strong);
   border: 1px solid rgba(53, 47, 39, 0.12);
+  flex-shrink: 0;
 }
 
 .sf-comp.sf-comp--bending .sf-bendNoDef__chipSelect {
@@ -10377,12 +10433,31 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
 
 .sf-comp.sf-comp--bending .sf-bendNoDef__cardTitle,
 .sf-comp.sf-comp--bending .sf-bendNoDef__panelHeading {
-  font-size: 0.82rem;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--accent);
+  letter-spacing: 0.1em;
+  color: #f0f7ff;
   font-weight: 800;
-  margin-bottom: 16px;
+  text-align: center;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.sf-comp.sf-comp--bending .sf-bendNoDef__panelHeading sub,
+.sf-comp.sf-comp--bending .sf-bendNoDef__cardTitle sub {
+  font-size: 0.65em;
+  color: inherit;
 }
 
 .sf-comp.sf-comp--bending .sf-bendNoDef__formRow,
@@ -10578,7 +10653,14 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   margin-top: 5px;
 }
 
-.sf-comp.sf-comp--tensionRod > .sf-comp__modeNav {
+/* Tension: analysis/design pills at top (same as Bending — DOM order is modeNav then panels) */
+.sf-comp.sf-comp--tension {
+  display: flex;
+  flex-direction: column;
+}
+
+.sf-comp.sf-comp--tension > .sf-comp__modeNav {
+  flex-shrink: 0;
   margin-top: 5px;
 }
 
@@ -10667,11 +10749,23 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
 }
 
 .sf-comp.sf-comp--compression .sf-compRed__sectionTitle {
-  font-size: 0.92rem;
+  display: block;
+  box-sizing: border-box;
+  margin: 0 0 12px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  font-size: 0.82rem;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--accent);
-  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-align: center;
+  color: #f0f7ff;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .sf-comp.sf-comp--compression .sf-compRed__formGrid,
@@ -10854,7 +10948,9 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   border-radius: 30px !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 14px 26px rgba(43, 38, 32, 0.1) !important;
   padding: 18px !important;
-  min-height: 1310px;
+  padding-bottom: 16px !important;
+  /* Tall enough for 3 columns incl. section images + FINAL STEEL SECTION inside taupe shell */
+  min-height: 1600px;
 }
 
 /* Match Section Props typography in Analysis & Design Compression */
@@ -10871,215 +10967,352 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   font-family: 'Inter', sans-serif;
 }
 
-/* ===== Tension Rod redesign ===== */
-.sf-comp.sf-comp--tensionRod .sf-rodRed {
-  --text: #2d2a24;
-  --muted: #6c665d;
-  --accent: #273a58;
-  --blue: #b6d0f2;
-  --blue-dark: #3d6aa4;
-  --yellow: #f5cf61;
-  --orange: #f16a20;
-  background: radial-gradient(circle at top left, #faf4e8 0%, #ddc5a3 100%) !important;
-  border-radius: 38px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
-  box-shadow: 0 24px 60px rgba(46, 40, 34, 0.12) !important;
+
+/* ===== TENSION ROD DESIGN (bundled from tension-rod-modern.css — loads with style.css) ===== */
+
+/*
+ * Design Tension Rod - classes match standalone mockup (shell, layout-grid, card, ...).
+ * Scoped with #trRodDesign so SteelForge hub styles do not strip layout/typography.
+ */
+
+#trRodDesign {
+  color: #1f2937;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  box-sizing: border-box;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__innerFrame {
-  background: #d7ccc0;
-  border-radius: 32px;
-  padding: 22px;
+#trRodDesign *,
+#trRodDesign *::before,
+#trRodDesign *::after {
+  box-sizing: border-box;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__layoutGrid {
-  display: grid;
-  grid-template-columns: 1.2fr 0.95fr;
-  gap: 24px;
+#trRodDesign .vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__bottomRow {
-  display: grid;
-  grid-template-columns: 1.4fr 0.7fr;
-  gap: 24px;
-  margin-top: 24px;
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__card {
-  background: #f6f2ed;
-  border: 1px solid rgba(46, 40, 34, 0.08);
+#trRodDesign.shell {
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 18px;
+  background: #d8d2c4 !important;
   border-radius: 28px;
-  padding: 20px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8),
+    0 20px 50px rgba(30, 41, 59, 0.12);
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__cardPanel {
-  display: grid;
-  gap: 16px;
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__panelHeader {
-  display: flex;
+#trRodDesign .hero-tab {
+  display: inline-flex !important;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__panelBadge {
-  background: rgba(47, 56, 88, 0.12);
-  color: var(--accent);
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 12px 22px;
+  margin-bottom: 18px;
   border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 0.78rem;
-  font-weight: 900;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%) !important;
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 8px rgba(19, 78, 138, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #f0f7ff !important;
+  font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  font-size: 0.82rem;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__sectionTitle {
-  margin: 0;
-  font-size: 0.92rem;
+#trRodDesign .layout-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr !important;
+  gap: 16px !important;
+  align-items: start;
+  width: 100%;
+}
+
+#trRodDesign .panel {
+  display: grid !important;
+  gap: 16px !important;
+  min-width: 0;
+}
+
+#trRodDesign .card {
+  background: #f7f5ef !important;
+  border-radius: 24px !important;
+  padding: 20px;
+  border: 1px solid rgba(104, 109, 120, 0.16) !important;
+  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.06) !important;
+}
+
+#trRodDesign .card-title {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--accent);
-  font-weight: 900;
+  text-align: center;
+  color: #f0f7ff !important;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 8px rgba(19, 78, 138, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  line-height: 1.35;
+  word-break: break-word;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__sectionCopy {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.6;
-  font-size: 0.9rem;
+#trRodDesign .small-card {
+  padding: 18px;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__fieldGrid,
-.sf-comp.sf-comp--tensionRod .sf-rodRed__tableGrid {
-  display: grid;
-  gap: 12px;
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__fieldRow,
-.sf-comp.sf-comp--tensionRod .sf-rodRed__tableRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) auto max-content;
-  gap: 12px;
+#trRodDesign .method-pill {
+  display: inline-flex !important;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(46, 40, 34, 0.08);
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 14px;
+  border-radius: 18px;
+  background: #e5e5e2 !important;
+  color: #1c2431 !important;
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__fieldRow:last-child,
-.sf-comp.sf-comp--tensionRod .sf-rodRed__tableRow:last-child {
-  border-bottom: none;
+#trRodDesign .method-pill select {
+  flex: 1;
+  border: none;
+  background: transparent !important;
+  font: inherit;
+  font-weight: 900;
+  color: inherit !important;
+  cursor: pointer;
+  text-align: center;
+  appearance: none;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__fieldLabel,
-.sf-comp.sf-comp--tensionRod .sf-rodRed__tableRow span:first-child {
-  font-size: 0.9rem;
-  color: var(--text);
+#trRodDesign .arrow {
+  margin-left: 10px;
+  opacity: 0.6;
+  pointer-events: none;
+  font-size: 0.75rem;
+}
+
+#trRodDesign table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#trRodDesign table th,
+#trRodDesign table td {
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 0.94rem;
+}
+
+#trRodDesign table th {
+  width: 52%;
+  color: #53606c !important;
   font-weight: 700;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__fieldValue,
-.sf-comp.sf-comp--tensionRod .sf-rodRed__inputPill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 88px;
-  border-radius: 999px;
-  padding: 9px 16px;
+#trRodDesign table td {
+  color: #1f2937 !important;
   font-weight: 800;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__fieldValue {
-  background: rgba(196, 211, 239, 0.22);
-  color: var(--blue-dark);
+#trRodDesign table input[type='text'] {
+  width: 100%;
+  max-width: 8rem;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font: inherit;
+  font-weight: 700;
+  background: #fff !important;
+  color: #1f2937 !important;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__inputPill {
-  background: #e3eeff;
-  color: var(--blue-dark);
+#trRodDesign .diameter-grid {
+  display: grid !important;
+  gap: 16px !important;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__fieldUnit {
-  color: var(--muted);
+#trRodDesign .diameter-block {
+  padding: 16px;
+  background: #ffffff !important;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+}
+
+#trRodDesign .formula {
+  color: #334155 !important;
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+#trRodDesign .value-pill {
+  display: inline-flex !important;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  margin-top: 10px;
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+#trRodDesign .value-pill.blue {
+  background: #e0f2fe !important;
+  color: #0f4f9a !important;
+}
+
+#trRodDesign .value-pill.light {
+  background: #f8fafc !important;
+  color: #64748b !important;
+}
+
+#trRodDesign .caption {
+  margin-top: 10px;
+  color: #475569 !important;
   font-size: 0.85rem;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__pill {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 9px 15px;
-  font-weight: 800;
-  font-size: 0.84rem;
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__pillDark {
-  background: #f3f0ea;
-  color: var(--text);
-  border: 1px solid rgba(46, 40, 34, 0.12);
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__pillSm {
-  background: #eef3fb;
-  color: var(--blue-dark);
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__pillBlue {
-  background: var(--blue);
-  color: var(--blue-dark);
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__pillYellow {
-  background: var(--yellow);
-  color: #4a3515;
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__pillOrange {
-  background: var(--orange);
-  color: #fff;
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__pillLarge {
-  width: 100%;
-  justify-content: center;
-  padding: 14px 18px;
-  font-size: 1rem;
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__resultRow span:first-child {
-  color: var(--accent);
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__separator {
-  grid-column: 1 / -1;
-  height: 1px;
-  background: rgba(46, 40, 34, 0.1);
-  margin: 4px 0;
-}
-
-.sf-comp.sf-comp--tensionRod .sf-rodRed__verdictCard {
-  display: grid;
-  align-items: center;
+#trRodDesign .highlight-card {
+  display: grid !important;
   justify-items: center;
+  align-items: center;
   text-align: center;
+  padding: 26px 20px;
 }
 
-.sf-comp.sf-comp--tensionRod .sf-rodRed__verdictTitle {
-  margin-bottom: 16px;
-  color: var(--accent);
-  font-size: 0.95rem;
-  letter-spacing: 0.16em;
+#trRodDesign .use-value {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fbf6ed !important;
+  border-radius: 999px;
+  padding: 16px 24px;
+  font-size: 1.1rem;
   font-weight: 900;
+  color: #9a3412 !important;
+}
+
+#trRodDesign .use-value span {
+  display: inline-flex;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #fb923c !important;
+  color: #ffffff !important;
+}
+
+#trRodDesign .result-pill {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 62px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: #ffffff !important;
+  font-weight: 800;
+}
+
+#trRodDesign .result-pill.blue {
+  background: #2563eb !important;
+}
+
+#trRodDesign .result-pill.yellow {
+  background: #facc15 !important;
+  color: #1f2937 !important;
+}
+
+#trRodDesign .result-pill.orange {
+  background: #f97316 !important;
+}
+
+#trRodDesign .result-pill.gray {
+  background: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+#trRodDesign .photos-card {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 14px !important;
+}
+
+#trRodDesign .photo-box {
+  min-height: 180px;
+  border-radius: 22px;
+  border: 1px dashed rgba(100, 116, 139, 0.35) !important;
+  background: #fbfbf8 !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 12px;
+  color: #475569 !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-@media (max-width: 1024px) {
-  .sf-comp.sf-comp--tensionRod .sf-rodRed__layoutGrid,
-  .sf-comp.sf-comp--tensionRod .sf-rodRed__bottomRow {
-    grid-template-columns: 1fr;
+#trRodDesign .photo-box img {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #fff;
+}
+
+#trRodDesign .photo-box__lbl {
+  display: none !important;
+}
+
+/* Two-column photo row: inner dashed borders formed a double vertical seam in the gap */
+@media (min-width: 1121px) {
+  #trRodDesign .photos-card .photo-box:first-child {
+    border-right: none !important;
+  }
+
+  #trRodDesign .photos-card .photo-box:last-child {
+    border-left: none !important;
+  }
+}
+
+.sf-comp.sf-comp--tensionRod {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1120px) {
+  #trRodDesign .layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #trRodDesign .photos-card {
+    grid-template-columns: 1fr !important;
   }
 }
 

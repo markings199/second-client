@@ -221,6 +221,12 @@
       const Ah = Number.isFinite(n) && Number.isFinite(dh) && Number.isFinite(t) ? n * dh * t : null;
       ahEl.textContent = fmt(Ah, 3);
 
+      const dfDispEl = el('sfTenAnaDfDisp');
+      if (dfDispEl) {
+        const dNom = parseNumLike(dhEl?.value);
+        dfDispEl.textContent = Number.isFinite(dNom) ? fmt(dNom, 4) : '—';
+      }
+
       const AnNs = Number.isFinite(Ag) && Number.isFinite(Ah) ? Ag - Ah : null;
       anNsEl.textContent = fmt(AnNs, 3);
 
@@ -249,6 +255,8 @@
       anGovEl.textContent = fmt(AnGov, 3);
 
       const Ae = Number.isFinite(U) && Number.isFinite(AnGov) ? U * AnGov : null;
+      const aeDisplayEl = el('sfTenAnaAe');
+      if (aeDisplayEl) aeDisplayEl.textContent = fmt(Ae, 4);
       const lrfdYield = Number.isFinite(Fy) && Number.isFinite(Ag) ? 0.9 * Fy * Ag : null;
       const lrfdFrac = Number.isFinite(Fu) && Number.isFinite(Ae) ? 0.75 * Fu * Ae : null;
       const asdYield = Number.isFinite(Fy) && Number.isFinite(Ag) ? (Fy * Ag) / 1.67 : null;
@@ -264,6 +272,16 @@
       if (outAsdF) outAsdF.textContent = fmt(asdFrac, 3);
       if (outAsdGov) outAsdGov.textContent = fmt(asdGov, 3);
       if (outAsdAllow) outAsdAllow.textContent = fmt(asdGov, 3);
+
+      const syncCapMirror = (srcId, dstId) => {
+        const src = el(srcId);
+        const dst = el(dstId);
+        if (src && dst) dst.textContent = src.textContent;
+      };
+      syncCapMirror('sfTenAnaLrfdYield', 'sfTenAnaLrfdYieldMir');
+      syncCapMirror('sfTenAnaLrfdFracture', 'sfTenAnaLrfdFractureMir');
+      syncCapMirror('sfTenAnaCapBlock', 'sfTenAnaCapBlockMir');
+      syncCapMirror('sfTenAnaLrfdGov', 'sfTenAnaLrfdGovMir');
     }
 
     function setDefaults() {

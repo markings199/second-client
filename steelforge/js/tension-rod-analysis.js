@@ -710,4 +710,119 @@
     checkUserDiameter();
     return true;
   };
+
+  /** Design Tension Rod layout — loads / diameters (pages/tension-rod.html, #trRodDesign) */
+  window.SteelForge.initTensionRodDesignUi = (panelRoot) => {
+    const root = panelRoot?.querySelector?.('.sf-comp--tensionRod') ?? document.querySelector('.sf-comp--tensionRod');
+    if (!root?.querySelector?.('#sfRodTrDl')) return;
+
+    const $ = (id) => root.querySelector(`#${id}`);
+    const parseNum = (v) => {
+      const n = Number(String(v ?? '').replace(/,/g, '').trim());
+      return Number.isFinite(n) ? n : null;
+    };
+
+    const STOCK = [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1, 1.125, 1.25, 1.375, 1.5, 1.75, 2];
+
+    function stockUp(d) {
+      if (!Number.isFinite(d)) return null;
+      return STOCK.find((x) => x >= d - 1e-9) ?? d;
+    }
+
+    function labelFrac(inch) {
+      const pairs = [
+        [0.25, '1/4'],
+        [0.375, '3/8'],
+        [0.5, '1/2'],
+        [0.625, '5/8'],
+        [0.75, '3/4'],
+        [0.875, '7/8'],
+        [1, '1'],
+        [1.125, '1 1/8'],
+        [1.25, '1 1/4'],
+        [1.375, '1 3/8'],
+        [1.5, '1 1/2'],
+        [1.75, '1 3/4'],
+        [2, '2'],
+      ];
+      const hit = pairs.find(([x]) => Math.abs(x - inch) < 0.02);
+      if (hit) return hit[1];
+      const rounded = Number(inch.toFixed(3));
+      return String(rounded).replace(/\.?0+$/, '');
+    }
+
+    function fmtLoad(v) {
+      if (!Number.isFinite(v)) return '—';
+      return v.toFixed(1).replace(/\.0$/, '');
+    }
+
+    function fmtD(v) {
+      if (!Number.isFinite(v)) return '—';
+      let s = v.toFixed(5);
+      s = s.replace(/(\.\d*?[1-9])0+$/, '$1').replace(/\.$/, '');
+      return s;
+    }
+
+    function recompute() {
+      const DL = parseNum($('sfRodTrDl')?.value);
+      const LL = parseNum($('sfRodTrLl')?.value);
+      const Fy = parseNum($('sfRodTrFy')?.textContent);
+
+      const c1216 = Number.isFinite(DL) && Number.isFinite(LL) ? 1.2 * DL + 1.6 * LL : null;
+      const c14 = Number.isFinite(DL) ? 1.4 * DL : null;
+      const Tu =
+        Number.isFinite(c1216) && Number.isFinite(c14)
+          ? Math.max(c1216, c14)
+          : Number.isFinite(c1216)
+            ? c1216
+            : Number.isFinite(c14)
+              ? c14
+              : null;
+      const DLplusLL = Number.isFinite(DL) && Number.isFinite(LL) ? DL + LL : null;
+
+      if ($('sfRodTrOut1216')) $('sfRodTrOut1216').textContent = fmtLoad(c1216);
+      if ($('sfRodTrOut14')) $('sfRodTrOut14').textContent = fmtLoad(c14);
+      if ($('sfRodTrOutTu')) $('sfRodTrOutTu').textContent = fmtLoad(Tu);
+      if ($('sfRodTrOutDlLl')) $('sfRodTrOutDlLl').textContent = fmtLoad(DLplusLL);
+
+      const method = String($('sfRodTrDesMethod')?.value || 'lrfd').toLowerCase();
+
+      let dLrfd = null;
+      if (Number.isFinite(Tu) && Number.isFinite(Fy) && Fy > 0) {
+        dLrfd = Math.sqrt((4 * Tu) / (0.9 * Math.PI * Fy));
+      }
+
+      let dAsd = null;
+      if (Number.isFinite(DLplusLL) && Number.isFinite(Fy) && Fy > 0) {
+        dAsd = Math.sqrt((4 * DLplusLL * 1.67) / (Math.PI * Fy));
+      }
+
+      const pillL = $('sfRodTrDlrfd');
+      const pillA = $('sfRodTrDasd');
+      const capL = $('sfRodTrDlrfdCap');
+      const capA = $('sfRodTrDasdCap');
+
+      if (pillL) pillL.textContent = Number.isFinite(dLrfd) ? `${fmtD(dLrfd)} in` : '— in';
+      if (pillA) pillA.textContent = Number.isFinite(dAsd) ? `${fmtD(dAsd)} in` : '— in';
+
+      const sL = stockUp(dLrfd);
+      const sA = stockUp(dAsd);
+      if (capL) capL.textContent = Number.isFinite(sL) ? `diameter ≈ ${labelFrac(sL)} in` : 'diameter ≈ — in';
+      if (capA) capA.textContent = Number.isFinite(sA) ? `diameter ≈ ${labelFrac(sA)} in` : 'diameter ≈ — in';
+
+      const useEl = $('sfRodTrDuse');
+      if (useEl) {
+        const pick = method === 'asd' ? sA : sL;
+        useEl.textContent = Number.isFinite(pick) ? labelFrac(pick) : '—';
+      }
+
+      const taPill = $('sfRodTrOutTa');
+      if (taPill) taPill.textContent = method === 'asd' ? fmtLoad(DLplusLL) : '—';
+    }
+
+    $('sfRodTrDesMethod')?.addEventListener('change', recompute);
+    ['sfRodTrDl', 'sfRodTrLl'].forEach((id) => $(id)?.addEventListener('input', recompute));
+
+    recompute();
+  };
 })();
