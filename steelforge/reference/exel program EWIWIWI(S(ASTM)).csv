@@ -1,0 +1,36 @@
+,,,,,,,,
+,,,,,,"Shear Lag Factor, U",,
+ASTM DESIGNATION,"Yield Stress, Fy","Tensile Stress, Fu",,BOLT db,,Cases,Description of Element,U
+A36,36,58,,HOLE dh,,1,Diretcly transmitted to fasteners,1
+A53 Gr. B,35,60,,,,2,Some are transmitted to fasteners,0.606
+A500 Gr. B1,42,58,,,,3,Transverse welds,1
+A500 Gr. B2,46,58,,,,4,Load is transmitted by longhitudinal welds,0.4545
+A500 Gr. C1,46,62,,,,5,Round HSS,N/A
+A500 Gr. C2,50,62,,,,6a,Rectangular HSS (single),N/A
+A501 Gr. A,36,58,,,,6b,Rectangular HSS (two side),N/A
+A501 Gr. B,50,70,,,,7a,"W, H, S, HP (flange - 3 or more)",N/A
+A529 Gr. 50,50,65,,,,7b,"W, H, S, HP (web - 4 or more)",0.7
+A529 Gr. 55,55,70,,,,8a,L and 2L (4 or more),0.8
+A709 Gr. 36,36,58,,,,8b,L and 2L (less than 3),0.6
+A1043 Gr. 36,36,58,,,,,,
+A1043 Gr. 50,50,65,,,,,,
+81085 Gr. A,50,65,,,,,,
+A562 Gr. 42,42,60,,,,,,
+A572 Gr. 50,50,65,,,,,,
+A572 Gr. 55,55,70,,,,,,
+A572 Gr. 60 e,60,75,,,,,,
+A572 Gr. 65e,65,80,,,,,,
+"A618 Gr. lak, lb & Il",50,70,,,,,,
+A618 Gr. III,50,65,,,,,,
+A709 50,50,65,,,,,,
+A709 50S,50,65,,,,,,
+A709 50W,50,70,,,,,,
+A913 50,50,65,,,,,,
+A913 60,60,75,,,,,,
+A913 65,65,80,,,,,,
+A913 70,70,90,,,,,,
+A992,50,65,,,,,,
+A1065k Gr. 50,50,60,,,,,,
+A558,50,70,,,,,,
+A847,50,70,,,,,,
+A1065k Gr. 50W,50,70,,,,,,

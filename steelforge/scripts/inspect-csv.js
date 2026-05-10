@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const csvPath = path.join(__dirname, '..', 'exel program EWIWIWI(S(STEEL SELECTION)).csv');
+const csvPath = path.join(__dirname, '..', 'reference', 'exel program EWIWIWI(S(STEEL SELECTION)).csv');
 const text = fs.readFileSync(csvPath, 'utf8');
 const lines = text.split(/\r?\n/);
 

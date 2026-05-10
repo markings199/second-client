@@ -105,6 +105,7 @@
               </div>
 
               <input type="hidden" id="sfShearAnaFu" />
+              <input type="hidden" id="sfShearAnaD" />
               <input type="hidden" id="sfShearAnaLambdaP" />
               <input type="hidden" id="sfShearAnaLambdaR" />
               <input type="hidden" id="sfShearAnaKv" />
@@ -306,7 +307,7 @@
 
               <div class="sf-shearDes__conditionRight">
                 <div class="sf-shearDes__conditionRow">
-                  <span class="sf-shearDes__conditionLabel">WEB SHEAR STRENGHT COEFFICIENT</span>
+                  <span class="sf-shearDes__conditionLabel">WEB SHEAR STRENGTH COEFFICIENT</span>
                   <span class="sf-shearDes__conditionExpr">C<sub>v</sub> =</span>
                   <span class="sf-shearDes__conditionPill" id="sfShearDesCv">-</span>
                 </div>
@@ -368,7 +369,8 @@
             <div class="sf-shearDes__beamRow sf-shearDes__beamRow--select">
               <span class="sf-shearDes__beamLabel">BEAM TYPE =</span>
               <select class="sf-shearDes__beamSelect" id="sfShearDesBeamType" aria-label="Beam type">
-                <option selected>SIMPLE BEAM - Uniformly Distributed Load</option>
+                <option value="cantilever" selected>CANTILEVER - Uniformly distributed load</option>
+                <option value="simple">SIMPLE BEAM - Uniformly distributed load</option>
               </select>
             </div>
 

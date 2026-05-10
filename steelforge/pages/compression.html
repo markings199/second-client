@@ -9,133 +9,187 @@
   </div>
 
   <div class="sf-comp__mode is-active" data-comp-mode-pane="analysis" role="tabpanel" aria-label="Analysis compression">
-    <div class="sf-comp__card sf-compRed" role="region" aria-label="Compression dashboard">
-      <div class="sf-comp__star" aria-hidden="true">★</div>
-      <div class="sf-compRed__innerFrame">
-        <div class="sf-compRed__dashboardGrid">
-          <div class="sf-compRed__column sf-compRed__columnLeft">
-            <div class="sf-compRed__card sf-compRed__cardPanel">
-              <div class="sf-compRed__panelHeading">
-                <span class="sf-compRed__panelLabel">DESIGN METHOD</span>
-                <span class="sf-compRed__pill sf-compRed__pillDark">LRFD <span class="sf-compRed__dropdown">▾</span></span>
+    <div class="sf-comp__emptyPane">
+      <div class="sf-comp__grayShell" role="region" aria-label="Compression analysis workspace">
+        <div class="sf-comp__grayShell-body sf-comp__grayShell-body--analysis">
+          <aside class="sf-compAna__sidebar" aria-label="Analysis parameters">
+            <div class="sf-compAna__headRow">
+              <span class="sf-compAna__pillLabel">ANALYSIS METHOD</span>
+              <div class="sf-compAna__selectWrap sf-compAna__selectWrap--method">
+                <select id="sfCompAnaMethod" class="sf-compAna__select" aria-label="Design method">
+                  <option value="lrfd" selected>LRFD</option>
+                  <option value="asd">ASD</option>
+                </select>
               </div>
-              <div class="sf-compRed__sectionTitle">PARAMETERS:</div>
-              <div class="sf-compRed__formGrid">
-                <div class="sf-compRed__formRow"><span>STEEL TYPE =</span><span class="sf-compRed__pill sf-compRed__pillSm">A36</span></div>
-                <div class="sf-compRed__formRow"><span>Fy =</span><span class="sf-compRed__pill sf-compRed__pillSm">36 ksi</span></div>
-                <div class="sf-compRed__formRow"><span>DEAD LOAD (DL) =</span><span class="sf-compRed__pill sf-compRed__pillSm">0.2 kips/ft</span></div>
-                <div class="sf-compRed__formRow"><span>LIVE LOAD (LL) =</span><span class="sf-compRed__pill sf-compRed__pillSm">0.8 kips/ft</span></div>
-                <div class="sf-compRed__formRow"><span>LENGTH =</span><span class="sf-compRed__pill sf-compRed__pillSm">55 ft</span></div>
-                <div class="sf-compRed__formRow"><span>DEFLECTION LIMITATION =</span><span class="sf-compRed__pill sf-compRed__pillSm">L/540 <span class="sf-compRed__dropdown">▾</span></span></div>
+            </div>
+            <div class="sf-compAna__headRow sf-compAna__headRow--steel">
+              <span class="sf-compAna__pillLabel">STEEL GRADE</span>
+              <div class="sf-compAna__selectWrap sf-compAna__selectWrap--steel">
+                <select id="sfCompAnaSteel" class="sf-compAna__select" aria-label="Steel grade"></select>
+              </div>
+            </div>
+            <div class="sf-compAna__headRow">
+              <span class="sf-compAna__pillLabel">SHAPE SELECTION</span>
+              <div class="sf-compAna__selectWrap">
+                <select id="sfCompAnaShape" class="sf-compAna__select" aria-label="W-shape"></select>
               </div>
             </div>
 
-            <div class="sf-compRed__card sf-compRed__cardPanel">
-              <div class="sf-compRed__sectionTitle">LOAD W/O BEAM WEIGHT</div>
-              <div class="sf-compRed__tableGrid">
-                <div class="sf-compRed__tableRow"><span>1.2DL + 1.6LL =</span><span class="sf-compRed__pill sf-compRed__pillBlue">1.52</span><span>kips/ft</span></div>
-                <div class="sf-compRed__tableRow"><span>1.4DL =</span><span class="sf-compRed__pill sf-compRed__pillBlue">0.20</span><span>kips/ft</span></div>
-                <div class="sf-compRed__tableRow"><span>W<sub>u</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">1.52</span><span>kips/ft</span></div>
-                <div class="sf-compRed__separator"></div>
-                <div class="sf-compRed__tableRow"><span>ULTIMATE MOMENT (M<sub>u</sub>) =</span><span class="sf-compRed__pill sf-compRed__pillBlue">547.75</span><span>kips/ft</span></div>
-              </div>
-              <div class="sf-compRed__tableGrid">
-                <div class="sf-compRed__tableRow"><span>DL+LL =</span><span class="sf-compRed__textMuted">-</span><span>kips/ft</span></div>
-                <div class="sf-compRed__tableRow"><span>W<sub>b</sub> =</span><span class="sf-compRed__textMuted">-</span><span>kips/ft</span></div>
-                <div class="sf-compRed__tableRow"><span>ALLOWABLE MOMENT (M<sub>a</sub>) =</span><span class="sf-compRed__textMuted">-</span><span>kips/ft</span></div>
-              </div>
-              <div class="sf-compRed__note">ASSUMING COMPACTION FOR Z<sub>c</sub> = 212.6703704 in³</div>
+            <div class="sf-compAna__kv">
+              <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">E</span></span>
+              <input id="sfCompAnaE" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" value="29000" aria-label="Modulus of elasticity ksi" />
+              <span class="sf-compAna__unit">ksi</span>
             </div>
-          </div>
-
-          <div class="sf-compRed__column sf-compRed__columnCenter">
-            <div class="sf-compRed__card sf-compRed__cardPanel">
-              <div class="sf-compRed__sectionTitle">BEAM LOAD:</div>
-              <div class="sf-compRed__tableGrid">
-                <div class="sf-compRed__tableRow"><span>BEAM TYPE =</span><span class="sf-compRed__pill sf-compRed__pillSm">FIXED AND PIN - Uniformly Distributed Load <span class="sf-compRed__dropdown">▾</span></span></div>
-                <div class="sf-compRed__tableRow"><span>ULTIMATE MOMENT (M<sub>u</sub>) =</span><span class="sf-compRed__pill sf-compRed__pillGrey">WL²/8</span></div>
-                <div class="sf-compRed__tableRow"><span>ULTIMATE DEFLECTION (Δ<sub>max</sub>) =</span><span class="sf-compRed__pill sf-compRed__pillGrey">5WL²/384EI</span></div>
-                <div class="sf-compRed__tableRow"><span>ALLOWABLE MOMENT OF INERTIA I<sub>c</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">4647.02586 in³</span></div>
-              </div>
+            <div class="sf-compAna__kv">
+              <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">A<sub>g</sub></span></span>
+              <input id="sfCompAnaAg" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" readonly aria-label="Gross area in squared inches" />
+              <span class="sf-compAna__unit">in²</span>
             </div>
-
-            <div class="sf-compRed__card sf-compRed__cardPanel">
-              <div class="sf-compRed__sectionTitle">ASSUMED SECTION BY Z<sub>x</sub></div>
-              <div class="sf-compRed__tableGrid">
-                <div class="sf-compRed__tableRow"><span>STEEL SECTION =</span><span class="sf-compRed__pill sf-compRed__pillYellow">W24X84</span></div>
-                <div class="sf-compRed__tableRow"><span>PLASTIC MODULUS Z<sub>x</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">224</span><span>in³</span></div>
-                <div class="sf-compRed__tableRow"><span>WEIGHT w<sub>e</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">84</span></div>
-                <div class="sf-compRed__tableRow"><span>ELASTIC SECTION S<sub>x</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">196</span><span>in³</span></div>
-                <div class="sf-compRed__tableRow"><span>λ<sub>t</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">5.66</span></div>
-              </div>
-              <div class="sf-compRed__remark sf-compRed__pill sf-compRed__pillOrange">UNSAFE</div>
+            <div class="sf-compAna__kv">
+              <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">r<sub>x</sub></span></span>
+              <input id="sfCompAnaRx" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" readonly aria-label="Radius of gyration x" />
+              <span class="sf-compAna__unit">in</span>
             </div>
-
-            <div class="sf-compRed__card sf-compRed__cardPanel">
-              <div class="sf-compRed__sectionTitle">ASSUMED SECTION BY I<sub>x</sub></div>
-              <div class="sf-compRed__tableGrid">
-                <div class="sf-compRed__tableRow"><span>STEEL SECTION =</span><span class="sf-compRed__pill sf-compRed__pillYellow">W30X116</span></div>
-                <div class="sf-compRed__tableRow"><span>PLASTIC MODULUS Z<sub>x</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">378</span><span>in³</span></div>
-                <div class="sf-compRed__tableRow"><span>SECTION MODULUS S<sub>x</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">329</span><span>in³</span></div>
-                <div class="sf-compRed__tableRow"><span>MOMENT OF INERTIA I<sub>x</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">4930</span><span>in³</span></div>
-                <div class="sf-compRed__tableRow"><span>λ<sub>rf</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">6.17</span></div>
-                <div class="sf-compRed__tableRow"><span>WEIGHT w =</span><span class="sf-compRed__pill sf-compRed__pillBlue">116</span></div>
-              </div>
+            <div class="sf-compAna__kv">
+              <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">r<sub>y</sub></span></span>
+              <input id="sfCompAnaRy" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" readonly aria-label="Radius of gyration y" />
+              <span class="sf-compAna__unit">in</span>
             </div>
-          </div>
-
-          <div class="sf-compRed__column sf-compRed__columnRight">
-            <div class="sf-compRed__card">
-              <div class="sf-compRed__sectionTitle">LOAD WITH BEAM WEIGHT</div>
-              <div class="sf-compRed__tableGrid">
-                <div class="sf-compRed__tableRow"><span>ULTIMATE WEIGHT w<sub>u</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">1.6206</span><span>kips/ft</span></div>
-                <div class="sf-compRed__tableRow"><span>ULTIMATE MOMENT M<sub>u</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">612.065</span><span>kips/ft</span></div>
-                <div class="sf-compRed__tableRow"><span>ALLOWABLE WEIGHT w<sub>a</sub> =</span><span class="sf-compRed__textMuted">-</span><span>kips/ft</span></div>
-                <div class="sf-compRed__tableRow"><span>ALLOWABLE MOMENT M<sub>a</sub> =</span><span class="sf-compRed__textMuted">-</span><span>kips/ft</span></div>
-              </div>
+            <div class="sf-compAna__kv">
+              <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">λ<sub>f</sub></span></span>
+              <input id="sfCompAnaLamF" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" readonly aria-label="Flange slenderness" />
+              <span class="sf-compAna__unit">—</span>
+            </div>
+            <div class="sf-compAna__kv">
+              <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">λ<sub>w</sub></span></span>
+              <input id="sfCompAnaLamW" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" readonly aria-label="Web slenderness" />
+              <span class="sf-compAna__unit">—</span>
+            </div>
+            <div class="sf-compAna__kv">
+              <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">F<sub>y</sub></span></span>
+              <input id="sfCompAnaFy" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" aria-label="Yield stress ksi" />
+              <span class="sf-compAna__unit">ksi</span>
+            </div>
+            <div class="sf-compAna__kv">
+              <span class="sf-compAna__kvLab"><span class="sf-compAna__sym">F<sub>u</sub></span></span>
+              <input id="sfCompAnaFu" class="sf-compAna__pillInput sf-compAna__pillInput--steel" type="text" aria-label="Tensile strength ksi" />
+              <span class="sf-compAna__unit">ksi</span>
             </div>
 
-            <div class="sf-compRed__card">
-              <div class="sf-compRed__sectionTitle">CHECK COMPACTNESS</div>
-              <div class="sf-compRed__tableGrid">
-                <div class="sf-compRed__tableRow"><span>λ<sub>pf</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">10.76527803</span></div>
-                <div class="sf-compRed__tableRow"><span>λ<sub>rf</sub> =</span><span class="sf-compRed__pill sf-compRed__pillBlue">20.36321061</span></div>
-                <div class="sf-compRed__tableRow sf-compRed__verdictRow"><span>VERDICT</span><span class="sf-compRed__pill sf-compRed__pillYellow">COMPACT FLANGE</span></div>
-                <div class="sf-compRed__tableRow"><span>NOMINAL MOMENT STRENGTH M<sub>n</sub> =</span><span class="sf-compRed__pill sf-compRed__pillSm">1134</span><span>kips/ft</span></div>
-              </div>
-            </div>
-
-            <div class="sf-compRed__card">
-              <div class="sf-compRed__sectionTitle">DEFLECTION</div>
-              <div class="sf-compRed__tableGrid">
-                <div class="sf-compRed__tableRow"><span>ALLOWABLE DEFLECTION</span><span class="sf-compRed__pill sf-compRed__pillBlue">0.101851852</span></div>
-                <div class="sf-compRed__tableRow"><span>MAX DEFLECTION</span><span class="sf-compRed__pill sf-compRed__pillBlue">0.101851852</span></div>
-              </div>
-            </div>
-
-            <div class="sf-compRed__card sf-compRed__bendingCard">
-              <div class="sf-compRed__sectionTitle">BENDING CAPACITY</div>
-              <div class="sf-compRed__pill sf-compRed__pillOrange sf-compRed__pillLarge">M<sub>u</sub> = 604.8 kips-ft</div>
-            </div>
-
-            <div class="sf-compRed__card sf-compRed__photoCard">
-              <div class="sf-compRed__sectionTitle">SECTION IMAGE</div>
-              <div class="sf-compRed__photoGrid">
-                <div class="sf-compRed__photoSlot">
-                  <img class="sf-compRed__photoImg" src="./assets/compression/w-section-plain.png" alt="W-section wide-flange shape (undeformed)" width="400" height="400" loading="lazy" />
+            <div class="sf-compAna__lengthBlock">
+              <div class="sf-compAna__lengthTitle">LENGTH</div>
+              <div class="sf-compAna__lengthCols">
+                <div class="sf-compAna__lengthCol">
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">x<sub>1</sub></span><input id="sfCompAnaX1" class="sf-compAna__pillInput" type="text" value="70" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">x<sub>2</sub></span><input id="sfCompAnaX2" class="sf-compAna__pillInput" type="text" value="0" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">x<sub>3</sub></span><input id="sfCompAnaX3" class="sf-compAna__pillInput" type="text" value="0" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">x<sub>4</sub></span><input id="sfCompAnaX4" class="sf-compAna__pillInput" type="text" value="0" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">x<sub>5</sub></span><input id="sfCompAnaX5" class="sf-compAna__pillInput" type="text" value="0" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">x<sub>6</sub></span><input id="sfCompAnaX6" class="sf-compAna__pillInput" type="text" value="0" /><span class="sf-compAna__unit">ft</span></div>
                 </div>
-                <div class="sf-compRed__photoSlot">
-                  <img class="sf-compRed__photoImg" src="./assets/compression/w-section-stress.png" alt="W-section under axial compression (stress visualization)" width="400" height="400" loading="lazy" />
+                <div class="sf-compAna__lengthCol">
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">y<sub>1</sub></span><input id="sfCompAnaY1" class="sf-compAna__pillInput" type="text" value="35" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">y<sub>2</sub></span><input id="sfCompAnaY2" class="sf-compAna__pillInput" type="text" value="35" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">y<sub>3</sub></span><input id="sfCompAnaY3" class="sf-compAna__pillInput" type="text" value="0" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">y<sub>4</sub></span><input id="sfCompAnaY4" class="sf-compAna__pillInput" type="text" value="0" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">y<sub>5</sub></span><input id="sfCompAnaY5" class="sf-compAna__pillInput" type="text" value="0" /><span class="sf-compAna__unit">ft</span></div>
+                  <div class="sf-compAna__kv sf-compAna__kv--coord"><span class="sf-compAna__kvLab">y<sub>6</sub></span><input id="sfCompAnaY6" class="sf-compAna__pillInput" type="text" value="0" /><span class="sf-compAna__unit">ft</span></div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <div class="sf-compAnaCompact">
+            <div class="sf-compAnaCompact__card">
+              <div class="sf-compAnaCompact__title">CHECK COMPACTNESS</div>
+              <div class="sf-compAnaCompact__inner">
+                <div class="sf-compAnaCompact__seg--flange">
+                  <div class="sf-compAnaCompact__sectionTitle">Flange</div>
+                  <div class="sf-compAnaCompact__row"><span class="sf-compAnaCompact__lambda">λ<sub>p</sub> =</span><span class="sf-compAnaCompact__value">—</span></div>
+                  <div class="sf-compAnaCompact__row"><span class="sf-compAnaCompact__lambda">λ<sub>r</sub> =</span><span class="sf-compAnaCompact__value">—</span></div>
+                </div>
+                <div class="sf-compAnaCompact__seg--web">
+                  <div class="sf-compAnaCompact__sectionTitle">Web</div>
+                  <div class="sf-compAnaCompact__row"><span class="sf-compAnaCompact__lambda">λ<sub>p</sub> =</span><span class="sf-compAnaCompact__value">—</span></div>
+                  <div class="sf-compAnaCompact__row"><span class="sf-compAnaCompact__lambda">λ<sub>r</sub> =</span><span class="sf-compAnaCompact__value">—</span></div>
+                </div>
+                <div class="sf-compAnaCompact__aside">
+                  <div class="sf-compAnaCompact__verdictTitle">VERDICT</div>
+                  <div class="sf-compAnaCompact__asideRow sf-compAnaCompact__asideRow--flange"><span class="sf-compAnaCompact__badge">—</span></div>
+                  <div class="sf-compAnaCompact__asideRow sf-compAnaCompact__asideRow--web"><span class="sf-compAnaCompact__badge">—</span></div>
                 </div>
               </div>
             </div>
 
-            <div class="sf-compRed__card">
-              <div class="sf-compRed__sectionTitle">FINAL STEEL SECTION</div>
-              <div class="sf-compRed__tableGrid">
-                <div class="sf-compRed__tableRow"><span>STEEL SECTION =</span><span class="sf-compRed__pill sf-compRed__pillOrange">W24X84</span></div>
-                <div class="sf-compRed__tableRow sf-compRed__verdictRow"><span>REMARKS:</span><span class="sf-compRed__pill sf-compRed__pillOrange">UNSAFE</span></div>
+            <div class="sf-compCap">
+              <div class="sf-compCap__card">
+                <div class="sf-compCap__title">CHECKING CAPACITY</div>
+                <div class="sf-compCap__section">
+                  <div class="sf-compCap__label">Euler elastic buckling</div>
+                  <div class="sf-compCap__row">
+                    <span class="sf-compCap__sym">F<sub>e</sub></span><span class="sf-compCap__eq">=</span><span class="sf-compCap__pill sf-compCap__pill--empty">—</span><span class="sf-compCap__unit">ksi</span>
+                  </div>
+                </div>
+                <div class="sf-compCap__section">
+                  <div class="sf-compCap__label">Critical stress</div>
+                  <div class="sf-compCap__row">
+                    <span class="sf-compCap__sym">F<sub>cr</sub></span><span class="sf-compCap__eq">=</span><span class="sf-compCap__pill sf-compCap__pill--empty">—</span><span class="sf-compCap__unit">ksi</span>
+                  </div>
+                </div>
+                <div class="sf-compCap__section">
+                  <div class="sf-compCap__label">Nominal axial strength</div>
+                  <div class="sf-compCap__row">
+                    <span class="sf-compCap__sym">P<sub>n</sub></span><span class="sf-compCap__eq">=</span><span class="sf-compCap__pill sf-compCap__pill--empty">—</span><span class="sf-compCap__unit">kips</span>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            <div class="sf-compAnaCompact__slotRightBelow">
+              <div class="sf-compGov">
+                <div class="sf-compGov__header">LOAD AND RESISTANCE FACTORED DESIGN (LRFD)</div>
+                <div class="sf-compGov__body">
+                  <span class="sf-compGov__sym">P<sub>u</sub></span><span class="sf-compGov__eq">=</span><span id="sfCompGovPu" class="sf-compGov__pill">—</span><span class="sf-compGov__unit">kips</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sf-compAnaCritical__card">
+              <div class="sf-compAnaCritical__title">CRITICAL SLENDERNESS RATIO</div>
+              <div class="sf-compAnaCritical__header" aria-hidden="true">
+                <div class="sf-compAnaCritical__element"></div>
+                <div>Connection</div>
+                <div>K</div>
+                <div>L (in)</div>
+                <div>r (in)</div>
+                <div>KL/r</div>
+              </div>
+              <!-- x₁ … x₆ -->
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">x<sub>1</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection x1"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">x<sub>2</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection x2"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">x<sub>3</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection x3"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">x<sub>4</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection x4"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">x<sub>5</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection x5"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">x<sub>6</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection x6"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <!-- y₁ … y₆ -->
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">y<sub>1</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection y1"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">y<sub>2</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection y2"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">y<sub>3</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection y3"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">y<sub>4</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection y4"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">y<sub>5</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection y5"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__row sf-compAnaCritical__row"><div class="sf-compAnaCritical__element">y<sub>6</sub></div><select class="sf-compAnaCritical__select" aria-label="Connection y6"></select><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__input"></div><div class="sf-compAnaCritical__output sf-compAnaCritical__output--empty"></div></div>
+              <div class="sf-compAnaCritical__governing">
+                <div class="sf-compAnaCritical__governingSpan"></div>
+                <div class="sf-compAnaCritical__governingKlr">
+                  <span class="sf-compAnaCritical__governingLab">Governing <span class="sf-compAna__sym">KL/r</span> =</span>
+                  <span class="sf-compAnaCritical__highlight sf-compAnaCritical__highlight--governing-klr">—</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sf-compAnaCompact__imgCard">
+              <div class="sf-compAnaCompact__imgPane"><img class="sf-compAnaCompact__img" src="./assets/compression/w-section-plain.png" alt="W-shape undeformed" loading="lazy" /></div>
+              <div class="sf-compAnaCompact__imgPane"><img class="sf-compAnaCompact__img" src="./assets/compression/w-section-stress.png" alt="W-shape compression stress" loading="lazy" /></div>
             </div>
           </div>
         </div>
@@ -149,7 +203,10 @@
         <header class="page-top">
           <div class="method-pill">
             <span>DESIGN METHOD</span>
-            <strong>LRFD</strong>
+            <select id="sfCompDesMethod" class="method-pill__select" aria-label="Design method (LRFD or ASD)">
+              <option value="lrfd" selected>LRFD</option>
+              <option value="asd">ASD</option>
+            </select>
           </div>
         </header>
 
@@ -159,14 +216,20 @@
             <div class="card parameter-card">
               <table class="data-table">
                 <tbody>
-                  <tr><th>Dead Load (DL)</th><td>100 kips</td></tr>
-                  <tr><th>Live Load (LL)</th><td>100 kips</td></tr>
-                  <tr><th>Length x₁</th><td>80 ft</td></tr>
-                  <tr><th>Length y₁</th><td>40 ft</td></tr>
-                  <tr><th>Length x₂</th><td>0 ft</td></tr>
-                  <tr><th>Length y₂</th><td>40 ft</td></tr>
-                  <tr><th>Length x₃</th><td>40 ft</td></tr>
-                  <tr><th>Length y₃</th><td>0 ft</td></tr>
+                  <tr><th scope="row">Dead Load (DL)</th><td class="sf-compDes-unitCell"><input id="sfCompDesDl" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="100" aria-label="Dead load kips" /><span class="sf-compDes-unit">kips</span></td></tr>
+                  <tr><th scope="row">Live Load (LL)</th><td class="sf-compDes-unitCell"><input id="sfCompDesLl" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="100" aria-label="Live load kips" /><span class="sf-compDes-unit">kips</span></td></tr>
+                  <tr><th scope="row">Length x<sub>1</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesX1" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="80" aria-label="Length x1 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length y<sub>1</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesY1" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="40" aria-label="Length y1 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length x<sub>2</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesX2" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="0" aria-label="Length x2 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length y<sub>2</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesY2" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="40" aria-label="Length y2 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length x<sub>3</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesX3" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="40" aria-label="Length x3 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length y<sub>3</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesY3" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="0" aria-label="Length y3 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length x<sub>4</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesX4" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="0" aria-label="Length x4 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length y<sub>4</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesY4" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="0" aria-label="Length y4 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length x<sub>5</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesX5" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="0" aria-label="Length x5 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length y<sub>5</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesY5" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="0" aria-label="Length y5 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length x<sub>6</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesX6" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="0" aria-label="Length x6 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
+                  <tr><th scope="row">Length y<sub>6</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesY6" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="0" aria-label="Length y6 ft" /><span class="sf-compDes-unit">ft</span></td></tr>
                 </tbody>
               </table>
             </div>
@@ -174,10 +237,10 @@
             <div class="card parameter-card">
               <table class="data-table">
                 <tbody>
-                  <tr><th>Steel Type</th><td>A992</td></tr>
-                  <tr><th>F<sub>y</sub></th><td>50 ksi</td></tr>
-                  <tr><th>F<sub>u</sub></th><td>65 ksi</td></tr>
-                  <tr><th>Modulus of Elasticity (E)</th><td>29000 ksi</td></tr>
+                  <tr><th scope="row">Steel grade</th><td><select id="sfCompDesSteel" class="sf-compDes-field sf-compDes-field--select" aria-label="Structural steel grade"></select></td></tr>
+                  <tr><th scope="row">F<sub>y</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesFy" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="50" aria-label="Yield stress ksi" /><span class="sf-compDes-unit">ksi</span></td></tr>
+                  <tr><th scope="row">F<sub>u</sub></th><td class="sf-compDes-unitCell"><input id="sfCompDesFu" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" value="65" aria-label="Tensile strength ksi" /><span class="sf-compDes-unit">ksi</span></td></tr>
+                  <tr><th scope="row">E</th><td>29000 ksi</td></tr>
                 </tbody>
               </table>
             </div>
@@ -212,22 +275,22 @@
                     <th>Connection</th>
                     <th>K</th>
                     <th>L (ft)</th>
-                    <th>KL</th>
+                    <th>KL (ft)</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>x₁</td><td>Fixed-Pinned</td><td>0.8</td><td>80</td><td>64</td></tr>
-                  <tr><td>x₂</td><td>Pinned-Pinned</td><td>1.0</td><td>80</td><td>80</td></tr>
-                  <tr><td>x₃</td><td>Fixed-Fixed</td><td>0.65</td><td>0</td><td>0</td></tr>
-                  <tr><td>x₄</td><td>Free-Pinned</td><td>2.0</td><td>0</td><td>0</td></tr>
-                  <tr><td>x₅</td><td>Fixed-Free</td><td>1.2</td><td>0</td><td>0</td></tr>
-                  <tr><td>x₆</td><td>Fixed-Pinned</td><td>0.8</td><td>40</td><td>32</td></tr>
-                  <tr><td>y₁</td><td>Pinned-Pinned</td><td>1.0</td><td>40</td><td>40</td></tr>
-                  <tr><td>y₂</td><td>Fixed-Fixed</td><td>0.65</td><td>0</td><td>0</td></tr>
-                  <tr><td>y₃</td><td>Free-Pinned</td><td>2.0</td><td>0</td><td>0</td></tr>
-                  <tr><td>y₄</td><td>Fixed-Free</td><td>1.2</td><td>0</td><td>0</td></tr>
-                  <tr><td>y₅</td><td>Fixed-Pinned</td><td>0.8</td><td>40</td><td>32</td></tr>
-                  <tr><td>y₆</td><td>Pinned-Pinned</td><td>1.0</td><td>0</td><td>0</td></tr>
+                  <tr><th scope="row">x<sub>1</sub></th><td><select id="sfCompDesConnX1" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKX1" aria-label="Connection x1"></select></td><td><input id="sfCompDesSlKX1" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K x1" /></td><td><input id="sfCompDesSlLX1" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length x1 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">x<sub>2</sub></th><td><select id="sfCompDesConnX2" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKX2" aria-label="Connection x2"></select></td><td><input id="sfCompDesSlKX2" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K x2" /></td><td><input id="sfCompDesSlLX2" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length x2 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">x<sub>3</sub></th><td><select id="sfCompDesConnX3" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKX3" aria-label="Connection x3"></select></td><td><input id="sfCompDesSlKX3" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K x3" /></td><td><input id="sfCompDesSlLX3" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length x3 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">x<sub>4</sub></th><td><select id="sfCompDesConnX4" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKX4" aria-label="Connection x4"></select></td><td><input id="sfCompDesSlKX4" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K x4" /></td><td><input id="sfCompDesSlLX4" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length x4 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">x<sub>5</sub></th><td><select id="sfCompDesConnX5" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKX5" aria-label="Connection x5"></select></td><td><input id="sfCompDesSlKX5" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K x5" /></td><td><input id="sfCompDesSlLX5" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length x5 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">x<sub>6</sub></th><td><select id="sfCompDesConnX6" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKX6" aria-label="Connection x6"></select></td><td><input id="sfCompDesSlKX6" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K x6" /></td><td><input id="sfCompDesSlLX6" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length x6 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">y<sub>1</sub></th><td><select id="sfCompDesConnY1" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKY1" aria-label="Connection y1"></select></td><td><input id="sfCompDesSlKY1" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K y1" /></td><td><input id="sfCompDesSlLY1" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length y1 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">y<sub>2</sub></th><td><select id="sfCompDesConnY2" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKY2" aria-label="Connection y2"></select></td><td><input id="sfCompDesSlKY2" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K y2" /></td><td><input id="sfCompDesSlLY2" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length y2 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">y<sub>3</sub></th><td><select id="sfCompDesConnY3" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKY3" aria-label="Connection y3"></select></td><td><input id="sfCompDesSlKY3" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K y3" /></td><td><input id="sfCompDesSlLY3" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length y3 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">y<sub>4</sub></th><td><select id="sfCompDesConnY4" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKY4" aria-label="Connection y4"></select></td><td><input id="sfCompDesSlKY4" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K y4" /></td><td><input id="sfCompDesSlLY4" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length y4 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">y<sub>5</sub></th><td><select id="sfCompDesConnY5" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKY5" aria-label="Connection y5"></select></td><td><input id="sfCompDesSlKY5" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K y5" /></td><td><input id="sfCompDesSlLY5" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length y5 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
+                  <tr><th scope="row">y<sub>6</sub></th><td><select id="sfCompDesConnY6" class="sf-compDes-field sf-compDes-field--select sf-compDes__connSelect" data-sf-k-for="sfCompDesSlKY6" aria-label="Connection y6"></select></td><td><input id="sfCompDesSlKY6" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly aria-label="K y6" /></td><td><input id="sfCompDesSlLY6" class="sf-compDes-field sf-compDes-field--num" type="number" step="any" readonly tabindex="-1" aria-label="Length y6 slender ft" /></td><td class="sf-compDesKlOut">—</td></tr>
                 </tbody>
               </table>
             </div>
@@ -239,7 +302,7 @@
                   <tr>
                     <th>Section</th>
                     <th>Weight (lb/ft)</th>
-                    <th>P<sub>n</sub></th>
+                    <th>φP<sub>n</sub> / P<sub>a</sub></th>
                     <th>Remarks</th>
                   </tr>
                 </thead>

@@ -53,7 +53,16 @@
               </tr>
               <tr>
                 <th>LENGTH</th>
-                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaLength" inputmode="decimal" autocomplete="off" /> in</td>
+                <td>
+                  <input
+                    class="sf-tensionAnalysisLayout__inp"
+                    id="sfTenAnaLength"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    title="Shear lag Case 2 uses L in U = 1 − x̄/L (connection length per workbook; may differ from overall member length)."
+                  />
+                  in
+                </td>
               </tr>
             </table>
 
@@ -107,11 +116,19 @@
                 <tr>
                   <th>GIVEN DIAMETER</th>
                   <td>
-                    <select class="sf-tensionAnalysisLayout__sel" id="sfTenAnaBoltKind" aria-label="Bolt type" style="max-width: 88px; display: inline-block; vertical-align: middle">
-                      <option value="bolt" selected>BOLT</option>
-                    </select>
-                    <input class="sf-tensionAnalysisLayout__inp" style="display: inline-block; width: calc(100% - 96px); vertical-align: middle" id="sfTenAnaDh" inputmode="decimal" autocomplete="off" placeholder="3/4" />
-                    in
+                    <div class="sf-tensionAnalysisLayout__inlineCluster" role="group" aria-label="Bolt nominal diameter">
+                      <select class="sf-tensionAnalysisLayout__sel sf-tensionAnalysisLayout__sel--boltKind" id="sfTenAnaBoltKind" aria-label="Bolt type">
+                        <option value="bolt" selected>BOLT</option>
+                      </select>
+                      <input
+                        class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--boltDh"
+                        id="sfTenAnaDh"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="3/4"
+                      />
+                      <span class="sf-tensionAnalysisLayout__unitSuffix">in</span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -174,28 +191,28 @@
                   </tr>
                   <tr>
                     <th>1</th>
-                    <td><input id="sfTenAnaS1" inputmode="decimal" /></td>
-                    <td><input id="sfTenAnaG1" inputmode="decimal" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaS1" inputmode="decimal" autocomplete="off" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaG1" inputmode="decimal" autocomplete="off" /></td>
                   </tr>
                   <tr>
                     <th>2</th>
-                    <td><input id="sfTenAnaS2" inputmode="decimal" /></td>
-                    <td><input id="sfTenAnaG2" inputmode="decimal" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaS2" inputmode="decimal" autocomplete="off" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaG2" inputmode="decimal" autocomplete="off" /></td>
                   </tr>
                   <tr>
                     <th>3</th>
-                    <td><input id="sfTenAnaS3" inputmode="decimal" /></td>
-                    <td><input id="sfTenAnaG3" inputmode="decimal" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaS3" inputmode="decimal" autocomplete="off" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaG3" inputmode="decimal" autocomplete="off" /></td>
                   </tr>
                   <tr>
                     <th>4</th>
-                    <td><input id="sfTenAnaS4" inputmode="decimal" /></td>
-                    <td><input id="sfTenAnaG4" inputmode="decimal" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaS4" inputmode="decimal" autocomplete="off" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaG4" inputmode="decimal" autocomplete="off" /></td>
                   </tr>
                   <tr>
                     <th>5</th>
-                    <td><input id="sfTenAnaS5" inputmode="decimal" /></td>
-                    <td><input id="sfTenAnaG5" inputmode="decimal" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaS5" inputmode="decimal" autocomplete="off" /></td>
+                    <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaG5" inputmode="decimal" autocomplete="off" /></td>
                   </tr>
                 </table>
               </div>
@@ -250,31 +267,31 @@
             <table>
               <tr>
                 <th>NUMBER OF BOLTS TO SHEAR</th>
-                <td>—</td>
+                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkNShear" inputmode="numeric" autocomplete="off" /></td>
               </tr>
               <tr>
                 <th>LENGTH IN SHEAR, L</th>
-                <td>—</td>
+                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkLshear" inputmode="decimal" autocomplete="off" /> in</td>
               </tr>
               <tr>
                 <th>NUMBER OF BOLTS IN TENSION</th>
-                <td>—</td>
+                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkNTension" inputmode="numeric" autocomplete="off" /></td>
               </tr>
               <tr>
                 <th>LENGTH IN TENSION, L<sub>t</sub></th>
-                <td>—</td>
+                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkLtension" inputmode="decimal" autocomplete="off" /> in</td>
               </tr>
               <tr>
                 <th>GIVEN DIAMETER</th>
-                <td>—</td>
+                <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkBoltAlias">—</span> in</td>
               </tr>
               <tr>
                 <th>FINAL DIAMETER</th>
-                <td>—</td>
+                <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkDhDisp">—</span> in</td>
               </tr>
               <tr>
                 <th>REDUCTION FACTOR, U<sub>b</sub></th>
-                <td>—</td>
+                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkUbs" inputmode="decimal" autocomplete="off" value="1" /></td>
               </tr>
             </table>
 
@@ -283,23 +300,23 @@
               <table>
                 <tr>
                   <th>GROSS AREA SHEAR, A<sub>gv</sub></th>
-                  <td>—</td>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAgv">—</span> in²</td>
                 </tr>
                 <tr>
                   <th>NET SHEAR AREA, A<sub>nv</sub></th>
-                  <td>—</td>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAnv">—</span> in²</td>
                 </tr>
                 <tr>
                   <th>SHEAR RESISTANCE</th>
-                  <td>—</td>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkRnCap">—</span> kips</td>
                 </tr>
                 <tr>
                   <th>TENSION RESISTANCE</th>
-                  <td>—</td>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkRnTen">—</span> kips</td>
                 </tr>
                 <tr>
                   <th>GOVERNING SHEAR RESISTANCE</th>
-                  <td>—</td>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkRnGov">—</span> kips</td>
                 </tr>
               </table>
             </div>
@@ -410,11 +427,13 @@
                   <tr>
                     <th>GIVEN DIAMETER</th>
                     <td>
-                      <select id="sfTenDesBoltKind" class="sf-tensionDesignLayout__sel" aria-label="Bolt type">
-                        <option value="bolt" selected>BOLT</option>
-                      </select>
-                      <input class="sf-tensionDesignLayout__inp sf-tensionDesignLayout__inp--dh" id="sfTenDesDh" inputmode="decimal" autocomplete="off" placeholder="7/8" />
-                      in
+                      <div class="sf-tensionDesignLayout__boltCluster" role="group" aria-label="Bolt nominal diameter">
+                        <select id="sfTenDesBoltKind" class="sf-tensionDesignLayout__sel" aria-label="Bolt type">
+                          <option value="bolt" selected>BOLT</option>
+                        </select>
+                        <input class="sf-tensionDesignLayout__inp sf-tensionDesignLayout__inp--dh" id="sfTenDesDh" inputmode="decimal" autocomplete="off" placeholder="7/8" />
+                        <span class="sf-tensionDesignLayout__unitSuffix">in</span>
+                      </div>
                     </td>
                   </tr>
                   <tr>

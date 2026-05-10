@@ -4,8 +4,48 @@
   const PHI_B = 0.9;
   const OMEGA_B = 1.67;
   const E_DEFAULT = 29000;
-  const KMOM = 1 / 8;
   const FY_CUSTOM_DEFAULT = 50;
+
+  function workbookBeamCase(rawId) {
+    return window.SteelForgeWorkbookBeamCaseById
+      ? window.SteelForgeWorkbookBeamCaseById(rawId)
+      : {
+          id: 'simple-u',
+          momentCoeff: 1 / 8,
+          deflectionK: 5 / 384,
+          momentFormula: 'WL²/8',
+          deflectionFormula: '5WL⁴/384EI',
+        };
+  }
+
+  function populateWorkbookDeflectionSelect(selectEl, preferredDenom) {
+    if (!selectEl) return;
+    const presets = window.SteelForgeWorkbookDeflectionLimitPresets;
+    if (!presets || presets.length === 0) return;
+    const prior = String(selectEl.value || '').trim();
+    selectEl.innerHTML = '';
+    for (const p of presets) {
+      const opt = document.createElement('option');
+      opt.value = String(p.denom);
+      opt.textContent = p.label;
+      selectEl.appendChild(opt);
+    }
+    const pref = String(preferredDenom ?? '').trim();
+    const pick =
+      presets.some((p) => String(p.denom) === prior)
+        ? prior
+        : presets.some((p) => String(p.denom) === pref)
+          ? pref
+          : String(presets.find((x) => x.denom === 360)?.denom ?? presets[0].denom);
+    selectEl.value = pick;
+  }
+
+  /** Δ_allow (in) from span L (ft) and workbook denominator n (Δ = L/n). */
+  function allowableDeflectionInches(L_ft, denomRaw) {
+    const n = parseNumLike(denomRaw);
+    if (!Number.isFinite(L_ft) || L_ft <= 0 || !Number.isFinite(n) || n <= 0) return null;
+    return (L_ft * 12) / n;
+  }
 
   function parseCsvLine(line) {
     const out = [];
@@ -57,35 +97,23 @@
     if (![Fy, E, Zx, Sx, lamF, lamW].every((x) => Number.isFinite(x) && x > 0)) return null;
     const My = (Fy * Sx) / 12;
     const Mp = (Fy * Zx) / 12;
-    const lpF = 0.38 * Math.sqrt(E / Fy);
     const lrF = 1.0 * Math.sqrt(E / Fy);
-    const lpW = 3.76 * Math.sqrt(E / Fy);
     const lrW = 5.7 * Math.sqrt(E / Fy);
-    const branch = (lam, lp, lr) => {
-      if (lam <= lp) return Mp;
-      if (lam <= lr) return Mp - (Mp - 0.7 * My) * ((lam - lp) / (lr - lp));
+    const branch = (lam, lr) => {
+      if (lam <= lr) return Mp;
       return 0.7 * My;
     };
-    const MnF = branch(lamF, lpF, lrF);
-    const MnW = branch(lamW, lpW, lrW);
+    const MnF = branch(lamF, lrF);
+    const MnW = branch(lamW, lrW);
     return Math.min(MnF, MnW);
   }
 
   function compactnessVerdict(lamF, lamW, Fy, E) {
     if (![lamF, lamW, Fy, E].every((x) => Number.isFinite(x) && x > 0)) return '—';
-    const lpF = 0.38 * Math.sqrt(E / Fy);
     const lrF = 1.0 * Math.sqrt(E / Fy);
-    const lpW = 3.76 * Math.sqrt(E / Fy);
     const lrW = 5.7 * Math.sqrt(E / Fy);
-    const flangeOk = lamF <= lpF && lamW <= lpW;
-    const noncompactOk = lamF <= lrF && lamW <= lrW;
-    if (flangeOk) return 'COMPACT SECTION';
-    if (noncompactOk) return 'NONCOMPACT SECTION';
+    if (lamF <= lrF && lamW <= lrW) return 'COMPACT FLANGE';
     return 'SLENDER SECTION';
-  }
-
-  function deflK(beam) {
-    return beam === 'cont' ? 1 / 185 : 5 / 384;
   }
 
   function populateSteelSelect(selectEl, preferredId = 'a992') {
@@ -169,8 +197,12 @@
 
   function fyFromSelect(sel) {
     if (!sel) return FY_CUSTOM_DEFAULT;
-    const g = steelPropsFromControlValue(sel.value);
-    return g && Number.isFinite(g.fy) ? g.fy : FY_CUSTOM_DEFAULT;
+    const raw = String(sel.value || '').trim();
+    const g = steelPropsFromControlValue(raw);
+    if (g && Number.isFinite(g.fy)) return g.fy;
+    const fyMatch = raw.match(/\bFy\s*=\s*(\d+(?:\.\d+)?)/i);
+    if (fyMatch) return Number(fyMatch[1]);
+    return FY_CUSTOM_DEFAULT;
   }
 
   function getPreferredSteelGradeId() {
@@ -188,15 +220,17 @@
     return isLRFD ? PHI_B * Mn : Mn / OMEGA_B;
   }
 
-  function deltaInches(W_klf, L_ft, E_ksi, I_in4, beam) {
+  function deltaInches(W_klf, L_ft, E_ksi, I_in4, deflectionK) {
     if (![W_klf, L_ft, E_ksi, I_in4].every((x) => Number.isFinite(x) && x > 0)) return null;
-    const k = deflK(beam);
+    const k = deflectionK;
+    if (!Number.isFinite(k) || k <= 0) return null;
     return (k * W_klf * Math.pow(12, 3) * Math.pow(L_ft, 4)) / (E_ksi * I_in4);
   }
 
-  function requiredIx(W_svc_klf, L_ft, E_ksi, delta_in, beam) {
+  function requiredIx(W_svc_klf, L_ft, E_ksi, delta_in, deflectionK) {
     if (![W_svc_klf, L_ft, E_ksi, delta_in].every((x) => Number.isFinite(x) && x > 0)) return null;
-    const k = deflK(beam);
+    const k = deflectionK;
+    if (!Number.isFinite(k) || k <= 0) return null;
     return (k * W_svc_klf * Math.pow(12, 3) * Math.pow(L_ft, 4)) / (E_ksi * delta_in);
   }
 
@@ -213,6 +247,7 @@
 
     const $ = (id) => pane.querySelector(`#${id}`);
     const methodEl = $('sfBendDesMethod');
+    const methodDefl = $('sfBendDesMethodDefl');
     const steelN = $('sfBendDesSteelN');
     const steelY = $('sfBendDesSteelY');
     const deflNo = root.querySelector('#sfBendDefNo');
@@ -228,6 +263,11 @@
       lY: $('sfBendDesLY'),
       beamY: $('sfBendDesBeamY'),
       deflLim: $('sfBendDesDeflLim'),
+      deflLimY: $('sfBendDesDeflLimY'),
+      formulaMomN: $('sfBendDesMomentFormulaN'),
+      formulaDeflN: $('sfBendDesDeflFormulaN'),
+      formulaMomY: $('sfBendDesMomentFormulaY'),
+      formulaDeflY: $('sfBendDesDeflFormulaY'),
       outN: {
         c12: $('sfBendDesN_c12'),
         c14: $('sfBendDesN_c14'),
@@ -275,6 +315,38 @@
       finalSec: $('sfBendDesSecN'),
       finalRm: $('sfBendDesRmN'),
       solve: $('sfBendDesSolve'),
+      fyDispN: $('sfBendDesFyDispN'),
+      fyDispY: $('sfBendDesFyDispY'),
+      defl: {
+        beamLbl: $('sfBendDesDeflBeamLbl'),
+        ixChip: $('sfBendDesIxReqChipDefl'),
+        ass1Sec: $('sfBendDesDeflAss1Sec'),
+        ass1Zx: $('sfBendDesDeflAss1Zx'),
+        ass1W: $('sfBendDesDeflAss1W'),
+        ass1Sx: $('sfBendDesDeflAss1Sx'),
+        ass1Lf: $('sfBendDesDeflAss1Lf'),
+        ass1Rm: $('sfBendDesDeflAss1Rm'),
+        ixSec: $('sfBendDesDeflIxSec'),
+        ixZx: $('sfBendDesDeflIxZx'),
+        ixSx: $('sfBendDesDeflIxSx'),
+        ixI: $('sfBendDesDeflIxI'),
+        ixLf: $('sfBendDesDeflIxLf'),
+        ixW: $('sfBendDesDeflIxW'),
+        lwWu: $('sfBendDesDeflLwWu'),
+        lwMu: $('sfBendDesDeflLwMu'),
+        lwWa: $('sfBendDesDeflLwWa'),
+        lwMa: $('sfBendDesDeflLwMa'),
+        lpf: $('sfBendDesDeflLpf'),
+        lrf: $('sfBendDesDeflLrf'),
+        verdict: $('sfBendDesDeflVerdict'),
+        Mn: $('sfBendDesDeflMn'),
+        allow: $('sfBendDesDeflAllow'),
+        deltaMax: $('sfBendDesDeflDeltaMax'),
+        capSym: $('sfBendDesDeflCapSym'),
+        capVal: $('sfBendDesDeflCapVal'),
+        finalSec: $('sfBendDesDeflFinalSec'),
+        finalRm: $('sfBendDesDeflFinalRm'),
+      },
     };
 
     if (!methodEl || !steelN || !steelY) return;
@@ -291,7 +363,7 @@
           dl: parseNumLike(els.dlY?.value),
           ll: parseNumLike(els.llY?.value),
           L: parseNumLike(els.lY?.value),
-          beam: String(els.beamY?.value || 'fp-u'),
+          beam: String(els.beamY?.value || 'simple-u'),
           steel: steelY,
         };
       }
@@ -299,13 +371,81 @@
         dl: parseNumLike(els.dlN?.value),
         ll: parseNumLike(els.llN?.value),
         L: parseNumLike(els.lN?.value),
-        beam: String(els.beamN?.value || 'fp-u'),
+        beam: String(els.beamN?.value || 'simple-u'),
         steel: steelN,
       };
     }
 
     function setOutSpan(el, text) {
       if (el) el.textContent = text;
+    }
+
+    function beamCaseLabel(beamId) {
+      const cs = window.SteelForgeWorkbookBeamCases;
+      const hit = cs?.find((c) => c.id === beamId);
+      return hit?.label ?? beamId ?? '—';
+    }
+
+    /** Workbook lists Δ as span/360 in feet; internal math stays in inches. */
+    function formatDeflectionDual(deltaIn) {
+      if (!Number.isFinite(deltaIn)) return '—';
+      return `${fmt(deltaIn / 12, 9)} ft (${fmt(deltaIn, 4)} in)`;
+    }
+
+    function copySpan(toEl, fromEl) {
+      if (toEl && fromEl) toEl.textContent = fromEl.textContent;
+    }
+
+    function copyHtml(toEl, fromEl) {
+      if (toEl && fromEl) toEl.innerHTML = fromEl.innerHTML;
+    }
+
+    function clearDeflMirrorPanels() {
+      const d = els.defl;
+      if (!d) return;
+      Object.values(d).forEach((el) => {
+        if (el) el.textContent = '—';
+      });
+      if (d.capSym) d.capSym.innerHTML = 'M<sub>u</sub>';
+    }
+
+    /** Keep “WITH DEFLECTION” dashboard cells aligned with computed outputs (single source of truth). */
+    function mirrorDeflPanels(insBeam) {
+      const d = els.defl;
+      if (!d) return;
+      setOutSpan(d.beamLbl, beamCaseLabel(insBeam));
+      copySpan(d.ixChip, els.ixChip);
+      copySpan(d.ass1Sec, els.ass1.sec);
+      copySpan(d.ass1Zx, els.ass1.zx);
+      copySpan(d.ass1W, els.ass1.w);
+      copySpan(d.ass1Sx, els.ass1.sx);
+      copySpan(d.ass1Lf, els.ass1.lf);
+      copySpan(d.ass1Rm, els.ass1.rm);
+      copySpan(d.lwWu, els.lw.Wu);
+      copySpan(d.lwMu, els.lw.Mu);
+      copySpan(d.lwWa, els.lw.Wa);
+      copySpan(d.lwMa, els.lw.Ma);
+      copySpan(d.lpf, els.lpf);
+      copySpan(d.lrf, els.lrf);
+      copySpan(d.verdict, els.verdict);
+      copySpan(d.Mn, els.Mn);
+      copySpan(d.allow, els.allowDefl);
+      copySpan(d.deltaMax, els.deflY);
+      copyHtml(d.capSym, els.capSym);
+      copySpan(d.capVal, els.capVal);
+      copySpan(d.finalSec, els.finalSec);
+      copySpan(d.finalRm, els.finalRm);
+      copySpan(d.ixSec, els.ixSec);
+      copySpan(d.ixZx, els.ixZx);
+      copySpan(d.ixSx, els.ixSx);
+      copySpan(d.ixI, els.ixI);
+      copySpan(d.ixLf, els.ixLf);
+      copySpan(d.ixW, els.ixW);
+    }
+
+    function syncMethodPeers(source) {
+      const peer = source === methodEl ? methodDefl : methodEl;
+      if (peer && source && peer.value !== source.value) peer.value = source.value;
     }
 
     let c12v,
@@ -330,7 +470,44 @@
       norm(els.dlY, 4, 0);
       norm(els.llY, 4, 0);
       norm(els.lY, 3, 0);
-      norm(els.deflLim, 4, 0);
+    }
+
+    function syncBeamFormulaLabels(beamRaw) {
+      const bc = workbookBeamCase(beamRaw);
+      const mom = bc.momentFormula || '—';
+      const def = bc.deflectionFormula || '—';
+      [els.formulaMomN, els.formulaMomY].forEach((el) => {
+        if (el) el.textContent = mom;
+      });
+      [els.formulaDeflN, els.formulaDeflY].forEach((el) => {
+        if (el) el.textContent = def;
+      });
+    }
+
+    function preferredWorkbookDeflectionDenom() {
+      const g = window.SteelForge?.activeStructuralSteelGrade;
+      const d = g?.workbookDeflectionDenom;
+      return Number.isFinite(d) && d > 0 ? d : 360;
+    }
+
+    function populateBeamCaseSelect(sel) {
+      if (!sel || !window.SteelForgeWorkbookBeamCases) return;
+      const prior = String(sel.value || '').trim();
+      sel.innerHTML = '';
+      for (const c of window.SteelForgeWorkbookBeamCases) {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.label;
+        sel.appendChild(opt);
+      }
+      const legacy = { 'fp-u': 'simple-u', cont: 'fixed-pinned-u' };
+      const mapped = legacy[prior] || prior;
+      const pick = [...sel.options].some((o) => o.value === mapped)
+        ? mapped
+        : [...sel.options].some((o) => o.value === prior)
+          ? prior
+          : 'simple-u';
+      sel.value = pick;
     }
 
     function recompute() {
@@ -340,18 +517,31 @@
       const isLRFD = method === 'lrfd';
       const E = E_DEFAULT;
       const Fy = fyFromSelect(ins.steel);
+      setOutSpan(els.fyDispN, Number.isFinite(Fy) ? `${fmt(Fy, 3)} ksi` : '—');
+      setOutSpan(els.fyDispY, Number.isFinite(Fy) ? `${fmt(Fy, 3)} ksi` : '—');
+      const bc = workbookBeamCase(ins.beam);
+      const KMOM = bc.momentCoeff;
 
       if (els.capSym) {
         els.capSym.innerHTML = isLRFD ? 'M<sub>u</sub> =' : 'M<sub>a</sub> =';
       }
 
-      const deflOn = isDeflOn();
-      const deltaLimIn = deflOn ? parseNumLike(els.deflLim?.value) : null;
-
       const dl = ins.dl;
       const ll = ins.ll;
       const L = ins.L;
-      const beam = ins.beam;
+
+      const deflOn = isDeflOn();
+      if (els.deflLim && els.deflLimY && els.deflLim.value !== els.deflLimY.value) {
+        if (deflOn) els.deflLim.value = els.deflLimY.value;
+        else els.deflLimY.value = els.deflLim.value;
+      }
+
+      const denomSrc =
+        deflOn && els.deflLimY ? els.deflLimY.value : els.deflLim ? els.deflLim.value : null;
+      const deltaLimIn =
+        deflOn && Number.isFinite(L) && L > 0 ? allowableDeflectionInches(L, denomSrc) : null;
+
+      syncBeamFormulaLabels(ins.beam);
 
       const invalid = ![dl, ll, L].every((x) => Number.isFinite(x) && x >= 0) || !Number.isFinite(L) || L <= 0;
 
@@ -377,9 +567,13 @@
           els.capVal,
           els.finalSec,
           els.finalRm,
+          els.fyDispN,
+          els.fyDispY,
         ].forEach((el) => {
           if (el) el.textContent = '—';
         });
+        if (els.capSym) els.capSym.innerHTML = 'M<sub>u</sub>';
+        clearDeflMirrorPanels();
         return;
       }
 
@@ -430,10 +624,10 @@
       let I_min = 0;
       if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
         const Wsvc = dlll_val;
-        const ixReq = requiredIx(Wsvc, L, E, deltaLimIn, beam);
+        const ixReq = requiredIx(Wsvc, L, E, deltaLimIn, bc.deflectionK);
         if (Number.isFinite(ixReq) && ixReq > 0) I_min = ixReq;
         setOutSpan(els.ixChip, fmt(ixReq, 1));
-        setOutSpan(els.allowDefl, `${fmt(deltaLimIn, 4)} in`);
+        setOutSpan(els.allowDefl, formatDeflectionDual(deltaLimIn));
       } else {
         setOutSpan(els.ixChip, '—');
         setOutSpan(els.allowDefl, '—');
@@ -455,6 +649,7 @@
         setOutSpan(els.Mn, '—');
         setOutSpan(els.finalSec, '—');
         setOutSpan(els.finalRm, '—');
+        mirrorDeflPanels(ins.beam);
         return;
       }
 
@@ -517,6 +712,7 @@
         if (deflOn) {
           ['ixSec', 'ixZx', 'ixSx', 'ixI', 'ixLf', 'ixW'].forEach((k) => setOutSpan(els[k], '—'));
         }
+        mirrorDeflPanels(ins.beam);
         return;
       }
 
@@ -548,15 +744,15 @@
       setOutSpan(els.finalSec, lab);
       setOutSpan(
         els.finalRm,
-        verdict.includes('SLENDER')
+        verdict.includes('SLENDER SECTION')
           ? 'Check slender-element provisions; nominal strength reduced.'
           : 'Section satisfies bending strength for governing combination.'
       );
 
       if (deflOn) {
         const Wsvc = dl + ll + w_self;
-        const dMax = deltaInches(Wsvc, L, E, picked.Ix, beam);
-        setOutSpan(els.deflY, Number.isFinite(dMax) ? `${fmt(dMax, 4)} in` : '—');
+        const dMax = deltaInches(Wsvc, L, E, picked.Ix, bc.deflectionK);
+        setOutSpan(els.deflY, Number.isFinite(dMax) ? formatDeflectionDual(dMax) : '—');
         setOutSpan(els.ixSec, lab);
         setOutSpan(els.ixZx, fmt(Zx, 3));
         setOutSpan(els.ixSx, fmt(Sx, 3));
@@ -568,12 +764,21 @@
           if (els[k]) els[k].textContent = '—';
         });
       }
+
+      mirrorDeflPanels(ins.beam);
     }
 
     function wire() {
       pane.querySelectorAll('input, select').forEach((el) => {
+        if (el === methodEl || el === methodDefl) return;
         el.addEventListener('input', recompute);
         el.addEventListener('change', recompute);
+      });
+      [methodEl, methodDefl].filter(Boolean).forEach((el) => {
+        el.addEventListener('change', () => {
+          syncMethodPeers(el);
+          recompute();
+        });
       });
       steelN.addEventListener('change', () => {
         steelY.value = steelN.value;
@@ -595,24 +800,40 @@
       const dDL = 0.15;
       const dLL = 0.4;
       const dL = 24;
-      const dDefl = (dL * 12) / 360;
       if (els.dlN && String(els.dlN.value).trim() === '') els.dlN.value = String(dDL);
       if (els.llN && String(els.llN.value).trim() === '') els.llN.value = String(dLL);
       if (els.lN && String(els.lN.value).trim() === '') els.lN.value = String(dL);
       if (els.dlY && String(els.dlY.value).trim() === '') els.dlY.value = String(dDL);
       if (els.llY && String(els.llY.value).trim() === '') els.llY.value = String(dLL);
       if (els.lY && String(els.lY.value).trim() === '') els.lY.value = String(dL);
-      if (els.deflLim && String(els.deflLim.value).trim() === '') els.deflLim.value = fmt(dDefl, 4);
-      if (els.beamN && !String(els.beamN.value).trim()) els.beamN.value = 'fp-u';
-      if (els.beamY && !String(els.beamY.value).trim()) els.beamY.value = 'cont';
+      if (els.beamN && !String(els.beamN.value).trim()) els.beamN.value = 'simple-u';
+      if (els.beamY && !String(els.beamY.value).trim()) els.beamY.value = 'simple-u';
     }
 
+    populateBeamCaseSelect(els.beamN);
+    populateBeamCaseSelect(els.beamY);
+
     const preferredSteelId = getPreferredSteelGradeId();
+    const prefDenom = preferredWorkbookDeflectionDenom();
+    populateWorkbookDeflectionSelect(els.deflLim, prefDenom);
+    populateWorkbookDeflectionSelect(els.deflLimY, prefDenom);
     populateSteelControl(steelN, preferredSteelId);
     populateSteelControl(steelY, preferredSteelId);
     steelY.value = steelN.value;
     applyDefaults();
     wire();
+    if (methodDefl && methodEl) methodDefl.value = methodEl.value;
+
+    window.addEventListener('sf:steel-grade-change', () => {
+      const pid = window.SteelForge?.activeStructuralSteelGrade?.id ?? getPreferredSteelGradeId();
+      const dn = preferredWorkbookDeflectionDenom();
+      populateWorkbookDeflectionSelect(els.deflLim, dn);
+      populateWorkbookDeflectionSelect(els.deflLimY, dn);
+      populateSteelControl(steelN, pid);
+      populateSteelControl(steelY, pid);
+      steelY.value = steelN.value;
+      recompute();
+    });
 
     fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
       .then((r) => {

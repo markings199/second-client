@@ -1,111 +1,301 @@
 <div class="sf-comp sf-comp--tensionRod">
-  <div id="trRodDesign" class="shell">
-    <header class="hero-tab">DESIGN TENSION ROD</header>
+  <div class="sf-comp__modeNav" role="tablist" aria-label="Tension rod calculator type">
+    <button class="sf-comp__modeBtn active" type="button" data-comp-mode="analysis" role="tab" aria-selected="true">
+      ANALYSIS TENSION ROD
+    </button>
+    <button class="sf-comp__modeBtn" type="button" data-comp-mode="design" role="tab" aria-selected="false">
+      DESIGN TENSION ROD
+    </button>
+  </div>
 
-    <main class="layout-grid">
-      <section class="panel panel-left">
-        <div class="card small-card">
-          <div class="card-title">DESIGN METHOD</div>
-          <label class="method-pill">
-            <span class="vh">Design method</span>
-            <select id="sfRodTrDesMethod" aria-label="Design method">
-              <option value="lrfd" selected>LRFD</option>
-              <option value="asd">ASD</option>
-            </select>
-            <span class="arrow" aria-hidden="true">▼</span>
-          </label>
-        </div>
+  <div class="sf-comp__mode is-active" data-comp-mode-pane="analysis" role="tabpanel" aria-label="Analysis tension rod">
+    <div id="trRodAnalysis" class="shell tr-rod-shell">
+      <header class="hero-tab">ANALYSIS TENSION ROD</header>
 
-        <div class="card">
-          <div class="card-title">PARAMETERS</div>
-          <table>
-            <tbody>
-              <tr>
-                <th>STEEL GRADE =</th>
-                <td><input type="text" id="sfRodTrSteel" value="A36" autocomplete="off" aria-label="Steel grade" /></td>
-              </tr>
-              <tr>
-                <th>F<sub>y</sub> =</th>
-                <td><span id="sfRodTrFy">36</span> ksi</td>
-              </tr>
-              <tr>
-                <th>F<sub>u</sub> =</th>
-                <td><span id="sfRodTrFu">58</span> ksi</td>
-              </tr>
-              <tr>
-                <th>DEAD LOAD (DL) =</th>
-                <td><input type="text" id="sfRodTrDl" inputmode="decimal" value="3" /> kips</td>
-              </tr>
-              <tr>
-                <th>LIVE LOAD (LL) =</th>
-                <td><input type="text" id="sfRodTrLl" inputmode="decimal" value="6" /> kips</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <main class="tr-rod-layout-grid">
+        <section class="panel panel-left">
+          <div class="card small-card">
+            <div class="card-title">ANALYSIS METHOD</div>
+            <label class="method-pill">
+              <span class="vh">Analysis method</span>
+              <select id="sfRodAnaMethod" aria-label="Analysis method">
+                <option value="lrfd" selected>LRFD</option>
+                <option value="asd">ASD</option>
+              </select>
+              <span class="arrow" aria-hidden="true">▼</span>
+            </label>
+          </div>
 
-      <section class="panel panel-center">
-        <div class="card">
-          <div class="card-title">DIAMETER OF BAR</div>
-          <div class="diameter-grid">
-            <div class="diameter-block">
-              <div class="formula">T<sub>u</sub> = 0.75²(F<sub>u</sub>)(A<sub>b</sub>); d =</div>
-              <div class="value-pill blue" id="sfRodTrDlrfd">0.71774 in</div>
-              <div class="caption" id="sfRodTrDlrfdCap">diameter ≈ 3/4 in</div>
+          <div class="card">
+            <div class="card-title">PARAMETERS</div>
+            <table class="parameters-table">
+              <tbody>
+                <tr>
+                  <th>STEEL GRADE</th>
+                  <td>
+                    <select id="sfRodAnaSteel" aria-label="Steel grade"></select>
+                  </td>
+                </tr>
+                <tr>
+                  <th>F<sub>y</sub></th>
+                  <td><input type="text" id="sfRodAnaFy" inputmode="decimal" autocomplete="off" aria-label="Fy" /> ksi</td>
+                </tr>
+                <tr>
+                  <th>F<sub>u</sub></th>
+                  <td><input type="text" id="sfRodAnaFu" inputmode="decimal" autocomplete="off" aria-label="Fu" /> ksi</td>
+                </tr>
+                <tr>
+                  <th>SECTION (CSV)</th>
+                  <td>
+                    <select id="sfRodAnaCatalog" aria-label="Rod section from steel CSV">
+                      <option value="manual">MANUAL (edit d)</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <th>d (SOLID ROD)</th>
+                  <td><input type="text" id="sfRodAnaD" inputmode="decimal" autocomplete="off" aria-label="Rod diameter" /> in</td>
+                </tr>
+                <tr>
+                  <th>L</th>
+                  <td>
+                    <input type="text" id="sfRodAnaL" inputmode="decimal" autocomplete="off" aria-label="Rod length" title="Shown for workbook continuity (length does not enter rod tensile capacity here)." />
+                    in
+                  </td>
+                </tr>
+                <tr>
+                  <th>k (A<sub>e</sub> = k A<sub>g</sub>)</th>
+                  <td><input type="text" id="sfRodAnaK" inputmode="decimal" autocomplete="off" value="0.75" aria-label="Effective area factor k" /></td>
+                </tr>
+                <tr>
+                  <th>DL</th>
+                  <td><input type="text" id="sfRodAnaDl" inputmode="decimal" autocomplete="off" aria-label="Dead load" /> kips</td>
+                </tr>
+                <tr>
+                  <th>LL</th>
+                  <td><input type="text" id="sfRodAnaLl" inputmode="decimal" autocomplete="off" aria-label="Live load" /> kips</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel panel-center">
+          <div class="card">
+            <div class="card-title">MEMBER PROPERTIES</div>
+            <table>
+              <tbody>
+                <tr>
+                  <th>A<sub>g</sub></th>
+                  <td><span id="sfRodOutAg">—</span> in²</td>
+                </tr>
+                <tr>
+                  <th>A<sub>e</sub></th>
+                  <td><span id="sfRodOutAe">—</span> in²</td>
+                </tr>
+                <tr>
+                  <th>TENSILE YIELDING</th>
+                  <td><span id="sfRodOutYield">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>TENSILE RUPTURE</th>
+                  <td><span id="sfRodOutFrac">—</span> kips</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card highlight-card">
+            <div class="card-title">CAPACITY SUMMARY</div>
+            <table>
+              <tbody>
+                <tr>
+                  <th id="sfRodOutCapLbl">GOVERNING CAPACITY</th>
+                  <td><span class="result-pill orange" id="sfRodOutCapGov">—</span> kips</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="sf-rod__verdict" id="sfRodVerdict">—</div>
+          </div>
+        </section>
+
+        <section class="panel panel-right">
+          <div class="card tensile-card">
+            <div class="card-title">TENSILE DEMAND</div>
+            <table>
+              <tbody>
+                <tr>
+                  <th>1.2DL + 1.6LL</th>
+                  <td><span class="result-pill blue" id="sfRodOutComb1216">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>1.4DL</th>
+                  <td><span class="result-pill yellow" id="sfRodOutComb14">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>DL + LL</th>
+                  <td><span class="result-pill gray" id="sfRodOutDlLl">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th id="sfRodOutGovLbl">GOVERNING DEMAND</th>
+                  <td><span class="result-pill orange" id="sfRodOutTGov">—</span> kips</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card photos-card">
+            <div class="photo-box">
+              <img src="./assets/tension-rod/tension-rod-plain.png?v=3" alt="Tension rod assembly (plain)" width="400" height="400" loading="lazy" decoding="async" />
             </div>
-            <div class="diameter-block">
-              <div class="formula">T<sub>a</sub> = 0.75(F<sub>u</sub>)(A<sub>b</sub>) / 2; d =</div>
-              <div class="value-pill light" id="sfRodTrDasd">— in</div>
-              <div class="caption" id="sfRodTrDasdCap">diameter ≈ — in</div>
+            <div class="photo-box">
+              <img src="./assets/tension-rod/tension-rod-stress.png?v=3" alt="Tension rod stress visualization" width="400" height="400" loading="lazy" decoding="async" />
             </div>
           </div>
-        </div>
+        </section>
+      </main>
 
-        <div class="card highlight-card">
-          <div class="card-title">DIAMETER TO BE USED</div>
-          <div class="use-value">d ≈ <span id="sfRodTrDuse">3/4</span> in</div>
-        </div>
-      </section>
+      <button type="button" id="sfRodAnaSolve" hidden tabindex="-1">SOLVE</button>
+    </div>
+  </div>
 
-      <section class="panel panel-right">
-        <div class="card tensile-card">
-          <div class="card-title">TENSILE FORCE</div>
-          <table>
-            <tbody>
-              <tr>
-                <th>1.2DL + 1.6LL =</th>
-                <td><span class="result-pill blue" id="sfRodTrOut1216">13.2</span> kips</td>
-              </tr>
-              <tr>
-                <th>1.4DL =</th>
-                <td><span class="result-pill yellow" id="sfRodTrOut14">4.2</span> kips</td>
-              </tr>
-              <tr>
-                <th>(ULTIMATE TENSILE FORCE) T<sub>u</sub> =</th>
-                <td><span class="result-pill orange" id="sfRodTrOutTu">13.2</span> kips</td>
-              </tr>
-              <tr>
-                <th>DL + LL =</th>
-                <td><span class="result-pill gray" id="sfRodTrOutDlLl">—</span> kips</td>
-              </tr>
-              <tr>
-                <th>(ALLOWABLE TENSILE FORCE) T<sub>a</sub> =</th>
-                <td><span class="result-pill gray" id="sfRodTrOutTa">—</span> kips</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+  <div class="sf-comp__mode" data-comp-mode-pane="design" role="tabpanel" aria-label="Design tension rod">
+    <div id="trRodDesign" class="shell tr-rod-shell">
+      <header class="hero-tab">DESIGN TENSION ROD</header>
 
-        <div class="card photos-card">
-          <div class="photo-box">
-            <img src="./assets/tension-rod/tension-rod-plain.png?v=3" alt="Tension rod assembly (plain)" width="400" height="400" loading="lazy" decoding="async" />
+      <main class="tr-rod-layout-grid">
+        <section class="panel panel-left">
+          <div class="card small-card">
+            <div class="card-title">DESIGN METHOD</div>
+            <label class="method-pill">
+              <span class="vh">Design method</span>
+              <select id="sfRodDesMethod" aria-label="Design method">
+                <option value="lrfd" selected>LRFD</option>
+                <option value="asd">ASD</option>
+              </select>
+              <span class="arrow" aria-hidden="true">▼</span>
+            </label>
           </div>
-          <div class="photo-box">
-            <img src="./assets/tension-rod/tension-rod-stress.png?v=3" alt="Tension rod stress visualization" width="400" height="400" loading="lazy" decoding="async" />
+
+          <div class="card">
+            <div class="card-title">PARAMETERS</div>
+            <table class="parameters-table">
+              <tbody>
+                <tr>
+                  <th>STEEL GRADE</th>
+                  <td>
+                    <select id="sfRodDesSteel" aria-label="Steel grade"></select>
+                  </td>
+                </tr>
+                <tr>
+                  <th>F<sub>y</sub></th>
+                  <td><input type="text" id="sfRodDesFy" inputmode="decimal" autocomplete="off" aria-label="Fy" /> ksi</td>
+                </tr>
+                <tr>
+                  <th>F<sub>u</sub></th>
+                  <td><input type="text" id="sfRodDesFu" inputmode="decimal" autocomplete="off" aria-label="Fu" /> ksi</td>
+                </tr>
+                <tr>
+                  <th>k (A<sub>e</sub> = k A<sub>g</sub>)</th>
+                  <td><input type="text" id="sfRodDesK" inputmode="decimal" autocomplete="off" value="0.75" aria-label="Effective area factor k" /></td>
+                </tr>
+                <tr>
+                  <th>DL</th>
+                  <td><input type="text" id="sfRodDesDl" inputmode="decimal" autocomplete="off" aria-label="Dead load" /> kips</td>
+                </tr>
+                <tr>
+                  <th>LL</th>
+                  <td><input type="text" id="sfRodDesLl" inputmode="decimal" autocomplete="off" aria-label="Live load" /> kips</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+
+        <section class="panel panel-center">
+          <div class="card">
+            <div class="card-title">LIGHTEST ADEQUATE SECTION</div>
+            <table>
+              <tbody>
+                <tr>
+                  <th>LABEL</th>
+                  <td><span class="value-pill blue" id="sfRodDesSection">—</span></td>
+                </tr>
+                <tr>
+                  <th>d (SOLID, EQUIV.)</th>
+                  <td><span id="sfRodDesD">—</span> in</td>
+                </tr>
+                <tr>
+                  <th>A<sub>g</sub></th>
+                  <td><span id="sfRodDesAg">—</span> in²</td>
+                </tr>
+                <tr>
+                  <th>A<sub>e</sub></th>
+                  <td><span id="sfRodDesAe">—</span> in²</td>
+                </tr>
+                <tr>
+                  <th>TENSILE YIELDING</th>
+                  <td><span id="sfRodDesYield">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>TENSILE RUPTURE</th>
+                  <td><span id="sfRodDesFrac">—</span> kips</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card highlight-card">
+            <div class="card-title">CAPACITY SUMMARY</div>
+            <table>
+              <tbody>
+                <tr>
+                  <th id="sfRodDesCapLbl">GOVERNING CAPACITY</th>
+                  <td><span class="result-pill orange" id="sfRodDesCapGov">—</span> kips</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="sf-rod__verdict" id="sfRodDesVerdict">—</div>
+          </div>
+        </section>
+
+        <section class="panel panel-right">
+          <div class="card tensile-card">
+            <div class="card-title">TENSILE DEMAND</div>
+            <table>
+              <tbody>
+                <tr>
+                  <th>1.2DL + 1.6LL</th>
+                  <td><span class="result-pill blue" id="sfRodDesOut1216">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>1.4DL</th>
+                  <td><span class="result-pill yellow" id="sfRodDesOut14">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>DL + LL</th>
+                  <td><span class="result-pill gray" id="sfRodDesOutDlLl">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th id="sfRodDesGovLbl">GOVERNING DEMAND</th>
+                  <td><span class="result-pill orange" id="sfRodDesTGov">—</span> kips</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card photos-card">
+            <div class="photo-box">
+              <img src="./assets/tension-rod/tension-rod-plain.png?v=3" alt="Tension rod assembly (plain)" width="400" height="400" loading="lazy" decoding="async" />
+            </div>
+            <div class="photo-box">
+              <img src="./assets/tension-rod/tension-rod-stress.png?v=3" alt="Tension rod stress visualization" width="400" height="400" loading="lazy" decoding="async" />
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <button type="button" id="sfRodDesSolve" hidden tabindex="-1">SOLVE</button>
+    </div>
   </div>
 </div>

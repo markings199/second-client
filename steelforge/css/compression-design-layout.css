@@ -45,7 +45,7 @@
   max-width: none;
   margin: 0;
   padding: 18px;
-  padding-bottom: 90px; /* extra depth so bottom panels stay inside gray shell */
+  padding-bottom: 28px; /* bottom content scrolls with page / panel; avoid excessive dead space */
   /* Same gray “table shell” as analysis active tab */
   background: var(--cd-outer-frame) !important;
   border: 2px solid var(--cd-outer-border) !important;
@@ -85,6 +85,30 @@
 
 .compression-design-layout .method-pill strong {
   font-weight: 800;
+}
+
+/* Visible LRFD / ASD control (wired by calculator.js — must stay id="sfCompDesMethod") */
+.compression-design-layout .method-pill__select {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  padding: 8px 28px 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(46, 40, 34, 0.22);
+  background: linear-gradient(180deg, #eef3fb 0%, #dce6f4 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--cd-accent);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.compression-design-layout .method-pill__select:focus {
+  outline: 2px solid rgba(46, 106, 168, 0.35);
+  outline-offset: 2px;
 }
 
 .compression-design-layout .main-layout {
@@ -132,6 +156,53 @@
   padding: 18px;
   margin-bottom: 0;
   box-shadow: var(--cd-inset-highlight);
+}
+
+/* Wired calculator fields (design compression) — keep compact inside co-dev tables */
+.compression-design-layout .sf-compDes-field {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 7rem;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--cd-border-soft);
+  background: var(--cd-pill-surface);
+  font: inherit;
+  font-weight: 700;
+  color: var(--cd-text);
+}
+
+.compression-design-layout .sf-compDes-field--select {
+  max-width: 12rem;
+}
+
+.compression-design-layout .sf-compDes-field:focus {
+  outline: 2px solid rgba(46, 106, 156, 0.35);
+  outline-offset: 1px;
+}
+
+.compression-design-layout .sf-compDes-unitCell {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.compression-design-layout .sf-compDes-unit {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cd-muted);
+  white-space: nowrap;
+}
+
+.compression-design-layout .ratio-table tbody th[scope='row'] {
+  text-align: left;
+  font-weight: 800;
+  color: var(--cd-text);
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.88rem;
+  background: transparent;
 }
 
 .compression-design-layout .data-table,

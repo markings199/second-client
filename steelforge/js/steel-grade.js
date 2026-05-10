@@ -126,6 +126,7 @@
         fy: resolved.fy,
         fu: resolved.fu,
         catalogId: resolved.catalogId ?? null,
+        workbookDeflectionDenom: resolved.workbookDeflectionDenom ?? null,
       };
       window.dispatchEvent(
         new CustomEvent('sf:steel-grade-change', {

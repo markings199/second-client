@@ -15,9 +15,10 @@
   <link rel="stylesheet" href="./css/overview-landing.css" />
   <link rel="stylesheet" href="./css/tension-analysis-layout.css" />
   <link rel="stylesheet" href="./css/tension-design-layout.css" />
-  <!-- Tension rod UI: rules bundled at end of css/style.css (was separate file; avoids stale cache vs sfStyles bust). -->
+  <link rel="stylesheet" href="./css/tension-rod-modern.css" />
 
   <script defer src="./js/steel-db.js"></script>
+  <script defer src="./js/workbook-materials.js"></script>
   <script defer src="./js/shear-csv-shapes.js"></script>
   <script defer src="./js/steel-grade.js"></script>
   <script defer src="./js/section-props.js"></script>
@@ -38,18 +39,6 @@
         lnk.href = href + '?v=' + v;
       });
     })();
-  </script>
-  <script>
-    // #region agent log
-    // Debug: confirm client -> debug server logging works.
-    try {
-      fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','X-Debug-Session-Id':'095c19'},
-        body:JSON.stringify({sessionId:'095c19',runId:'pre-fix',hypothesisId:'H_log_pipeline',location:'steelforge/index.html:head',message:'page-loaded-log-ping',data:{ts:Date.now()},timestamp:Date.now()})
-      }).catch(()=>{});
-    } catch(e) {}
-    // #endregion agent log
   </script>
 </head>
 <body>

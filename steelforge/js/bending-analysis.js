@@ -1,7 +1,4 @@
 (() => {
-  // #region agent log
-  fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'ea572d' }, body: JSON.stringify({ sessionId: 'ea572d', runId: 'layout-baseline', hypothesisId: 'H0', location: 'js/bending-analysis.js:top-level', message: 'script-loaded', data: { href: window.location.href }, timestamp: Date.now() }) }).catch(() => {});
-  // #endregion
   const CSV_NAME = 'exel program EWIWIWI(S(STEEL SELECTION)).csv';
   /** Column indices from steel selection workbook (0-based). */
   const COL = { type: 0, label: 2, lamF: 23, lamW: 24, Sx: 30, Zx: 33 };
@@ -146,8 +143,8 @@
   }
 
   /**
-   * Nominal flexural strength (kip·ft) — flange and web each follow the same
-   * compact / noncompact / slender breakpoints as the workbook (λ_pf, λ_rf, λ_pw, λ_rw).
+   * Nominal flexural strength (kip·ft) — matches workbook stepping: Mp when λ ≤ λr;
+   * slender flange/web uses 0.7My (no λp–λr linear interpolation).
    */
   function nominalMomentKipFt(Fy, E, Zx, Sx, lamF, lamW) {
     if (![Fy, E, Zx, Sx, lamF, lamW].every((x) => Number.isFinite(x) && x > 0)) return null;
@@ -155,32 +152,25 @@
     const My = (Fy * Sx) / 12;
     const Mp = (Fy * Zx) / 12;
 
-    const lpF = 0.38 * Math.sqrt(E / Fy);
     const lrF = 1.0 * Math.sqrt(E / Fy);
-    const lpW = 3.76 * Math.sqrt(E / Fy);
     const lrW = 5.7 * Math.sqrt(E / Fy);
 
-    const branch = (lam, lp, lr) => {
-      if (lam <= lp) return Mp;
-      if (lam <= lr) return Mp - (Mp - 0.7 * My) * ((lam - lp) / (lr - lp));
+    /** Workbook stepping: full Mp when λ ≤ λr (no λp–λr interpolation); slender uses 0.7My. */
+    const branch = (lam, lr) => {
+      if (lam <= lr) return Mp;
       return 0.7 * My;
     };
 
-    const MnF = branch(lamF, lpF, lrF);
-    const MnW = branch(lamW, lpW, lrW);
+    const MnF = branch(lamF, lrF);
+    const MnW = branch(lamW, lrW);
     return Math.min(MnF, MnW);
   }
 
   function compactnessVerdict(lamF, lamW, Fy, E) {
     if (![lamF, lamW, Fy, E].every((x) => Number.isFinite(x) && x > 0)) return '—';
-    const lpF = 0.38 * Math.sqrt(E / Fy);
     const lrF = 1.0 * Math.sqrt(E / Fy);
-    const lpW = 3.76 * Math.sqrt(E / Fy);
     const lrW = 5.7 * Math.sqrt(E / Fy);
-    const flangeOk = lamF <= lpF && lamW <= lpW;
-    const noncompactOk = lamF <= lrF && lamW <= lrW;
-    if (flangeOk) return 'COMPACT SECTION';
-    if (noncompactOk) return 'NONCOMPACT SECTION';
+    if (lamF <= lrF && lamW <= lrW) return 'COMPACT FLANGE';
     return 'SLENDER SECTION';
   }
 
@@ -212,35 +202,14 @@
     const outMn = $('sfBendAnaMn');
     const outMa = $('sfBendAnaMa');
     const outPhiMn = $('sfBendAnaMu');
-    const capSym = pane.querySelector('.sf-tbRef__bendCap .sf-tbRef__capHeroSym');
     const capLrfdLbl = $('sfBendAnaCapLrfdLbl');
     const solveBtn = $('sfBendAnaSolve');
-    const shellEl = pane.querySelector('.sf-tbRef__bendShell');
-    const leftCardEl = pane.querySelector('.sf-tbRef__bendLeft');
-    const rightWrapEl = pane.querySelector('.sf-tbRef__bendRight');
-    const compactCardEl = pane.querySelector('.sf-tbRef__bendCompact');
-    const capacityCardEl = pane.querySelector('.sf-tbRef__bendCap');
-    const rootCardEl = pane.querySelector('.sf-comp__card');
 
     if (!methodEl || !shapeEl || !steelEl || !fyEl || !eEl || !mpEl) return;
 
     let wRows = [];
 
     const isManual = () => String(shapeEl.value || '') === 'manual';
-
-    // #region agent log
-    function sendLayoutDebugLog(runId, message) {
-      if (!rootCardEl || !shellEl || !leftCardEl || !rightWrapEl) return;
-      const rect = (el) => {
-        if (!el) return null;
-        const r = el.getBoundingClientRect();
-        return { w: Number(r.width.toFixed(2)), h: Number(r.height.toFixed(2)), x: Number(r.x.toFixed(2)), y: Number(r.y.toFixed(2)) };
-      };
-      const cs = window.getComputedStyle(shellEl);
-      const rootCs = window.getComputedStyle(rootCardEl);
-      fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'ea572d' }, body: JSON.stringify({ sessionId: 'ea572d', runId, hypothesisId: 'H1,H2,H3,H4', location: 'js/bending-analysis.js:initBendingAnalysis', message, data: { viewport: { w: window.innerWidth, h: window.innerHeight }, shellCols: cs.gridTemplateColumns, shellGap: cs.gap, rootCardHeight: rootCs.height, rootCardMinHeight: rootCs.minHeight, rootCardRect: rect(rootCardEl), shellRect: rect(shellEl), leftRect: rect(leftCardEl), rightRect: rect(rightWrapEl), compactRect: rect(compactCardEl), capacityRect: rect(capacityCardEl) }, timestamp: Date.now() }) }).catch(() => {});
-    }
-    // #endregion
 
     function setGeomReadOnly(ro) {
       [lfEl, lwEl, zxEl, sxEl].forEach((el) => {
@@ -293,21 +262,17 @@
     }
 
     function recompute() {
-      // #region agent log
-      sendLayoutDebugLog('layout-baseline', 'recompute-before-values');
-      // #endregion
       normalizeInputs();
       syncSteel();
       if (eEl) eEl.value = String(E_DEFAULT);
 
-      const method = String(methodEl.value || 'asd').toLowerCase();
+      const method = String(methodEl.value || 'lrfd').toLowerCase();
       const isLRFD = method === 'lrfd';
 
-      if (capSym) {
-        capSym.innerHTML = isLRFD ? 'φM<sub>n</sub> =' : 'M<sub>a</sub> =';
-      }
       if (capLrfdLbl) {
-        capLrfdLbl.innerHTML = isLRFD ? 'φM<sub>n</sub> (LRFD) =' : 'M<sub>n</sub>/Ω (ASD) =';
+        capLrfdLbl.innerHTML = isLRFD
+          ? '<span class="sf-bendAna__capEm">φM<sub>n</sub></span> (LRFD) — governing'
+          : '<span class="sf-bendAna__capEm">M<sub>n</sub>/Ω</span> (ASD) — governing';
       }
 
       const Fy = parseNumLike(fyEl?.value);
@@ -336,11 +301,10 @@
       const maAsd = Number.isFinite(Mn) ? Mn / OMEGA_B : null;
       const design = isLRFD ? phiMn : maAsd;
 
-      if (outMa) outMa.textContent = fmt(design, 3);
-      if (outPhiMn) outPhiMn.textContent = fmt(design, 3);
-      // #region agent log
-      sendLayoutDebugLog('layout-baseline', 'recompute-after-values');
-      // #endregion
+      if (outMa) outMa.textContent = fmt(maAsd, 3);
+      if (outPhiMn) outPhiMn.textContent = fmt(phiMn, 3);
+      const govEl = $('sfBendAnaGovCap');
+      if (govEl) govEl.textContent = fmt(design, 3);
     }
 
     function buildShapeOptions() {
@@ -392,10 +356,13 @@
     syncSteel();
     buildShapeOptions();
     wire();
-    // #region agent log
-    sendLayoutDebugLog('layout-baseline', 'init-after-wire');
-    window.addEventListener('resize', () => sendLayoutDebugLog('layout-baseline', 'window-resize'));
-    // #endregion
+
+    window.addEventListener('sf:steel-grade-change', () => {
+      const pid = window.SteelForge?.activeStructuralSteelGrade?.id ?? getPreferredSteelGradeId();
+      populateSteelControl(steelEl, pid);
+      syncSteel();
+      recompute();
+    });
 
     fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
       .then((r) => {
@@ -411,7 +378,7 @@
         buildShapeOptions();
         if (wRows.length) {
           const pref =
-            wRows.find((r) => String(r[COL.label] || '').trim().toUpperCase() === 'W44X335') ??
+            wRows.find((r) => String(r[COL.label] || '').trim().toUpperCase() === 'W21X44') ??
             wRows[0];
           const lab = String(pref?.[COL.label] || '').trim();
           shapeEl.value = lab;
@@ -422,15 +389,9 @@
           setGeomReadOnly(false);
         }
         recompute();
-        // #region agent log
-        sendLayoutDebugLog('layout-baseline', 'after-csv-loaded');
-        // #endregion
       })
       .catch(() => {
         recompute();
-        // #region agent log
-        sendLayoutDebugLog('layout-baseline', 'csv-load-failed');
-        // #endregion
       });
   };
 })();

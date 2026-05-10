@@ -1,21 +1,21 @@
 /*
- * Design Tension Rod — classes match standalone mockup (shell, layout-grid, card, …).
- * Scoped with #trRodDesign so SteelForge hub styles do not strip layout/typography.
+ * Tension rod (analysis + design) — shell/layout tokens (.tr-rod-shell).
+ * Scoped under .sf-comp--tensionRod so hub/global sheets can't flatten layout.
  */
 
-#trRodDesign {
+.sf-comp--tensionRod .tr-rod-shell {
   color: #1f2937;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
   box-sizing: border-box;
 }
 
-#trRodDesign *,
-#trRodDesign *::before,
-#trRodDesign *::after {
+.sf-comp--tensionRod .tr-rod-shell *,
+.sf-comp--tensionRod .tr-rod-shell *::before,
+.sf-comp--tensionRod .tr-rod-shell *::after {
   box-sizing: border-box;
 }
 
-#trRodDesign .vh {
+.sf-comp--tensionRod .tr-rod-shell .vh {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -27,11 +27,17 @@
   border: 0;
 }
 
-#trRodDesign.shell {
+.sf-comp--tensionRod .tr-rod-shell.shell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   max-width: 1180px;
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding: 18px;
+  box-sizing: border-box;
+  overflow-x: hidden;
   background: #d8d2c4 !important;
   border-radius: 28px;
   box-shadow:
@@ -39,7 +45,7 @@
     0 20px 50px rgba(30, 41, 59, 0.12);
 }
 
-#trRodDesign .hero-tab {
+.sf-comp--tensionRod .tr-rod-shell .hero-tab {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -60,29 +66,59 @@
   font-size: 0.82rem;
 }
 
-#trRodDesign .layout-grid {
+/* Dedicated class avoids clashes with any global `.layout-grid`; explicit tracks prevent column bleed/overlap */
+.sf-comp--tensionRod .tr-rod-shell .tr-rod-layout-grid {
   display: grid !important;
-  grid-template-columns: 1fr 1fr 1fr !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
   gap: 16px !important;
   align-items: start;
   width: 100%;
-}
-
-#trRodDesign .panel {
-  display: grid !important;
-  gap: 16px !important;
+  max-width: 100%;
   min-width: 0;
+  box-sizing: border-box;
 }
 
-#trRodDesign .card {
+.sf-comp--tensionRod .tr-rod-shell .panel-left {
+  grid-column: 1;
+}
+
+.sf-comp--tensionRod .tr-rod-shell .panel-center {
+  grid-column: 2;
+}
+
+.sf-comp--tensionRod .tr-rod-shell .panel-right {
+  grid-column: 3;
+}
+
+.sf-comp--tensionRod .tr-rod-shell .panel {
+  display: grid !important;
+  gap: 20px !important;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  z-index: auto;
+  /* As a grid item: do not grow with the tallest sibling column */
+  align-self: start;
+  height: fit-content;
+  /* Inner cards stack to content height — avoids PARAMETERS/MEMBER cards stretching */
+  align-items: start;
+  align-content: start;
+  justify-items: stretch;
+}
+
+.sf-comp--tensionRod .tr-rod-shell .card {
   background: #f7f5ef !important;
   border-radius: 24px !important;
   padding: 20px;
   border: 1px solid rgba(104, 109, 120, 0.16) !important;
   box-shadow: 0 10px 24px rgba(31, 41, 55, 0.06) !important;
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
 }
 
-#trRodDesign .card-title {
+.sf-comp--tensionRod .tr-rod-shell .card-title {
   display: block;
   box-sizing: border-box;
   width: 100%;
@@ -104,11 +140,11 @@
   word-break: break-word;
 }
 
-#trRodDesign .small-card {
+.sf-comp--tensionRod .tr-rod-shell .small-card {
   padding: 18px;
 }
 
-#trRodDesign .method-pill {
+.sf-comp--tensionRod .tr-rod-shell .method-pill {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -124,7 +160,7 @@
   border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-#trRodDesign .method-pill select {
+.sf-comp--tensionRod .tr-rod-shell .method-pill select {
   flex: 1;
   border: none;
   background: transparent !important;
@@ -136,37 +172,42 @@
   appearance: none;
 }
 
-#trRodDesign .arrow {
+.sf-comp--tensionRod .tr-rod-shell .arrow {
   margin-left: 10px;
   opacity: 0.6;
   pointer-events: none;
   font-size: 0.75rem;
 }
 
-#trRodDesign table {
+.sf-comp--tensionRod .tr-rod-shell table {
   width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
 }
 
-#trRodDesign table th,
-#trRodDesign table td {
+.sf-comp--tensionRod .tr-rod-shell table th,
+.sf-comp--tensionRod .tr-rod-shell table td {
   padding: 10px 8px;
   text-align: left;
   font-size: 0.94rem;
+  /* Do not use overflow-wrap:anywhere — it breaks short units ("ksi") one letter per line */
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
-#trRodDesign table th {
+.sf-comp--tensionRod .tr-rod-shell table th {
   width: 52%;
   color: #53606c !important;
   font-weight: 700;
 }
 
-#trRodDesign table td {
+.sf-comp--tensionRod .tr-rod-shell table td {
   color: #1f2937 !important;
   font-weight: 800;
 }
 
-#trRodDesign table input[type='text'] {
+.sf-comp--tensionRod .tr-rod-shell table input[type='text'] {
   width: 100%;
   max-width: 8rem;
   border: 1px solid rgba(148, 163, 184, 0.45);
@@ -178,25 +219,100 @@
   color: #1f2937 !important;
 }
 
-#trRodDesign .diameter-grid {
+.sf-comp--tensionRod .tr-rod-shell table select {
+  width: 100%;
+  max-width: 14rem;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font: inherit;
+  font-weight: 700;
+  background: #fff !important;
+  color: #1f2937 !important;
+}
+
+/* PARAMETERS card only: wider value column so numeric inputs stay on one line with units */
+.sf-comp--tensionRod .tr-rod-shell table.parameters-table th {
+  width: 38%;
+  max-width: 11rem;
+}
+
+.sf-comp--tensionRod .tr-rod-shell table.parameters-table td {
+  width: 62%;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+  min-width: 0;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.sf-comp--tensionRod .tr-rod-shell table.parameters-table td > input[type='text'] {
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 3.25rem;
+  max-width: min(11rem, 100%);
+}
+
+.sf-comp--tensionRod .tr-rod-shell table.parameters-table td > select {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+}
+
+.sf-comp--tensionRod .tr-rod-shell table input:-webkit-autofill,
+.sf-comp--tensionRod .tr-rod-shell table input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1f2937 !important;
+  transition: background-color 99999s ease-out;
+}
+
+.sf-comp--tensionRod .sf-rod__verdict {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  text-align: center;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.sf-comp--tensionRod .sf-rod__verdict--safe {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.sf-comp--tensionRod .sf-rod__verdict--unsafe {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+.sf-comp--tensionRod .sf-rod__inp--readonly {
+  opacity: 0.88;
+  cursor: not-allowed;
+}
+
+.sf-comp--tensionRod .tr-rod-shell .diameter-grid {
   display: grid !important;
   gap: 16px !important;
 }
 
-#trRodDesign .diameter-block {
+.sf-comp--tensionRod .tr-rod-shell .diameter-block {
   padding: 16px;
   background: #ffffff !important;
   border-radius: 18px;
   border: 1px solid rgba(148, 163, 184, 0.18) !important;
 }
 
-#trRodDesign .formula {
+.sf-comp--tensionRod .tr-rod-shell .formula {
   color: #334155 !important;
   font-size: 0.94rem;
   line-height: 1.5;
 }
 
-#trRodDesign .value-pill {
+.sf-comp--tensionRod .tr-rod-shell .value-pill {
   display: inline-flex !important;
   align-items: center;
   padding: 10px 14px;
@@ -206,31 +322,45 @@
   font-size: 0.95rem;
 }
 
-#trRodDesign .value-pill.blue {
+.sf-comp--tensionRod .tr-rod-shell .value-pill.blue {
   background: #e0f2fe !important;
   color: #0f4f9a !important;
 }
 
-#trRodDesign .value-pill.light {
+.sf-comp--tensionRod .tr-rod-shell .value-pill.light {
   background: #f8fafc !important;
   color: #64748b !important;
 }
 
-#trRodDesign .caption {
+.sf-comp--tensionRod .tr-rod-shell .caption {
   margin-top: 10px;
   color: #475569 !important;
   font-size: 0.85rem;
 }
 
-#trRodDesign .highlight-card {
+.sf-comp--tensionRod .tr-rod-shell .highlight-card {
   display: grid !important;
   justify-items: center;
   align-items: center;
+  align-content: start;
   text-align: center;
   padding: 26px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  row-gap: 12px;
 }
 
-#trRodDesign .use-value {
+/* Analysis pane: tighter vertical rhythm for sparse capacity + photo strip */
+#trRodAnalysis .highlight-card {
+  padding: 18px 16px;
+  align-items: start;
+}
+
+#trRodAnalysis .photos-card .photo-box {
+  min-height: 0;
+}
+
+.sf-comp--tensionRod .tr-rod-shell .use-value {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -243,7 +373,7 @@
   color: #9a3412 !important;
 }
 
-#trRodDesign .use-value span {
+.sf-comp--tensionRod .tr-rod-shell .use-value span {
   display: inline-flex;
   padding: 8px 18px;
   border-radius: 999px;
@@ -251,7 +381,7 @@
   color: #ffffff !important;
 }
 
-#trRodDesign .result-pill {
+.sf-comp--tensionRod .tr-rod-shell .result-pill {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -262,31 +392,31 @@
   font-weight: 800;
 }
 
-#trRodDesign .result-pill.blue {
+.sf-comp--tensionRod .tr-rod-shell .result-pill.blue {
   background: #2563eb !important;
 }
 
-#trRodDesign .result-pill.yellow {
+.sf-comp--tensionRod .tr-rod-shell .result-pill.yellow {
   background: #facc15 !important;
   color: #1f2937 !important;
 }
 
-#trRodDesign .result-pill.orange {
+.sf-comp--tensionRod .tr-rod-shell .result-pill.orange {
   background: #f97316 !important;
 }
 
-#trRodDesign .result-pill.gray {
+.sf-comp--tensionRod .tr-rod-shell .result-pill.gray {
   background: #cbd5e1 !important;
   color: #334155 !important;
 }
 
-#trRodDesign .photos-card {
+.sf-comp--tensionRod .tr-rod-shell .photos-card {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
   gap: 14px !important;
 }
 
-#trRodDesign .photo-box {
+.sf-comp--tensionRod .tr-rod-shell .photo-box {
   min-height: 180px;
   border-radius: 22px;
   border: 1px dashed rgba(100, 116, 139, 0.35) !important;
@@ -303,7 +433,7 @@
   text-transform: uppercase;
 }
 
-#trRodDesign .photo-box img {
+.sf-comp--tensionRod .tr-rod-shell .photo-box img {
   width: 100%;
   height: auto;
   max-height: 200px;
@@ -312,34 +442,83 @@
   background: #fff;
 }
 
-#trRodDesign .photo-box__lbl {
+.sf-comp--tensionRod .tr-rod-shell .photo-box__lbl {
   display: none !important;
 }
 
 /* Two-column photo row: inner facing dashed sides read as a double line — omit them */
 @media (min-width: 1121px) {
-  #trRodDesign .photos-card .photo-box:first-child {
+  .sf-comp--tensionRod .tr-rod-shell .photos-card .photo-box:first-child {
     border-right: none !important;
   }
 
-  #trRodDesign .photos-card .photo-box:last-child {
+  .sf-comp--tensionRod .tr-rod-shell .photos-card .photo-box:last-child {
     border-left: none !important;
   }
 }
 
 .sf-comp.sf-comp--tensionRod {
+  display: flex;
+  flex-direction: column;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
 }
 
+.sf-comp.sf-comp--tensionRod > .sf-comp__modeNav {
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.sf-comp.sf-comp--tensionRod > .sf-comp__mode {
+  display: none;
+}
+
+/*
+ * Hub rule `.content-panel.comp-panel > .sf-comp > .sf-comp__mode.is-active` uses display:flex.
+ * That gives flex items min-width:auto so wide table content can spill horizontally and overlap
+ * the previous grid column. Force block formatting for tension rod only.
+ */
+.sf-comp.sf-comp--tensionRod > .sf-comp__mode.is-active {
+  display: block !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--tensionRod > .sf-comp__mode.is-active {
+  display: block !important;
+  flex-direction: unset !important;
+  align-items: unset !important;
+  width: 100%;
+  min-width: 0;
+  padding-bottom: 10px;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--tensionRod > .sf-comp__mode.is-active > .shell.tr-rod-shell {
+  flex: none !important;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 @media (max-width: 1120px) {
-  #trRodDesign .layout-grid {
+  .sf-comp--tensionRod .tr-rod-shell .tr-rod-layout-grid {
     grid-template-columns: 1fr !important;
   }
 
-  #trRodDesign .photos-card {
+  .sf-comp--tensionRod .tr-rod-shell .panel-left,
+  .sf-comp--tensionRod .tr-rod-shell .panel-center,
+  .sf-comp--tensionRod .tr-rod-shell .panel-right {
+    grid-column: auto;
+  }
+
+  .sf-comp--tensionRod .tr-rod-shell .photos-card {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* Hub chrome uses heavy horizontal padding; tension rod is a full-width 3-col grid — tighten slightly to avoid squeeze/overlap */
+.content-panel.comp-panel > .sf-comp.sf-comp--tensionRod {
+  padding-left: clamp(12px, 3vw, 56px);
+  padding-right: clamp(12px, 3vw, 56px);
 }

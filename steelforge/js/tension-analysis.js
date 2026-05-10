@@ -51,9 +51,19 @@
     return Number.isFinite(n) ? n : null;
   }
 
+  /** Match workbook / typical fabricated holes: d<sub>h</sub> = d<sub>b</sub> + 1/8 in (see `reference/exel program EWIWIWI(TENSION) (1).csv`). */
+  const HOLE_OVERSIZE_IN = 1 / 8;
+  const PHI_LRFD_BLOCK = 0.75;
+  const OMEGA_ASD_BLOCK = 2.0;
+
   function fmt(v, d = 3) {
     if (!Number.isFinite(v)) return '—';
     return v.toFixed(d).replace(/\.?0+$/, '');
+  }
+
+  function holeDiameterFromBoltDia(boltDiaIn) {
+    if (!Number.isFinite(boltDiaIn) || boltDiaIn <= 0) return null;
+    return boltDiaIn + HOLE_OVERSIZE_IN;
   }
 
   function toNumInput(v, fallback = '') {
@@ -62,6 +72,11 @@
 
   function minPositive(arr) {
     const vals = arr.filter((x) => Number.isFinite(x) && x > 0);
+    return vals.length ? Math.min(...vals) : null;
+  }
+
+  function finiteMin(arr) {
+    const vals = arr.filter((x) => Number.isFinite(x));
     return vals.length ? Math.min(...vals) : null;
   }
 
@@ -181,6 +196,19 @@
       fuEl.readOnly = true;
     }
 
+    function syncAnalysisCapacityLabels(isLRFD) {
+      pane.querySelectorAll('.capacity-inline .capacity-table--inline').forEach((tbl) => {
+        const rows = tbl.querySelectorAll('tr');
+        if (rows.length < 4) return;
+        const ths = [0, 1, 2, 3].map((i) => rows[i]?.querySelector('th')).filter(Boolean);
+        if (ths.length < 4) return;
+        ths[0].innerHTML = isLRFD ? 'YIELDING (φT<sub>n</sub>, LRFD)' : 'YIELDING (P<sub>n</sub>/Ω, ASD)';
+        ths[1].innerHTML = isLRFD ? 'FRACTURE (φT<sub>n</sub>, LRFD)' : 'FRACTURE (P<sub>n</sub>/Ω, ASD)';
+        ths[2].innerHTML = isLRFD ? 'BLOCK SHEAR (LRFD)' : 'BLOCK SHEAR (ASD)';
+        ths[3].innerHTML = isLRFD ? 'GOVERNING (LRFD)' : 'GOVERNING (ASD)';
+      });
+    }
+
     function normalizeInputs() {
       if (nEl) {
         const n = parseNumLike(nEl.value);
@@ -194,6 +222,17 @@
         const v = parseNumLike(case8El.value);
         if (Number.isFinite(v)) case8El.value = fmt(v, 3);
       }
+      ['sfTenAnaBlkNShear', 'sfTenAnaBlkNTension'].forEach((bid) => {
+        const bx = el(bid);
+        if (!bx) return;
+        const vn = parseNumLike(bx.value);
+        if (Number.isFinite(vn)) bx.value = String(Math.max(0, Math.round(vn)));
+      });
+      const blkUbs = el('sfTenAnaBlkUbs');
+      if (blkUbs) {
+        const ubs = parseNumLike(blkUbs.value);
+        if (Number.isFinite(ubs)) blkUbs.value = fmt(Math.max(0, ubs), 3);
+      }
     }
 
     function recompute() {
@@ -204,12 +243,11 @@
       const xbar = parseNumLike(xbarEl?.value);
       const L = parseNumLike(lenEl?.value);
       const n = parseNumLike(nEl?.value);
-      const dh = parseNumLike(dhEl?.value);
       const Fy = parseNumLike(fyEl?.value);
       const Fu = parseNumLike(fuEl?.value);
 
       if (!case2Touched && Number.isFinite(xbar) && Number.isFinite(L) && L > 0) {
-        case2El.value = fmt(Math.max(0.6, 1 - xbar / L), 3);
+        case2El.value = fmt(Math.max(0.6, 1 - xbar / L), 6);
       }
 
       const c1 = parseNumLike(case1El?.value);
@@ -218,13 +256,24 @@
       const U = minPositive([c1, c2, c8]);
       uGovEl.textContent = fmt(U, 3);
 
-      const Ah = Number.isFinite(n) && Number.isFinite(dh) && Number.isFinite(t) ? n * dh * t : null;
-      ahEl.textContent = fmt(Ah, 3);
+      const boltDia = parseNumLike(dhEl?.value);
+      const dhHole = holeDiameterFromBoltDia(boltDia);
+      const Ah =
+        Number.isFinite(n) && Number.isFinite(dhHole) && Number.isFinite(t) ? n * dhHole * t : null;
+      ahEl.textContent = fmt(Ah, 4);
 
       const dfDispEl = el('sfTenAnaDfDisp');
       if (dfDispEl) {
-        const dNom = parseNumLike(dhEl?.value);
-        dfDispEl.textContent = Number.isFinite(dNom) ? fmt(dNom, 4) : '—';
+        dfDispEl.textContent = Number.isFinite(dhHole) ? fmt(dhHole, 4) : '—';
+      }
+
+      const blkBoltAlias = el('sfTenAnaBlkBoltAlias');
+      if (blkBoltAlias) {
+        blkBoltAlias.textContent = Number.isFinite(boltDia) ? fmt(boltDia, 4) : '—';
+      }
+      const blkDhDisp = el('sfTenAnaBlkDhDisp');
+      if (blkDhDisp) {
+        blkDhDisp.textContent = Number.isFinite(dhHole) ? fmt(dhHole, 4) : '—';
       }
 
       const AnNs = Number.isFinite(Ag) && Number.isFinite(Ah) ? Ag - Ah : null;
@@ -257,21 +306,97 @@
       const Ae = Number.isFinite(U) && Number.isFinite(AnGov) ? U * AnGov : null;
       const aeDisplayEl = el('sfTenAnaAe');
       if (aeDisplayEl) aeDisplayEl.textContent = fmt(Ae, 4);
+
+      const blkNS = parseNumLike(el('sfTenAnaBlkNShear')?.value);
+      const blkLS = parseNumLike(el('sfTenAnaBlkLshear')?.value);
+      const blkNT = parseNumLike(el('sfTenAnaBlkNTension')?.value);
+      const blkLT = parseNumLike(el('sfTenAnaBlkLtension')?.value);
+      const blkUbs = parseNumLike(el('sfTenAnaBlkUbs')?.value);
+
+      const outBlkAgv = el('sfTenAnaBlkAgv');
+      const outBlkAnv = el('sfTenAnaBlkAnv');
+      const outBlkRnCap = el('sfTenAnaBlkRnCap');
+      const outBlkRnTen = el('sfTenAnaBlkRnTen');
+      const outBlkRnGov = el('sfTenAnaBlkRnGov');
+      const capBlkEl = el('sfTenAnaCapBlock');
+
+      let lrfdBlock = null;
+      let asdBlock = null;
+
+      const ntBlk = Number.isFinite(blkNT) ? blkNT : n;
+      const clearBlkOut = () => {
+        [outBlkAgv, outBlkAnv, outBlkRnCap, outBlkRnTen, outBlkRnGov, capBlkEl].forEach((node) => {
+          if (node) node.textContent = '—';
+        });
+      };
+
+      if (
+        Number.isFinite(t) &&
+        t > 0 &&
+        Number.isFinite(Fy) &&
+        Fy > 0 &&
+        Number.isFinite(Fu) &&
+        Fu > 0 &&
+        Number.isFinite(dhHole) &&
+        dhHole > 0 &&
+        Number.isFinite(blkNS) &&
+        blkNS >= 0 &&
+        Number.isFinite(blkLS) &&
+        blkLS > 0 &&
+        Number.isFinite(ntBlk) &&
+        ntBlk >= 0 &&
+        Number.isFinite(blkLT) &&
+        blkLT > 0 &&
+        Number.isFinite(blkUbs) &&
+        blkUbs > 0
+      ) {
+        const AgvBlk = 2 * blkLS * t;
+        const AnvBlk = AgvBlk - blkNS * dhHole * t;
+        const AgtBlk = blkLT * t;
+        const AntBlk = AgtBlk - ntBlk * dhHole * t;
+        if (outBlkAgv) outBlkAgv.textContent = fmt(AgvBlk, 4);
+        if (outBlkAnv) outBlkAnv.textContent = fmt(AnvBlk, 4);
+        if (AnvBlk > 0 && AntBlk > 0) {
+          const tensPart = blkUbs * Fu * AntBlk;
+          const rnShearRupt = 0.6 * Fu * AnvBlk + tensPart;
+          const rnShearYield = 0.6 * Fy * AgvBlk + tensPart;
+          const rnGovBlk = Math.min(rnShearRupt, rnShearYield);
+          lrfdBlock = PHI_LRFD_BLOCK * rnGovBlk;
+          asdBlock = rnGovBlk / OMEGA_ASD_BLOCK;
+          if (outBlkRnCap) outBlkRnCap.textContent = fmt(rnShearRupt, 3);
+          if (outBlkRnTen) outBlkRnTen.textContent = fmt(rnShearYield, 3);
+          if (outBlkRnGov) outBlkRnGov.textContent = fmt(rnGovBlk, 3);
+        } else {
+          clearBlkOut();
+        }
+      } else {
+        clearBlkOut();
+      }
+
       const lrfdYield = Number.isFinite(Fy) && Number.isFinite(Ag) ? 0.9 * Fy * Ag : null;
       const lrfdFrac = Number.isFinite(Fu) && Number.isFinite(Ae) ? 0.75 * Fu * Ae : null;
       const asdYield = Number.isFinite(Fy) && Number.isFinite(Ag) ? (Fy * Ag) / 1.67 : null;
       const asdFrac = Number.isFinite(Fu) && Number.isFinite(Ae) ? (Fu * Ae) / 2.0 : null;
-      const lrfdGov = Number.isFinite(lrfdYield) && Number.isFinite(lrfdFrac) ? Math.min(lrfdYield, lrfdFrac) : null;
-      const asdGov = Number.isFinite(asdYield) && Number.isFinite(asdFrac) ? Math.min(asdYield, asdFrac) : null;
+      const finLrfdGov = finiteMin([lrfdYield, lrfdFrac, lrfdBlock]);
+      const finAsdGov = finiteMin([asdYield, asdFrac, asdBlock]);
 
-      if (outLrfdY) outLrfdY.textContent = fmt(lrfdYield, 3);
-      if (outLrfdF) outLrfdF.textContent = fmt(lrfdFrac, 3);
-      if (outLrfdGov) outLrfdGov.textContent = fmt(lrfdGov, 3);
-      if (outLrfdUlt) outLrfdUlt.textContent = fmt(lrfdGov, 3);
+      const isLRFD = String(methodEl?.value || 'lrfd').toLowerCase() === 'lrfd';
+      syncAnalysisCapacityLabels(isLRFD);
+
+      const dispYield = isLRFD ? lrfdYield : asdYield;
+      const dispFrac = isLRFD ? lrfdFrac : asdFrac;
+      const dispBlk = isLRFD ? lrfdBlock : asdBlock;
+      const dispGov = isLRFD ? finLrfdGov : finAsdGov;
+
+      if (outLrfdY) outLrfdY.textContent = fmt(dispYield, 3);
+      if (outLrfdF) outLrfdF.textContent = fmt(dispFrac, 3);
+      if (capBlkEl) capBlkEl.textContent = fmt(dispBlk, 3);
+      if (outLrfdGov) outLrfdGov.textContent = fmt(dispGov, 3);
+      if (outLrfdUlt) outLrfdUlt.textContent = fmt(dispGov, 3);
       if (outAsdY) outAsdY.textContent = fmt(asdYield, 3);
       if (outAsdF) outAsdF.textContent = fmt(asdFrac, 3);
-      if (outAsdGov) outAsdGov.textContent = fmt(asdGov, 3);
-      if (outAsdAllow) outAsdAllow.textContent = fmt(asdGov, 3);
+      if (outAsdGov) outAsdGov.textContent = fmt(finAsdGov, 3);
+      if (outAsdAllow) outAsdAllow.textContent = fmt(finAsdGov, 3);
 
       const syncCapMirror = (srcId, dstId) => {
         const src = el(srcId);
@@ -292,12 +417,20 @@
       if (nEl && !String(nEl.value).trim()) nEl.value = '2';
       if (dhEl && !String(dhEl.value).trim()) dhEl.value = '3/4';
       if (case1El && !String(case1El.value).trim()) case1El.value = '1.0';
-      if (case8El && !String(case8El.value).trim()) case8El.value = '0.9';
+      if (case8El && !String(case8El.value).trim()) case8El.value = '0.8';
       if (steelEl && !String(steelEl.value).trim()) steelEl.value = activeGrade?.label ?? 'A992';
       applySteelDefaults();
       setGeometryReadOnly(!isManualMode());
       case2Touched = false;
       stagSumTouched = false;
+      const blkNS = el('sfTenAnaBlkNShear');
+      const blkLS = el('sfTenAnaBlkLshear');
+      const blkLT = el('sfTenAnaBlkLtension');
+      const blkUbsEl = el('sfTenAnaBlkUbs');
+      if (blkNS && !String(blkNS.value).trim()) blkNS.value = '5';
+      if (blkLS && !String(blkLS.value).trim()) blkLS.value = '7.5';
+      if (blkLT && !String(blkLT.value).trim()) blkLT.value = '9';
+      if (blkUbsEl && !String(blkUbsEl.value).trim()) blkUbsEl.value = '1';
     }
 
     function defaultAngleRow() {
@@ -347,6 +480,19 @@
       solveBtn?.addEventListener('click', recompute);
     }
 
+    const attachAnalysisGradeListener = () => {
+      const fn = () => {
+        const g = getActiveSteelGrade();
+        if (g && steelEl) steelEl.value = g.label;
+        applySteelDefaults();
+        recompute();
+      };
+      const prev = window.SteelForge._sfTenAnaGradeListener;
+      if (prev) window.removeEventListener('sf:steel-grade-change', prev);
+      window.SteelForge._sfTenAnaGradeListener = fn;
+      window.addEventListener('sf:steel-grade-change', fn);
+    };
+
     fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
       .then((r) => {
         if (!r.ok) throw new Error(String(r.status));
@@ -374,11 +520,13 @@
         const dflt = defaultAngleRow();
         if (dflt) applyAiscRowByLabel(dflt[COL.label]);
         wire();
+        attachAnalysisGradeListener();
         recompute();
       })
       .catch(() => {
         setDefaults();
         wire();
+        attachAnalysisGradeListener();
         recompute();
       });
   };
@@ -422,13 +570,18 @@
     let angleRows = [];
 
     const getUFromLagText = () => {
-      const raw = String(lagEl?.value || '').trim().toUpperCase();
+      const raw = String(lagEl?.value || '').trim();
       if (!raw) return null;
-      const n = parseNumLike(raw);
-      if (Number.isFinite(n)) return n;
-      if (raw.includes('1')) return 1.0;
-      if (raw.includes('2')) return 0.85;
-      if (raw.includes('8')) return 0.9;
+      const nDirect = parseNumLike(raw);
+      if (Number.isFinite(nDirect)) return nDirect;
+      const m = raw.trim().match(/^case\s*(.+)$/i);
+      if (m && window.SteelForgeWorkbookShearLagU) {
+        let key = String(m[1]).trim().replace(/\s+/g, '').toLowerCase();
+        key = key.replace(/^0+/, '') || '0';
+        if (key === '8') key = '8a';
+        const uBook = window.SteelForgeWorkbookShearLagU(key);
+        if (Number.isFinite(uBook)) return uBook;
+      }
       return null;
     };
 
@@ -592,8 +745,8 @@
       if (outGovAg) outGovAg.textContent = fmt(govAg, 3);
 
       const dh = parseNumLike(dhEl?.value);
-      const df = Number.isFinite(dh) ? dh + 1 / 16 : null;
-      if (dfEl) dfEl.textContent = fmt(df, 3);
+      const df = holeDiameterFromBoltDia(dh);
+      if (dfEl) dfEl.textContent = fmt(df, 4);
 
       renderTable(govAg);
     }
@@ -609,6 +762,21 @@
       });
       solveBtn?.addEventListener('click', recompute);
     }
+
+    const attachDesignGradeListener = () => {
+      const fn = () => {
+        const g = getActiveSteelGrade();
+        if (g && steelEl) steelEl.value = g.label;
+        applySteelDefaults();
+        normalizeInputs();
+        recompute();
+      };
+      const prev = window.SteelForge._sfTenDesGradeListener;
+      if (prev) window.removeEventListener('sf:steel-grade-change', prev);
+      window.SteelForge._sfTenDesGradeListener = fn;
+      window.addEventListener('sf:steel-grade-change', fn);
+    };
+    attachDesignGradeListener();
 
     fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
       .then((r) => {
@@ -627,11 +795,13 @@
           });
         setDefaults();
         wire();
+        attachDesignGradeListener();
         recompute();
       })
       .catch(() => {
         setDefaults();
         wire();
+        attachDesignGradeListener();
         recompute();
       });
   };

@@ -1,14 +1,11 @@
 // Simple client-side loader:
 // Loads `pages/<module>.html` into the #dynamicPanel.
+// Hash routes: `#overview`, `#bending`, `#bending/design`, etc.
 (() => {
   const panel = document.getElementById('dynamicPanel');
   const buttons = Array.from(document.querySelectorAll('.page-btn'));
 
   if (!panel || buttons.length === 0) return;
-
-  // #region agent log
-  fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'979d53'},body:JSON.stringify({sessionId:'979d53',runId:'pre-fix',hypothesisId:'H_sizes',location:'js/main.js:11',message:'Computed UI sizes + logo info on load',data:(() => { try { const bicol=document.querySelector('.sf-uni-bicol'); const uni=document.querySelector('.sf-uni-university'); const sub=document.querySelector('.sf-uni-sub'); const bu=document.querySelector('.sf-uni-logo--bu'); const buceng=document.querySelector('.sf-uni-logo--buceng'); const badge=document.querySelector('.sf-uni-badge'); const b=document.querySelector('.page-btn'); const bi=document.querySelector('.page-btn i'); const out={}; out.dpr=window.devicePixelRatio||1; if(bicol) out.bicolFont=getComputedStyle(bicol).fontSize; if(uni) out.universityFont=getComputedStyle(uni).fontSize; if(sub) out.deptFont=getComputedStyle(sub).fontSize; if(badge) out.badgeSize={w:getComputedStyle(badge).width,h:getComputedStyle(badge).height}; const logoInfo=(img) => img ? ({src:img.currentSrc||img.getAttribute('src'),natural:{w:img.naturalWidth,h:img.naturalHeight},size:{w:getComputedStyle(img).width,h:getComputedStyle(img).height},blend:getComputedStyle(img).mixBlendMode,filter:getComputedStyle(img).filter,rendering:getComputedStyle(img).imageRendering}) : null; out.buLogo=logoInfo(bu); out.bucengLogo=logoInfo(buceng); if(b){ out.buttonFont=getComputedStyle(b).fontSize; out.buttonPadding=getComputedStyle(b).padding; } if(bi) out.buttonIconFont=getComputedStyle(bi).fontSize; return out; } catch(e){ return {error:String(e)}; } })(),timestamp:Date.now()})}).catch(()=>{});
-  // #endregion agent log
 
   const allowedPages = new Set(
     buttons
@@ -23,14 +20,28 @@
     });
   }
 
-  function setHash(pageId) {
-    const next = `#${pageId}`;
-    if (window.location.hash !== next) window.location.hash = next;
+  /** @returns {{ page: string, mode: 'design' | null }} */
+  function parseHash() {
+    const raw = (window.location.hash || '').replace(/^#/, '').trim();
+    if (!raw) return { page: 'overview', mode: null };
+    const slash = raw.indexOf('/');
+    if (slash === -1) {
+      const page = allowedPages.has(raw) ? raw : 'overview';
+      return { page, mode: null };
+    }
+    const pageId = raw.slice(0, slash).trim();
+    const rest = raw.slice(slash + 1).trim().toLowerCase();
+    const page = allowedPages.has(pageId) ? pageId : 'overview';
+    const mode = rest === 'design' ? 'design' : null;
+    return { page, mode };
   }
 
-  function getPageFromHash() {
-    const raw = (window.location.hash || '').replace(/^#/, '').trim();
-    return raw || 'overview';
+  function setHash(pageId, mode) {
+    let next;
+    if (!pageId || pageId === 'overview') next = '#overview';
+    else if (mode === 'design') next = `#${pageId}/design`;
+    else next = `#${pageId}`;
+    if (window.location.hash !== next) window.location.hash = next;
   }
 
   function sleep(ms) {
@@ -46,14 +57,17 @@
       const target = el.getAttribute('data-overview-page');
       if (!target || !allowed.has(target)) return;
       el.style.cursor = 'pointer';
-      el.addEventListener('click', () => loadPage(target));
+      const modeAttr = (el.getAttribute('data-overview-mode') || 'analysis').toLowerCase();
+      const mode = modeAttr === 'design' ? 'design' : null;
+      const go = () => loadPage(target, { pushHash: true, mode });
+      el.addEventListener('click', go);
       if (el.tagName !== 'BUTTON') {
         el.setAttribute('role', 'button');
         el.setAttribute('tabindex', '0');
         el.addEventListener('keydown', (evt) => {
           if (evt.key === 'Enter' || evt.key === ' ') {
             evt.preventDefault();
-            loadPage(target);
+            go();
           }
         });
       }
@@ -94,10 +108,19 @@
     });
   }
 
-  async function loadPage(pageId, { pushHash = true } = {}) {
+  const MODE_PAGES = new Set(['bending', 'compression', 'tension', 'shear', 'tension-rod']);
+
+  function applyRouteMode(safeId, modeWant) {
+    if (!MODE_PAGES.has(safeId) || !window.SteelForge?.activateModuleMode) return;
+    window.SteelForge.activateModuleMode(panel, modeWant);
+  }
+
+  async function loadPage(pageId, { pushHash = true, mode: modeOption } = {}) {
     const safeId = allowedPages.has(pageId) ? pageId : 'overview';
+    const resolvedMode = modeOption === 'design' ? 'design' : 'analysis';
+
     setActiveButton(safeId);
-    if (pushHash) setHash(safeId);
+    if (pushHash) setHash(safeId, modeOption === 'design' ? 'design' : null);
 
     const url = `./pages/${encodeURIComponent(safeId)}.html`;
 
@@ -141,7 +164,7 @@
           window.SteelForge.initTension(panel);
         }
         if (safeId === 'shear' && window.SteelForge?.initShear) {
-          window.SteelForge.initShear(panel);
+          window.SteelForge.initShear(panel, { initialMode: resolvedMode });
         }
         if (safeId === 'steel-grade' && window.SteelForge?.initSteelGrade) {
           window.SteelForge.initSteelGrade(panel);
@@ -155,148 +178,12 @@
         if (safeId === 'overview') {
           initOverviewNavigation(panel);
         }
+        if (safeId !== 'shear') {
+          applyRouteMode(safeId, resolvedMode);
+        }
       } catch (_) {
         // ignore init failures to avoid breaking navigation
       }
-
-      // #region agent log
-      try {
-        if (safeId === 'shear') {
-          const link = document.getElementById('sfStyles');
-          const comp = panel.querySelector('.sf-comp.sf-comp--shear');
-          const mode = comp?.querySelector('.sf-comp__mode.is-active');
-          const card = mode?.querySelector('.sf-comp__card');
-
-          const rect = (el) => {
-            if (!el?.getBoundingClientRect) return null;
-            const r = el.getBoundingClientRect();
-            return { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
-          };
-
-          const cs = (el, keys) => {
-            if (!el) return null;
-            const s = getComputedStyle(el);
-            const out = {};
-            keys.forEach((k) => (out[k] = s[k]));
-            return out;
-          };
-
-          fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '095c19' },
-            body: JSON.stringify({
-              sessionId: '095c19',
-              runId: 'pre-fix',
-              hypothesisId: 'H_shear_gray_width',
-              location: 'steelforge/js/main.js:afterLoadPage(shear)',
-              message: 'Measure shear gray card + stylesheet href',
-              data: {
-                stylesheet: link ? { href: link.getAttribute('href'), resolved: link.href } : null,
-                viewport: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio || 1 },
-                rects: { panel: rect(panel), comp: rect(comp), mode: rect(mode), card: rect(card) },
-                cardStyle: cs(card, ['width', 'maxWidth', 'minWidth', 'height', 'maxHeight', 'minHeight', 'marginLeft', 'marginRight', 'paddingLeft', 'paddingRight', 'boxSizing', 'flex']),
-                compStyle: cs(comp, ['paddingLeft', 'paddingRight', 'width', 'maxWidth']),
-                panelStyle: cs(panel, ['paddingLeft', 'paddingRight', 'width']),
-              },
-              timestamp: Date.now(),
-            }),
-          }).catch(() => {});
-        }
-      } catch (_) {}
-      // #endregion
-
-      // #region agent log
-      if (isDashboard) {
-        const hero = panel.querySelector('.dash-hero');
-        const titleRow = panel.querySelector('.dash-calculator__titleRow');
-        const card = panel.querySelector('.dash-card');
-        const imgWrap = panel.querySelector('.dash-card__imgWrap');
-        const img = panel.querySelector('.dash-card__img');
-        const head = panel.querySelector('.dash-card__head');
-        const btn = panel.querySelector('.dash-btn');
-        const actions = panel.querySelector('.dash-card__actions');
-        const dotsCard = panel.querySelector('.dash-dots--card');
-        const landing = panel.querySelector('.dash-landing');
-        const grid = panel.querySelector('.dash-grid');
-
-        const rect = (el) => {
-          if (!el) return null;
-          const r = el.getBoundingClientRect();
-          return { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
-        };
-
-        const collect = () => (() => {
-          try {
-            const out = {
-              viewport: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio || 1 },
-              found: {
-                hero: !!hero,
-                titleRow: !!titleRow,
-                card: !!card,
-                imgWrap: !!imgWrap,
-                img: !!img,
-                head: !!head,
-                btn: !!btn,
-                actions: !!actions,
-                dotsCard: !!dotsCard,
-              },
-            };
-            out.panel = { clientH: panel.clientHeight, scrollH: panel.scrollHeight, className: panel.className };
-            out.body = { overflow: getComputedStyle(document.body).overflow };
-            if (landing) out.landing = { clientH: landing.clientHeight, scrollH: landing.scrollHeight };
-            if (grid) out.grid = { clientH: grid.clientHeight, scrollH: grid.scrollHeight };
-            out.rects = {
-              panel: rect(panel),
-              landing: rect(landing),
-              hero: rect(hero),
-              titleRow: rect(titleRow),
-              grid: rect(grid),
-              card: rect(card),
-              imgWrap: rect(imgWrap),
-              actions: rect(actions),
-              dotsCard: rect(dotsCard),
-            };
-            if (card) {
-              const cs = getComputedStyle(card);
-              out.card = { background: cs.backgroundColor, radius: cs.borderRadius, shadow: cs.boxShadow, padding: cs.padding, transform: cs.transform };
-            }
-            if (img) {
-              const cs = getComputedStyle(img);
-              out.img = { height: cs.height, width: cs.width, margin: cs.margin, objectFit: cs.objectFit };
-            }
-            if (head) {
-              const cs = getComputedStyle(head);
-              out.head = { background: cs.backgroundColor, radius: cs.borderRadius, padding: cs.padding };
-            }
-            if (btn) {
-              const cs = getComputedStyle(btn);
-              out.btn = { background: cs.backgroundColor, radius: cs.borderRadius, padding: cs.padding, fontSize: cs.fontSize };
-            }
-            if (actions) {
-              const cs = getComputedStyle(actions);
-              out.actions = { gap: cs.gap, display: cs.display, alignItems: cs.alignItems };
-            }
-            if (hero) {
-              const cs = getComputedStyle(hero);
-              out.hero = { margin: cs.margin, padding: cs.padding, radius: cs.borderRadius, background: cs.backgroundColor };
-            }
-            if (imgWrap) {
-              const cs = getComputedStyle(imgWrap);
-              out.imgWrap = { padding: cs.padding, radius: cs.borderRadius, background: cs.backgroundColor };
-            }
-            return out;
-          } catch (e) {
-            return { error: String(e) };
-          }
-        })();
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            const data = collect();
-            fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'651544'},body:JSON.stringify({sessionId:'651544',runId:'pre-fix',hypothesisId:'H_card_css_applied',location:'js/main.js:~70',message:'Dashboard card computed styles',data,timestamp:Date.now()})}).catch(()=>{});
-          });
-        });
-      }
-      // #endregion agent log
     } catch (err) {
       panel.innerHTML = `
         <div class="placeholder-content">
@@ -320,15 +207,17 @@
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const page = btn.getAttribute('data-page');
-      if (page) loadPage(page);
+      if (page) loadPage(page, { pushHash: true, mode: null });
     });
   });
 
   // Back/forward navigation.
   window.addEventListener('hashchange', () => {
-    loadPage(getPageFromHash(), { pushHash: false });
+    const { page, mode } = parseHash();
+    loadPage(page, { pushHash: false, mode });
   });
 
   // Initial load.
-  loadPage(getPageFromHash(), { pushHash: false });
+  const { page: startPage, mode: startMode } = parseHash();
+  loadPage(startPage, { pushHash: false, mode: startMode });
 })();

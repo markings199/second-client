@@ -3,6 +3,15 @@
   const PHI_C = 0.9; // AISC compression resistance factor
   const OMEGA_C = 1.67; // AISC ASD safety factor (compression)
 
+  /**
+   * Reference workbook (Excel export) column curve: Fcr = 0.658^(Fy/Fe)·Fy for all slender regimes
+   * (no transition to 0.877·Fe). Matches exported Fe / Fcr / φPn rows when KL/r > 4.71√(E/Fy).
+   */
+  function sfCompressionWorkbookFcr(Fy, Fe) {
+    if (![Fy, Fe].every((x) => Number.isFinite(x) && x > 0)) return null;
+    return (0.658 ** (Fy / Fe)) * Fy;
+  }
+
   function $(root, sel) {
     return root.querySelector(sel);
   }
@@ -369,7 +378,10 @@
     };
 
     const steelEl = input('sfCompAnaSteel');
-    populateStructuralSteelGradeSelect(steelEl, getPreferredStructuralSteelGradeId());
+    populateStructuralSteelGradeSelect(
+      steelEl,
+      window.SteelForge?.activeStructuralSteelGrade?.id || 'a529_55',
+    );
 
     const E_DEFAULT = 29000;
     const PHI_C = 0.9;
@@ -381,13 +393,6 @@
       'free-pinned': 2,
       'fixed-free': 1.2,
     };
-
-    function aiscFcr(Fy, Fe, KLr) {
-      if (![Fy, Fe, KLr].every((x) => Number.isFinite(x) && x > 0)) return null;
-      const limit = 4.71 * Math.sqrt(E_DEFAULT / Fy);
-      if (KLr <= limit) return (0.658 ** (Fy / Fe)) * Fy;
-      return 0.877 * Fe;
-    }
 
     function compactLimits(Fy) {
       if (!Number.isFinite(Fy) || Fy <= 0) return null;
@@ -473,13 +478,13 @@
       if (lim && webBadge) webBadge.textContent = classify(lamW, lim.web, 'web');
 
       // Critical slenderness table based on x/y (ft) and connection K.
-      const xs = [1, 2, 3, 4, 5].map((i) => parseNum(input(`sfCompAnaX${i}`)?.value) ?? 0);
-      const ys = [1, 2, 3, 4, 5].map((i) => parseNum(input(`sfCompAnaY${i}`)?.value) ?? 0);
+      const xs = [1, 2, 3, 4, 5, 6].map((i) => parseNum(input(`sfCompAnaX${i}`)?.value) ?? 0);
+      const ys = [1, 2, 3, 4, 5, 6].map((i) => parseNum(input(`sfCompAnaY${i}`)?.value) ?? 0);
       const rows = Array.from(pane.querySelectorAll('.sf-compAnaCritical__row'));
       let gov = null;
       rows.forEach((rowEl, idx) => {
-        const axis = idx < 5 ? 'x' : 'y';
-        const i = axis === 'x' ? idx : idx - 5;
+        const axis = idx < 6 ? 'x' : 'y';
+        const i = axis === 'x' ? idx : idx - 6;
         const Lft = axis === 'x' ? xs[i] : ys[i];
         const sel = rowEl.querySelector('select.sf-compAnaCritical__select');
         if (sel && sel.options.length <= 1) {
@@ -521,7 +526,7 @@
 
       // Capacity (ksi/in).
       const fe = Number.isFinite(gov) && gov > 0 ? (Math.PI ** 2 * E_DEFAULT) / (gov ** 2) : null;
-      const fcr = Number.isFinite(Fy) && Number.isFinite(fe) ? aiscFcr(Fy, fe, gov) : null;
+      const fcr = Number.isFinite(Fy) && Number.isFinite(fe) ? sfCompressionWorkbookFcr(Fy, fe) : null;
       const pn = Number.isFinite(fcr) && Number.isFinite(Ag) ? fcr * Ag : null; // kips
       const method = String(input('sfCompAnaMethod')?.value || 'lrfd').toLowerCase();
       const cap = method === 'asd' ? (Number.isFinite(pn) ? pn / OMEGA_C : null) : (Number.isFinite(pn) ? PHI_C * pn : null);
@@ -533,6 +538,15 @@
       if (fePill) fePill.textContent = fmt(fe, 8);
       if (fcrPill) fcrPill.textContent = fmt(fcr, 8);
       if (pnPill) pnPill.textContent = Number.isFinite(pn) ? fmt(pn, 2) : '—';
+
+      const govHeader = pane.querySelector('.sf-compGov__header');
+      const govSym = pane.querySelector('.sf-compGov__body .sf-compGov__sym');
+      if (govHeader)
+        govHeader.textContent =
+          method === 'asd'
+            ? 'ALLOWABLE STRENGTH DESIGN (ASD)'
+            : 'LOAD AND RESISTANCE FACTORED DESIGN (LRFD)';
+      if (govSym) govSym.innerHTML = method === 'asd' ? 'P<sub>a</sub>' : 'P<sub>u</sub>';
 
       const puPill = pane.querySelector('#sfCompGovPu');
       if (puPill) puPill.textContent = Number.isFinite(cap) ? fmt(cap, 2) : '—';
@@ -554,7 +568,7 @@
     };
 
     applySteelGrade();
-    loadWShapesFromCsv().then((rows) => {
+      loadWShapesFromCsv().then((rows) => {
       shapeSel.innerHTML = '';
       rows.forEach((r) => {
         const lab = String(r[COL.label] || '').trim();
@@ -564,7 +578,7 @@
         opt.textContent = lab.replace(/X/gi, '×');
         shapeSel.appendChild(opt);
       });
-      const pref = rows.find((r) => String(r[COL.label] || '').trim().toUpperCase() === 'W44X335');
+      const pref = rows.find((r) => String(r[COL.label] || '').trim().toUpperCase() === 'W40X503');
       if (pref) shapeSel.value = String(pref[COL.label] || '').trim();
       else if (rows[0]) shapeSel.value = String(rows[0][COL.label] || '').trim();
       applyShape(rows);
@@ -573,29 +587,282 @@
     });
   }
 
-  function attachCompressionDesignPanel(root) {
-    const pane = root.querySelector('.sf-comp--compression .sf-comp__mode[data-comp-mode-pane="design"]');
-    if (!pane) {
-      // #region agent log
-      fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '6de84a' },
-        body: JSON.stringify({
-          sessionId: '6de84a',
-          runId: 'design-mount',
-          hypothesisId: 'H_PANE',
-          location: 'calculator.js:attachCompressionDesignPanel',
-          message: 'compression design pane not found',
-          data: {},
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
-      return;
+  /** DESIGN compression: visible inputs in `.compression-design-layout` share ids with hidden bridge fallbacks. */
+  function normalizeSubscriptLabel(s) {
+    const map = {
+      '\u2080': '0',
+      '\u2081': '1',
+      '\u2082': '2',
+      '\u2083': '3',
+      '\u2084': '4',
+      '\u2085': '5',
+      '\u2086': '6',
+      '\u2087': '7',
+      '\u2088': '8',
+      '\u2089': '9',
+    };
+    return String(s).replace(/[\u2080-\u2089]/g, (ch) => map[ch] ?? ch);
+  }
+
+  function parseLeadingNumber(txt) {
+    const m = String(txt ?? '')
+      .replace(/\u00A0/g, ' ')
+      .trim()
+      .match(/^([\d.,]+)/);
+    if (!m) return NaN;
+    return Number(m[1].replace(/,/g, ''));
+  }
+
+  function ensureCompressionDesignStaticBridge(pane) {
+    const layout = pane.querySelector('.compression-design-layout');
+    if (!layout) return null;
+    let bridge = pane.querySelector('#sfCompDesStaticBridge');
+    if (bridge) return bridge;
+
+    bridge = document.createElement('div');
+    bridge.id = 'sfCompDesStaticBridge';
+    bridge.hidden = true;
+    bridge.setAttribute('aria-hidden', 'true');
+    pane.appendChild(bridge);
+
+    const ensureInput = (id, attrs = {}) => {
+      let el = pane.querySelector(`#${id}`) ?? bridge.querySelector(`#${id}`);
+      if (el) return el;
+      el = document.createElement('input');
+      el.id = id;
+      el.type = attrs.type || 'text';
+      if (attrs.readOnly) el.readOnly = true;
+      bridge.appendChild(el);
+      return el;
+    };
+    const ensureSel = (id) => {
+      let el = pane.querySelector(`#${id}`) ?? bridge.querySelector(`#${id}`);
+      if (el) return el;
+      el = document.createElement('select');
+      el.id = id;
+      bridge.appendChild(el);
+      return el;
+    };
+
+    // Visible LRFD/ASD lives in compression.html (.method-pill__select); only bridge if absent (avoid duplicate id).
+    if (!layout.querySelector('#sfCompDesMethod')) {
+      const sel = ensureSel('sfCompDesMethod');
+      sel.innerHTML = '<option value="lrfd">LRFD</option><option value="asd">ASD</option>';
     }
 
-    /* Static DESIGN COMPRESSION layout (pages/compression.html) — no sfCompDes wiring */
-    if (pane.querySelector('.compression-design-layout')) return;
+    ensureInput('sfCompDesDl', { type: 'number' });
+    ensureInput('sfCompDesLl', { type: 'number' });
+    ensureInput('sfCompDesFy', { type: 'number' });
+    ensureInput('sfCompDesFu', { type: 'number' });
+
+    ensureSel('sfCompDesSteel');
+
+    ensureInput('sfCompDesComb12', { readOnly: true });
+    ensureInput('sfCompDesComb14', { readOnly: true });
+    ensureInput('sfCompDesCombSvc', { readOnly: true });
+    ensureInput('sfCompDesPu', { readOnly: true });
+    ensureInput('sfCompDesPa', { readOnly: true });
+
+    ensureInput('sfCompDesGovKLx', { readOnly: true });
+    ensureInput('sfCompDesGovKLy', { readOnly: true });
+    ensureInput('sfCompDesGovKLyAsm', { readOnly: true });
+
+    for (let i = 1; i <= 6; i++) {
+      ensureInput(`sfCompDesX${i}`, { type: 'number' });
+      ensureInput(`sfCompDesY${i}`, { type: 'number' });
+      ensureInput(`sfCompDesSlKX${i}`, { type: 'number' });
+      ensureInput(`sfCompDesSlLX${i}`, { type: 'number' });
+      ensureInput(`sfCompDesSlKLX${i}`, { readOnly: true });
+      ensureInput(`sfCompDesSlKY${i}`, { type: 'number' });
+      ensureInput(`sfCompDesSlLY${i}`, { type: 'number' });
+      ensureInput(`sfCompDesSlKLY${i}`, { readOnly: true });
+    }
+
+    for (let i = 1; i <= 4; i++) {
+      ensureInput(`sfCompDesSafeSec${i}`, { readOnly: true });
+      ensureInput(`sfCompDesSafeWt${i}`, { readOnly: true });
+      ensureInput(`sfCompDesSafePu${i}`, { readOnly: true });
+      ensureInput(`sfCompDesSafeRm${i}`, { readOnly: true });
+    }
+    ensureInput('sfCompDesLightest', { readOnly: true });
+
+    const CONN_MAP = {
+      'fixed-pinned': 0.8,
+      'pinned-pinned': 1,
+      'fixed-fixed': 0.65,
+      'free-pinned': 2,
+      'fixed-free': 1.2,
+    };
+
+    const normConn = (s) =>
+      String(s ?? '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/–|—/g, '-');
+
+    const hasVisibleLoads = !!layout.querySelector('#sfCompDesDl');
+    const hasVisibleSlenderK = !!layout.querySelector('#sfCompDesSlKX1');
+
+    if (!hasVisibleLoads) {
+      const leftPanels = layout.querySelectorAll('.left-panel .parameter-card');
+      const rowEls = leftPanels[0]?.querySelectorAll('tbody tr') ?? [];
+
+      rowEls.forEach((tr) => {
+        const th = normalizeSubscriptLabel(tr.querySelector('th')?.textContent ?? '');
+        const td = tr.querySelector('td');
+        const raw = td?.textContent ?? '';
+        const n = parseLeadingNumber(raw);
+        if (/dead\s*load/i.test(th)) {
+          if (Number.isFinite(n)) bridge.querySelector('#sfCompDesDl').value = String(n);
+        } else if (/live\s*load/i.test(th)) {
+          if (Number.isFinite(n)) bridge.querySelector('#sfCompDesLl').value = String(n);
+        } else if (/length\s+x/i.test(th)) {
+          const d = th.match(/x\s*(\d+)/i);
+          const idx = d ? Number(d[1]) : NaN;
+          if (idx >= 1 && idx <= 6 && Number.isFinite(n)) {
+            const xEl = bridge.querySelector(`#sfCompDesX${idx}`);
+            if (xEl) xEl.value = String(n);
+          }
+        } else if (/length\s+y/i.test(th)) {
+          const d = th.match(/y\s*(\d+)/i);
+          const idx = d ? Number(d[1]) : NaN;
+          if (idx >= 1 && idx <= 6 && Number.isFinite(n)) {
+            const yEl = bridge.querySelector(`#sfCompDesY${idx}`);
+            if (yEl) yEl.value = String(n);
+          }
+        }
+      });
+
+      const steelRows = leftPanels[1]?.querySelectorAll('tbody tr') ?? [];
+      steelRows.forEach((tr) => {
+        const th = (tr.querySelector('th')?.textContent ?? '').trim();
+        const td = tr.querySelector('td')?.textContent ?? '';
+        const n = parseLeadingNumber(td);
+        if (/^\s*f\s*y/i.test(th) || /F\s*y/i.test(th)) {
+          if (Number.isFinite(n)) bridge.querySelector('#sfCompDesFy').value = String(n);
+        }
+        if (/^\s*f\s*u/i.test(th) || /F\s*u/i.test(th)) {
+          if (Number.isFinite(n)) bridge.querySelector('#sfCompDesFu').value = String(n);
+        }
+      });
+    }
+
+    if (!hasVisibleSlenderK) {
+      const ratioRows = layout.querySelectorAll('.ratio-table tbody tr');
+      ratioRows.forEach((tr) => {
+        const cells = tr.querySelectorAll('td');
+        if (cells.length < 5) return;
+        const elLab = normalizeSubscriptLabel(cells[0].textContent ?? '').trim();
+        const conn = normConn(cells[1].textContent);
+        const kVal = parseLeadingNumber(cells[2].textContent);
+        const LVal = parseLeadingNumber(cells[3].textContent);
+
+        const xm = elLab.match(/^x\s*(\d+)/i);
+        const ym = elLab.match(/^y\s*(\d+)/i);
+        let axis = '';
+        let idx = NaN;
+        if (xm) {
+          axis = 'X';
+          idx = Number(xm[1]);
+        } else if (ym) {
+          axis = 'Y';
+          idx = Number(ym[1]);
+        }
+        if (!(axis && idx >= 1 && idx <= 6)) return;
+
+        const kNorm = CONN_MAP[conn];
+        const kUse = Number.isFinite(kVal) ? kVal : kNorm;
+        const kEl = bridge.querySelector(`#sfCompDesSlK${axis}${idx}`);
+        if (kEl && Number.isFinite(kUse)) kEl.value = String(kUse);
+        const parLen =
+          axis === 'X'
+            ? bridge.querySelector(`#sfCompDesX${idx}`)
+            : bridge.querySelector(`#sfCompDesY${idx}`);
+        if (Number.isFinite(LVal) && parLen && !String(parLen.value || '').trim()) {
+          parLen.value = String(LVal);
+        }
+      });
+    }
+
+    const methCtl = layout.querySelector('#sfCompDesMethod') || bridge.querySelector('#sfCompDesMethod');
+    if (methCtl) methCtl.value = 'lrfd';
+
+    return bridge;
+  }
+
+  function mirrorCompressionDesignStaticLayout(pane, input) {
+    const layout = pane.querySelector('.compression-design-layout');
+    if (!layout || !pane.querySelector('#sfCompDesStaticBridge')) return;
+
+    const g = (id) => input(id)?.value ?? '';
+
+    const setLastTd = (tableSel, rowIdx, text) => {
+      const tr = layout.querySelector(`${tableSel} tbody tr:nth-child(${rowIdx})`);
+      const td = tr?.querySelector('td:last-child');
+      if (td) td.textContent = text;
+    };
+
+    const fmtCell = (val) => (!val || val === '—' ? '—' : `${val} kips`);
+    setLastTd('.load-table', 1, fmtCell(g('sfCompDesComb12')));
+    setLastTd('.load-table', 2, fmtCell(g('sfCompDesComb14')));
+    setLastTd('.load-table', 3, fmtCell(g('sfCompDesCombSvc')));
+
+    const sum = layout.querySelector('.summary-card .summary-value');
+    if (sum) {
+      const method = String(input('sfCompDesMethod')?.value || 'lrfd').toLowerCase();
+      const v = method === 'asd' ? g('sfCompDesPa') : g('sfCompDesPu');
+      sum.textContent = !v || v === '—' ? '—' : `${v} kips`;
+    }
+
+    const ratioBody = layout.querySelector('.ratio-table tbody');
+    if (ratioBody) {
+      const rows = ratioBody.querySelectorAll('tr');
+      rows.forEach((tr) => {
+        const labCell = tr.querySelector('th') ?? tr.querySelector('td');
+        const lab = normalizeSubscriptLabel(labCell?.textContent ?? '').trim();
+        const xm = lab.match(/^x\s*(\d+)/i);
+        const ym = lab.match(/^y\s*(\d+)/i);
+        let hid = '';
+        if (xm) hid = `sfCompDesSlKLX${xm[1]}`;
+        else if (ym) hid = `sfCompDesSlKLY${ym[1]}`;
+        if (!hid) return;
+        const kl = g(hid);
+        const tds = tr.querySelectorAll('td');
+        const klTd = tds[tds.length - 1];
+        if (klTd && kl !== '') klTd.textContent = kl;
+      });
+    }
+
+    const secBody = layout.querySelector('.section-table tbody');
+    if (secBody) {
+      const rows = secBody.querySelectorAll('tr');
+      for (let i = 0; i < 4; i++) {
+        const tr = rows[i];
+        if (!tr) break;
+        const tds = tr.querySelectorAll('td');
+        const sec = g(`sfCompDesSafeSec${i + 1}`);
+        const wt = g(`sfCompDesSafeWt${i + 1}`);
+        const pu = g(`sfCompDesSafePu${i + 1}`);
+        const rm = g(`sfCompDesSafeRm${i + 1}`);
+        if (tds.length >= 4) {
+          tds[0].textContent = sec || '—';
+          tds[1].textContent = wt || '—';
+          tds[2].textContent = pu && pu !== 'NO SECTION' ? `${pu} kips` : pu || '—';
+          tds[3].textContent = rm || '—';
+        }
+      }
+    }
+
+    const light = layout.querySelector('.result-strip .result-code');
+    if (light) light.textContent = g('sfCompDesLightest') || '—';
+  }
+
+  function attachCompressionDesignPanel(root) {
+    const pane = root.querySelector('.sf-comp--compression .sf-comp__mode[data-comp-mode-pane="design"]');
+    if (!pane) return;
+
+    ensureCompressionDesignStaticBridge(pane);
 
     const input = (id) => pane.querySelector(`#${id}`);
     const CSV_NAME = 'exel program EWIWIWI(S(STEEL SELECTION)).csv';
@@ -654,7 +921,7 @@
       window.SteelForge.__sfWShapesCsvPromise = fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
         .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
         .then((txt) => {
-          const lines = txt.split(/\\r?\\n/);
+          const lines = txt.split(/\r?\n/);
           const rows = [];
           for (let i = 4; i < lines.length; i++) {
             const line = lines[i];
@@ -689,15 +956,47 @@
     };
 
     const applyConnKFromSelect = (sel) => {
+      const kid = sel.dataset?.sfKFor;
+      if (!kid) return;
       const kv = SF_COMP_DES_CONN_K[sel.value];
       if (kv === undefined) return;
-      const kid = sel.id.replace('Sel', 'K');
       const kEl = input(kid);
       if (kEl) kEl.value = String(kv);
     };
 
+    /** Populate connection dropdowns (analysis-aligned); `data-sf-k-for` points at the K numeric input id. */
+    const wireCompressionDesignConnSelects = () => {
+      const pairs = [
+        ['fixed-pinned', 'Fixed-Pinned'],
+        ['pinned-pinned', 'Pinned-Pinned'],
+        ['fixed-fixed', 'Fixed-Fixed'],
+        ['free-pinned', 'Free-Pinned'],
+        ['fixed-free', 'Fixed-Free'],
+      ];
+      pane.querySelectorAll('select.sf-compDes__connSelect[data-sf-k-for]').forEach((sel) => {
+        if (sel.options.length > 1) return;
+        sel.innerHTML = '';
+        pairs.forEach(([v, t]) => {
+          const o = document.createElement('option');
+          o.value = v;
+          o.textContent = t;
+          sel.appendChild(o);
+        });
+      });
+    };
+
+    const initCompressionDesignConnDefaults = () => {
+      pane.querySelectorAll('select.sf-compDes__connSelect[data-sf-k-for]').forEach((sel) => {
+        if (!sel.value || !SF_COMP_DES_CONN_K[sel.value]) {
+          const yAxis = /^sfCompDesConnY\d$/i.test(sel.id);
+          sel.value = yAxis ? 'pinned-pinned' : 'fixed-pinned';
+        }
+        applyConnKFromSelect(sel);
+      });
+    };
+
     const syncSlenderLFromParams = () => {
-      for (let i = 1; i <= 5; i++) {
+      for (let i = 1; i <= 6; i++) {
         const xi = input(`sfCompDesX${i}`);
         const lx = input(`sfCompDesSlLX${i}`);
         if (xi && lx) lx.value = xi.value;
@@ -719,7 +1018,7 @@
     const updateGoverningKLFromSlender = () => {
       let maxX = NaN;
       let maxY = NaN;
-      for (let i = 1; i <= 5; i++) {
+      for (let i = 1; i <= 6; i++) {
         const Lx = parseNum(input(`sfCompDesSlLX${i}`)?.value);
         const Ly = parseNum(input(`sfCompDesSlLY${i}`)?.value);
         const klx = parseNum(input(`sfCompDesSlKLX${i}`)?.value);
@@ -744,7 +1043,7 @@
     const updateSlenderKL = () => {
       syncSlenderLFromParams();
       for (const ax of ['X', 'Y']) {
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 6; i++) {
           const kEl = input(`sfCompDesSlK${ax}${i}`);
           const lEl = input(`sfCompDesSlL${ax}${i}`);
           const klEl = input(`sfCompDesSlKL${ax}${i}`);
@@ -760,13 +1059,6 @@
     const E_DEFAULT = 29000;
     const PHI_C = 0.9;
     const OMEGA_C = 1.67;
-
-    function aiscFcr(Fy, Fe, KLr) {
-      if (![Fy, Fe, KLr].every((x) => Number.isFinite(x) && x > 0)) return null;
-      const limit = 4.71 * Math.sqrt(E_DEFAULT / Fy);
-      if (KLr <= limit) return (0.658 ** (Fy / Fe)) * Fy;
-      return 0.877 * Fe;
-    }
 
     const setSafeRow = (i, sec, wt, cap, remark) => {
       const secEl = input(`sfCompDesSafeSec${i}`);
@@ -824,7 +1116,7 @@
         if (!Number.isFinite(KLr) || KLr <= 0) continue;
 
         const Fe = (Math.PI ** 2 * E_DEFAULT) / (KLr ** 2);
-        const Fcr = aiscFcr(Fy, Fe, KLr);
+        const Fcr = sfCompressionWorkbookFcr(Fy, Fe);
         if (!Number.isFinite(Fcr) || Fcr <= 0) continue;
         const Pn = Fcr * Ag; // kips
         const cap = isLRFD ? PHI_C * Pn : Pn / OMEGA_C;
@@ -893,7 +1185,10 @@
 
       updateSlenderKL();
       // Safe sections depend on demand + governing lengths; computed when CSV is ready.
-      loadWShapesFromCsv().then(updateSafeSections);
+      loadWShapesFromCsv().then((rows) => {
+        updateSafeSections(rows);
+        mirrorCompressionDesignStaticLayout(pane, input);
+      });
     };
 
     const steelEl = input('sfCompDesSteel');
@@ -918,10 +1213,13 @@
       }
     };
 
+    wireCompressionDesignConnSelects();
+    initCompressionDesignConnDefaults();
+
     pane.querySelectorAll('input:not([readonly]), select').forEach((el) => {
       el.addEventListener('input', updateDemand);
       el.addEventListener('change', () => {
-        if (el.classList.contains('sf-compDes__tableSelect')) applyConnKFromSelect(el);
+        if (el.matches?.('select.sf-compDes__connSelect')) applyConnKFromSelect(el);
         syncSteel();
         updateDemand();
       });
@@ -929,100 +1227,10 @@
 
     syncSteel();
     updateDemand();
-    // Ensure the safe table is computed on initial load.
-    loadWShapesFromCsv().then(updateSafeSections);
-
-    // #region agent log
-    fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '6de84a' },
-      body: JSON.stringify({
-        sessionId: '6de84a',
-        runId: 'design-mount',
-        hypothesisId: 'H_DOM',
-        location: 'calculator.js:attachCompressionDesignPanel',
-        message: 'compression design UI mounted',
-        data: {
-          hasParamsCard: !!pane.querySelector('.sf-compDes__card--params'),
-          hasDemandCard: !!pane.querySelector('.sf-compDes__demandCard'),
-          hasDesignGridShell: (() => {
-            const b = pane.querySelector('.sf-comp__grayShell-body--design');
-            return !!(b && window.getComputedStyle(b).display === 'grid');
-          })(),
-          hasVizCol: !!pane.querySelector('.sf-compDes__vizCol'),
-          hasSlenderRailViz: !!pane.querySelector('.sf-compDes__slenderRail--vizCol'),
-          hasSlenderRail: !!pane.querySelector('.sf-compDes__slenderRail'),
-          hasSlenderTitleTab: !!pane.querySelector('.sf-compDes__slenderTitle'),
-          slenderRows: pane.querySelectorAll('.sf-compDes__slenderTable tbody tr').length,
-          govKLx: input('sfCompDesGovKLx')?.value ?? null,
-          method: input('sfCompDesMethod')?.value ?? null,
-          midColLayout: (() => {
-            const body = pane.querySelector('.sf-comp__grayShell-body--design');
-            const slender = pane.querySelector('.sf-compDes__midCard--slender');
-            const safe = pane.querySelector('.sf-compDes__midCard--safe');
-            const tbl = pane.querySelector('.sf-compDes__slenderTable');
-            if (!slender || !safe) return null;
-            const scSl = window.getComputedStyle(slender);
-            const rowGap = 10;
-            return {
-              clientH: slender.clientHeight + rowGap + safe.clientHeight,
-              scrollH: body?.scrollHeight ?? null,
-              safeScrollH: pane.querySelector('.sf-compDes__midScroll--safe')?.scrollHeight ?? null,
-              slenderCardBg: window.getComputedStyle(slender).backgroundColor,
-              slenderFit: {
-                scrollHeight: slender.scrollHeight,
-                clientHeight: slender.clientHeight,
-                clippedLikely: slender.scrollHeight > slender.clientHeight + 1,
-                flexShrink: scSl.flexShrink,
-                minHeight: scSl.minHeight,
-                overflowY: scSl.overflowY,
-                tableOffsetH: tbl?.offsetHeight ?? null,
-              },
-            };
-          })(),
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    const __methodRow = pane.querySelector(
-      '.sf-compDes__card--params > .sf-compAna__headRow:first-child',
-    );
-    const __methodLab = __methodRow?.querySelector('.sf-compAna__pillLabel');
-    const __methodWrap = pane.querySelector(
-      '.sf-compDes__card--params .sf-compAna__selectWrap--method',
-    );
-    const __methodSel = __methodWrap?.querySelector('.sf-compAna__select');
-    if (__methodRow && __methodLab && __methodWrap && __methodSel) {
-      const rR = __methodRow.getBoundingClientRect();
-      const rL = __methodLab.getBoundingClientRect();
-      const rW = __methodWrap.getBoundingClientRect();
-      const rS = __methodSel.getBoundingClientRect();
-      const cG = window.getComputedStyle(__methodRow);
-      const cW = window.getComputedStyle(__methodWrap);
-      const cS = window.getComputedStyle(__methodSel);
-      fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '6de84a' },
-        body: JSON.stringify({
-          sessionId: '6de84a',
-          runId: 'post-fix',
-          hypothesisId: 'H_GRID',
-          location: 'calculator.js:attachCompressionDesignPanel',
-          message: 'DESIGN METHOD column hug + LRFD pill (grid cols / heights)',
-          data: {
-            rowGridTemplateColumns: cG.gridTemplateColumns,
-            labelRect: { w: Math.round(rL.width), h: Math.round(rL.height), x: Math.round(rL.x) },
-            wrapRect: { w: Math.round(rW.width), h: Math.round(rW.height), x: Math.round(rW.x) },
-            rowRect: { w: Math.round(rR.width), h: Math.round(rR.height) },
-            selRect: { w: Math.round(rS.width), h: Math.round(rS.height) },
-            wrapComputed: { width: cW.width, maxWidth: cW.maxWidth, justifySelf: cW.justifySelf },
-            selComputed: { width: cS.width, fontSize: cS.fontSize, height: cS.height },
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    }
-    // #endregion
+    loadWShapesFromCsv().then((rows) => {
+      updateSafeSections(rows);
+      mirrorCompressionDesignStaticLayout(pane, input);
+    });
   }
 
   function attachModeToggle(root, { topic = 'COMPRESSION' } = {}) {
@@ -1032,156 +1240,6 @@
     const buttons = Array.from(nav.querySelectorAll('button.sf-comp__modeBtn'));
     const panes = Array.from(root.querySelectorAll('.sf-comp__mode'));
     const indicator = root.querySelector('.sf-comp__indicator span');
-
-    // #region agent log
-    const __sf2Log = (hypothesisId, message, data, runId = 'pre-fix') => {
-      fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'f85dc2' },
-        body: JSON.stringify({
-          sessionId: 'f85dc2',
-          runId,
-          hypothesisId,
-          location: 'steelforge/js/calculator.js:attachModeToggle',
-          message,
-          data,
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    };
-    // #endregion
-
-    // #region agent log
-    const __sfLog = (hypothesisId, message, data) => {
-      fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'e9cea5' },
-        body: JSON.stringify({
-          sessionId: 'e9cea5',
-          runId: 'pre-fix',
-          hypothesisId,
-          location: 'steelforge/js/calculator.js:attachModeToggle',
-          message,
-          data,
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    };
-    // #endregion
-
-    const __rect = (el) => {
-      if (!el?.getBoundingClientRect) return null;
-      const r = el.getBoundingClientRect();
-      return { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
-    };
-
-    // #region agent log
-    const __cs = (el, keys) => {
-      if (!el) return null;
-      const s = window.getComputedStyle(el);
-      const out = {};
-      keys.forEach((k) => (out[k] = s[k]));
-      return out;
-    };
-    // #endregion
-
-    const __measureLayout = (mode) => {
-      const pane = root.querySelector(`.sf-comp__mode[data-comp-mode-pane="${mode}"]`);
-      const card = pane?.querySelector('.sf-comp__card');
-      const cols = pane?.querySelector('.sf-comp__cols');
-      const leftWrap = pane?.querySelector('.sf-comp__left');
-      const params = pane?.querySelector('.sf-comp__panel[aria-label="Parameters"]');
-      const results = pane?.querySelector('.sf-comp__panel[aria-label="Results"]');
-      const paramsForm = params?.querySelector('.sf-comp__form');
-      const resultsBody = results?.querySelector('.sf-comp__results');
-      const anyRbar = resultsBody?.querySelector('.sf-comp__rbar');
-      const anyBigBox = resultsBody?.querySelector('.sf-comp__bigBox');
-      const contentPanel = root.closest('.content-panel');
-      const solveSlot = pane?.querySelector('.sf-comp__solveSlot');
-      const solve = solveSlot?.querySelector('.sf-comp__solve') || pane?.querySelector('.sf-comp__footer .sf-comp__solve');
-      const dots = pane?.querySelector('.sf-comp__dots');
-      const topline = root.querySelector('.sf-comp__topline');
-
-      const csSolve = solve ? window.getComputedStyle(solve) : null;
-      const csCard = card ? window.getComputedStyle(card) : null;
-      const csSlot = solveSlot ? window.getComputedStyle(solveSlot) : null;
-
-      // #region agent log
-      // H_SOLVE_POS: SOLVE should be inside card (like reference)
-      __sf2Log(
-        'H_SOLVE_POS',
-        'solve-position-vs-card',
-        {
-          topic,
-          mode,
-          viewport: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio || 1 },
-          rects: {
-            pane: __rect(pane),
-            contentPanel: __rect(contentPanel),
-            card: __rect(card),
-            cols: __rect(cols),
-            leftWrap: __rect(leftWrap),
-            params: __rect(params),
-            results: __rect(results),
-            solveSlot: __rect(solveSlot),
-            solve: __rect(solve),
-            dots: __rect(dots),
-            topline: __rect(topline),
-          },
-          overflow: {
-            paramsForm: paramsForm
-              ? { clientH: paramsForm.clientHeight, scrollH: paramsForm.scrollHeight }
-              : null,
-            resultsBody: resultsBody
-              ? { clientH: resultsBody.clientHeight, scrollH: resultsBody.scrollHeight }
-              : null,
-          },
-          fields: {
-            rbar: anyRbar
-              ? { rect: __rect(anyRbar), style: __cs(anyRbar, ['minWidth', 'width', 'maxWidth', 'height', 'paddingLeft', 'paddingRight']) }
-              : null,
-            bigBox: anyBigBox
-              ? { rect: __rect(anyBigBox), style: __cs(anyBigBox, ['minWidth', 'width', 'maxWidth', 'height']) }
-              : null,
-          },
-          styles: {
-            pane: __cs(pane, ['display', 'flexDirection', 'overflow', 'paddingBottom']),
-            card: __cs(card, ['display', 'flexDirection', 'overflow', 'paddingBottom', 'paddingTop', 'paddingLeft', 'paddingRight']),
-            cols: __cs(cols, ['display', 'gridTemplateRows', 'gridTemplateColumns', 'alignItems', 'alignContent', 'rowGap', 'gap']),
-            leftWrap: __cs(leftWrap, ['display', 'flexDirection', 'alignItems', 'width']),
-            solveSlot: __cs(solveSlot, ['display', 'gridRow', 'gridColumn', 'alignItems', 'justifyContent', 'paddingTop', 'paddingBottom', 'marginTop', 'marginBottom']),
-            solve: __cs(solve, ['height', 'width', 'marginTop', 'marginBottom']),
-          },
-        },
-        'pre-fix'
-      );
-      // #endregion
-
-      __sfLog('H1', 'layout-measure', {
-        mode,
-        viewport: { w: window.innerWidth, h: window.innerHeight },
-        rects: {
-          topline: __rect(topline),
-          pane: __rect(pane),
-          card: __rect(card),
-          cols: __rect(cols),
-          params: __rect(params),
-          results: __rect(results),
-          solveSlot: __rect(solveSlot),
-          solve: __rect(solve),
-          dots: __rect(dots),
-        },
-        solveStyle: csSolve
-          ? { fontSize: csSolve.fontSize, padding: csSolve.padding, height: csSolve.height, width: csSolve.width }
-          : null,
-        cardStyle: csCard
-          ? { padding: csCard.padding, display: csCard.display, flexDirection: csCard.flexDirection, overflow: csCard.overflow }
-          : null,
-        solveSlotStyle: csSlot
-          ? { display: csSlot.display, justifyContent: csSlot.justifyContent, padding: csSlot.padding, alignItems: csSlot.alignItems }
-          : null,
-      });
-    };
 
     const setMode = (mode) => {
       buttons.forEach((b) => {
@@ -1199,331 +1257,6 @@
           ? `ANALYSIS <span class="sf-comp__indicatorAccent">${topic}</span>`
           : `DESIGN <span class="sf-comp__indicatorAccent">${topic}</span>`;
       }
-
-      // #region agent log
-      requestAnimationFrame(() => {
-        __measureLayout(mode);
-        if (topic === 'COMPRESSION' && mode === 'design') {
-          requestAnimationFrame(() => {
-            const pane = root.querySelector('.sf-comp__mode[data-comp-mode-pane="design"]');
-            const slenderCard = pane?.querySelector('.sf-compDes__midCard--slender');
-            const safeEl = pane?.querySelector('.sf-compDes__midScroll--safe');
-            const slenderEl = pane?.querySelector('.sf-compDes__midScroll--slender');
-            const beamTray = pane?.querySelector('.sf-compDes__beamPhotoTray');
-            const beamImgs = beamTray ? [...beamTray.querySelectorAll('img.sf-compDes__beamPhoto')] : [];
-            const slenderRail = pane?.querySelector('.sf-compDes__slenderRail');
-            const safeCard = pane?.querySelector('.sf-compDes__midCard--safe');
-            const demandCard = pane?.querySelector('.sf-compDes__demandCard');
-            const paramsAside = pane?.querySelector('.sf-compDes__card--params');
-            const demandGrid = pane?.querySelector('.sf-compDes__demandGrid');
-            const lightestCard = pane?.querySelector('.sf-compDes__lightestCard');
-            const shell = pane?.querySelector('.sf-comp__grayShell');
-            const shellBody = pane?.querySelector('.sf-comp__grayShell-body--design');
-            const ep = pane?.querySelector('.sf-comp__emptyPane');
-            const csShellBody = shellBody ? window.getComputedStyle(shellBody) : null;
-            const csDemandGrid = demandGrid ? window.getComputedStyle(demandGrid) : null;
-            const csSafeScroll = safeEl ? window.getComputedStyle(safeEl) : null;
-            const csSlenderScroll = slenderEl ? window.getComputedStyle(slenderEl) : null;
-            fetch('http://127.0.0.1:7369/ingest/c2c70d86-bcd0-4894-aefe-b03a3bc89ae5', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '6de84a' },
-              body: JSON.stringify({
-                sessionId: '6de84a',
-                runId: 'bottom-row-align',
-                hypothesisId: 'H_SCROLL',
-                location: 'calculator.js:attachModeToggle:setMode',
-                message: 'design compression scroll surfaces after tab switch',
-                data: {
-                  contentPadVerify: {
-                    demandGridPaddingTop: csDemandGrid?.paddingTop ?? null,
-                    safeScrollMarginTop: csSafeScroll?.marginTop ?? null,
-                    slenderScrollPaddingTop: csSlenderScroll?.paddingTop ?? null,
-                  },
-                  beamPhotoVerify: {
-                    imgCount: beamImgs.length,
-                    allDecoded:
-                      beamImgs.length > 0 &&
-                      beamImgs.every((img) => img.complete && img.naturalWidth > 0),
-                    src0: beamImgs[0]?.getAttribute('src') ?? null,
-                    naturalW: beamImgs.map((i) => i.naturalWidth),
-                  },
-                  slenderRailDock:
-                    slenderRail && slenderCard
-                      ? (() => {
-                          const mrect = slenderCard.getBoundingClientRect();
-                          const r = slenderRail.getBoundingClientRect();
-                          return {
-                            gapPx: Math.round(r.left - mrect.right),
-                            railRightOfSlenderCard: r.left + 0.5 >= mrect.right,
-                          };
-                        })()
-                      : null,
-                  slenderContainmentH_OVERFLOW:
-                    slenderEl != null
-                      ? {
-                          overflowXComputed: csSlenderScroll?.overflowX ?? null,
-                          scrollW: slenderEl.scrollWidth,
-                          clientW: slenderEl.clientWidth,
-                          horizontalScrollNeeded: slenderEl.scrollWidth > slenderEl.clientWidth + 2,
-                          slenderRightVsRailLeft:
-                            slenderRail && slenderCard
-                              ? Math.round(
-                                  slenderRail.getBoundingClientRect().left - slenderCard.getBoundingClientRect().right,
-                                )
-                              : null,
-                        }
-                      : null,
-                  shellBodyOverflowY: csShellBody?.overflowY ?? null,
-                  shellBodyOverflowX: csShellBody?.overflowX ?? null,
-                  shellBodyScrollable: shellBody
-                    ? shellBody.scrollHeight > shellBody.clientHeight + 1
-                    : null,
-                  safeScrollable: safeEl ? safeEl.scrollHeight > safeEl.clientHeight + 1 : null,
-                  midStackDims:
-                    slenderCard && safeCard
-                      ? {
-                          slenderH: slenderCard.clientHeight,
-                          safeH: safeCard.clientHeight,
-                          scrollH: shellBody?.scrollHeight ?? null,
-                        }
-                      : null,
-                  /* H_ROW_ALIGN: DEMAND + SAFE share grid row 2 — card tops should match within 1px */
-                  demandSafeTopAlign_H_ROW:
-                    demandCard && safeCard
-                      ? Math.round(
-                          demandCard.getBoundingClientRect().top - safeCard.getBoundingClientRect().top,
-                        )
-                      : null,
-                  /* H_OVERLAP: horizontal gap between DEMAND right edge and SAFE left — negative means overlap */
-                  demandSafeHorizontalGap_H_OVERLAP:
-                    demandCard && safeCard
-                      ? Math.round(
-                          safeCard.getBoundingClientRect().left -
-                            demandCard.getBoundingClientRect().right,
-                        )
-                      : null,
-                  /* H_SAFE_PAD: gap from SAFE tab pill bottom to blue table top — should be small after tighten */
-                  safePackProbe_H_PAD:
-                    (() => {
-                      const title = pane?.querySelector('.sf-compDes__safeTitle');
-                      const blue = pane?.querySelector('.sf-compDes__midScroll--safe');
-                      const sc = pane?.querySelector('.sf-compDes__midCard--safe');
-                      if (!title || !blue || !sc) return null;
-                      const tb = title.getBoundingClientRect().bottom;
-                      const bt = blue.getBoundingClientRect().top;
-                      const c = window.getComputedStyle(sc);
-                      return {
-                        titleBottomToBlueTopPx: Math.round(bt - tb),
-                        safeCardPaddingTop: c.paddingTop,
-                        blueMarginTop: window.getComputedStyle(blue).marginTop,
-                      };
-                    })(),
-                  shellDims: shell
-                    ? { offsetH: shell.offsetHeight, clientH: shell.clientHeight, scrollH: shell.scrollHeight }
-                    : null,
-                  /* H_VSCROLL: design taupe shell must allow vertical scroll when table taller than cap */
-                  grayShellDesignScroll_H_V:
-                    shell != null
-                      ? (() => {
-                          const sh = window.getComputedStyle(shell);
-                          return {
-                            overflowY: sh.overflowY,
-                            paddingTop: sh.paddingTop,
-                            paddingBottom: sh.paddingBottom,
-                            clientH: shell.clientHeight,
-                            scrollH: shell.scrollHeight,
-                            verticalScrollNeeded: shell.scrollHeight > shell.clientHeight + 2,
-                            maxHResolved: sh.getPropertyValue('--sf-compression-gray-max-h-design').trim(),
-                          };
-                        })()
-                      : null,
-                  /* H_VIS: SAFE blue table region — full table visible, no collapsed scrollport */
-                  safeTableVisibility_H_VIS:
-                    safeEl != null
-                      ? (() => {
-                          const tbl = pane?.querySelector('.sf-compDes__safeTable');
-                          const cs = window.getComputedStyle(safeEl);
-                          return {
-                            overflowY: cs.overflowY,
-                            scrollClientH: safeEl.clientHeight,
-                            scrollScrollH: safeEl.scrollHeight,
-                            tableOffsetH: tbl?.offsetHeight ?? null,
-                            collapsedSuspect: safeEl.clientHeight > 0 && tbl && tbl.offsetHeight > safeEl.clientHeight + 8,
-                          };
-                        })()
-                      : null,
-                  safeCardDims: safeCard
-                    ? { offsetH: safeCard.offsetHeight, clientH: safeCard.clientHeight, scrollH: safeCard.scrollHeight }
-                    : null,
-                  emptyPaneClientH: ep?.clientHeight ?? null,
-                  viewportInnerH: window.innerHeight,
-                  shellFitsViewportGuess:
-                    shell != null ? shell.offsetHeight <= window.innerHeight - 96 : null,
-                  bottomRowAlignPx:
-                    safeCard && demandCard && lightestCard
-                      ? {
-                          safeBottom: Math.round(safeCard.getBoundingClientRect().bottom),
-                          demandBottom: Math.round(demandCard.getBoundingClientRect().bottom),
-                          lightestBottom: Math.round(lightestCard.getBoundingClientRect().bottom),
-                          deltaSafeDemand:
-                            Math.round(
-                              safeCard.getBoundingClientRect().bottom -
-                                demandCard.getBoundingClientRect().bottom,
-                            ),
-                        }
-                      : null,
-                  grayShellBodyFitH_FIT:
-                    shellBody != null
-                      ? {
-                          clientW: shellBody.clientWidth,
-                          scrollW: shellBody.scrollWidth,
-                          horizontalOverflow: shellBody.scrollWidth > shellBody.clientWidth + 2,
-                        }
-                      : null,
-                  demandParamsGapH_GAP:
-                    paramsAside && demandCard
-                      ? {
-                          px: Math.round(
-                            demandCard.getBoundingClientRect().top -
-                              paramsAside.getBoundingClientRect().bottom,
-                          ),
-                        }
-                      : null,
-                  slenderTitleClipH_CLIP:
-                    (() => {
-                      const titleEl = pane?.querySelector('.sf-compDes__slenderTitle');
-                      const panelEl = document.getElementById('dynamicPanel');
-                      if (!titleEl || !panelEl) return null;
-                      const tr = titleEl.getBoundingClientRect();
-                      const pr = panelEl.getBoundingClientRect();
-                      return {
-                        titleTop: Math.round(tr.top),
-                        panelTop: Math.round(pr.top),
-                        clippedTop: tr.top < pr.top - 0.5,
-                      };
-                    })(),
-                  /* H_SAFE_CLIP: SAFE straddle tab clipped when midCard--safe had overflow-x:auto */
-                  safeTitleClipH_CLIP:
-                    (() => {
-                      const titleEl = pane?.querySelector('.sf-compDes__safeTitle');
-                      const safeCard = pane?.querySelector('.sf-compDes__midCard--safe');
-                      const panelEl = document.getElementById('dynamicPanel');
-                      if (!titleEl || !safeCard || !panelEl) return null;
-                      const tr = titleEl.getBoundingClientRect();
-                      const sr = safeCard.getBoundingClientRect();
-                      const pr = panelEl.getBoundingClientRect();
-                      const cs = window.getComputedStyle(safeCard);
-                      return {
-                        titleTop: Math.round(tr.top),
-                        safeCardTop: Math.round(sr.top),
-                        panelTop: Math.round(pr.top),
-                        clippedVsPanel: tr.top < pr.top - 0.5,
-                        safeCardOverflow: cs.overflow,
-                      };
-                    })(),
-                  /* H_DESIGN_REF: unified white straddle pills — demand vs slender bg should match */
-                  pillDesignVerify_H_REF:
-                    (() => {
-                      const d = pane?.querySelector('.sf-compDes__demandTitle');
-                      const sl = pane?.querySelector('.sf-compDes__slenderTitle');
-                      const g = (el) => (el ? getComputedStyle(el) : null);
-                      const cd = d ? g(d) : null;
-                      const csl = sl ? g(sl) : null;
-                      return {
-                        demandBg: cd?.backgroundColor ?? null,
-                        demandBorder: cd?.borderTopColor ?? null,
-                        slenderBg: csl?.backgroundColor ?? null,
-                        slenderBorder: csl?.borderTopColor ?? null,
-                      };
-                    })(),
-                  panelOverflowClip_H_CLIP:
-                    (() => {
-                      const p = document.getElementById('dynamicPanel');
-                      if (!p) return null;
-                      const o = getComputedStyle(p).overflow;
-                      return {
-                        overflow: o,
-                        compDesignActiveClass: p.classList.contains('comp-design-active'),
-                        clipsLikely: o === 'hidden' || o === 'clip',
-                      };
-                    })(),
-                  /* H_GOV_CASCADE: governing pills must not inherit generic .pillInput cream bg — verify rgb steel vs neutral */
-                  govBlockVerify_H_REF:
-                    (() => {
-                      const blue = pane?.querySelector('#sfCompDesGovKLx');
-                      const yel = pane?.querySelector('#sfCompDesGovKLyAsm');
-                      const lab = pane?.querySelector('.sf-compDes__govLab');
-                      if (!blue || !yel) return null;
-                      const cb = window.getComputedStyle(blue);
-                      const cy = window.getComputedStyle(yel);
-                      const cl = lab ? window.getComputedStyle(lab) : null;
-                      return {
-                        blueBg: cb.backgroundColor,
-                        blueColor: cb.color,
-                        yellowBg: cy.backgroundColor,
-                        yellowColor: cy.color,
-                        labelTextAlign: cl?.textAlign ?? null,
-                      };
-                    })(),
-                  /* H_FMT: ref layout — three columns should share same top edge (stacked cards, no auto-gap). */
-                  layoutRef_H_FMT:
-                    (() => {
-                      const lc = pane?.querySelector('.sf-compDes__card--params');
-                      const mc = pane?.querySelector('.sf-compDes__midCard--slender');
-                      const vc = pane?.querySelector('.sf-compDes__vizCol');
-                      if (!lc || !mc || !vc) return null;
-                      const tl = (el) => Math.round(el.getBoundingClientRect().top);
-                      const a = tl(lc);
-                      const b = tl(mc);
-                      const c = tl(vc);
-                      return {
-                        topLeftCol: a,
-                        topMidCol: b,
-                        topVizCol: c,
-                        maxDeltaPx: Math.max(Math.abs(b - a), Math.abs(c - a), Math.abs(c - b)),
-                      };
-                    })(),
-                  /* H_REF: LIGHTEST split card — cream label col + white value col */
-                  lightestSplitLayout_H_REF:
-                    (() => {
-                      const card = pane?.querySelector('.sf-compDes__lightestCard');
-                      const lab = pane?.querySelector('.sf-compDes__lightestLabelCol');
-                      const val = pane?.querySelector('.sf-compDes__lightestValueCol');
-                      const viz = pane?.querySelector('.sf-compDes__vizCol');
-                      const safeCard = pane?.querySelector('.sf-compDes__midCard--safe');
-                      const railViz = pane?.querySelector('.sf-compDes__slenderRail--vizCol');
-                      if (!card || !lab || !val) return null;
-                      const cs = getComputedStyle(card);
-                      const vr = viz?.getBoundingClientRect();
-                      const cr = card.getBoundingClientRect();
-                      const rr = railViz?.getBoundingClientRect();
-                      return {
-                        flexDirection: cs.flexDirection,
-                        labelColW: Math.round(lab.getBoundingClientRect().width),
-                        valueColW: Math.round(val.getBoundingClientRect().width),
-                        lineCount: lab.querySelectorAll('.sf-compDes__lightestLine').length,
-                        underMidCol: false,
-                        underVizCol: !!(viz && viz.contains(card)),
-                        marginTopComputed: cs.marginTop,
-                        vizColHpx: vr ? Math.round(vr.height) : null,
-                        railToLightestGapPx:
-                          rr != null ? Math.round(cr.top - rr.bottom) : null,
-                        lightestPinDeltaPx:
-                          vr != null ? Math.round(vr.bottom - cr.bottom) : null,
-                        gapBelowSafePx:
-                          safeCard && card
-                            ? Math.round(card.getBoundingClientRect().top - safeCard.getBoundingClientRect().bottom)
-                            : null,
-                      };
-                    })(),
-                },
-                timestamp: Date.now(),
-              }),
-            }).catch(() => {});
-          });
-        }
-      });
-      // #endregion
     };
 
     nav.addEventListener('click', (e) => {
@@ -1537,6 +1270,17 @@
     // default to analysis (as requested)
     setMode('analysis');
   }
+
+  /** After SPA navigation: switch analysis/design tab when hash uses `#page/design`. */
+  window.SteelForge.activateModuleMode = (panelRoot, mode) => {
+    const want = mode === 'design' ? 'design' : 'analysis';
+    const comp = panelRoot?.querySelector?.('.sf-comp');
+    if (!comp) return;
+    const nav = comp.querySelector('.sf-comp__modeNav');
+    if (!nav) return;
+    const btn = nav.querySelector(`button.sf-comp__modeBtn[data-comp-mode="${want}"]`);
+    if (btn && !btn.classList.contains('active')) btn.click();
+  };
 
   window.SteelForge = window.SteelForge || {};
   window.SteelForge.initCompression = (panelRoot) => {
@@ -1732,8 +1476,12 @@
       const lamEl = input('sfShearAnaLambda');
       if (hEl) hEl.readOnly = !isManual;
       if (awEl) awEl.readOnly = !isManual;
-      // λ is always derived from geometry for strict consistency with CSV-derived h/tw.
-      if (lamEl) lamEl.readOnly = true;
+      if (lamEl) {
+        lamEl.readOnly = !isManual;
+        lamEl.title = isManual
+          ? 'Web slenderness λ_w = h/t_w — enter directly, or leave blank when h, d, and A_w match rolled-shape conventions'
+          : 'Web slenderness h/t_w from steel catalog';
+      }
     };
 
     const applySteelGradeProps = () => {
@@ -1806,11 +1554,13 @@
       const lamEl = input('sfShearAnaLambda');
       const lamFEl = input('sfShearAnaLambdaF');
       const awEl = input('sfShearAnaAw');
+      const dEl = input('sfShearAnaD');
       const lamFVal = shapeLambdaF(s);
       if (hEl) hEl.value = fmtGeom(s.h, 4);
       if (lamEl && lamVal != null) lamEl.value = fmtGeom(lamVal, 3);
       if (lamFEl) lamFEl.value = lamFVal != null ? fmtGeom(lamFVal, 3) : '';
       if (awEl && awVal != null) awEl.value = fmtGeom(awVal, 4);
+      if (dEl) dEl.value = Number.isFinite(s.d) ? fmtGeom(s.d, 4) : '';
       setManualGeometryMode(false);
       applyCatalogDefaults();
       syncWebSpacingAndKv();
@@ -1828,8 +1578,10 @@
 
     const applyDefaultShapeOnLoad = () => {
       if (!shapeSel || !shapes.length) return;
-      // Match workbook-style deterministic defaults used across modules.
-      const pref = shapes.find((s) => String(s.name || '').trim().toUpperCase() === 'W44X335');
+      // Prefer workbook shear reference section when present (see reference CSV W12×40).
+      const pref =
+        shapes.find((s) => String(s.name || '').trim().toUpperCase() === 'W12X40') ??
+        shapes.find((s) => String(s.name || '').trim().toUpperCase() === 'W44X335');
       const fallback = shapeNamesSorted[0] ?? null;
       const chosen = pref ?? fallback;
       if (!chosen) return;
@@ -1853,6 +1605,7 @@
       const hGeom = num('sfShearAnaH');
       const lamEl = input('sfShearAnaLambda');
       const typedLambda = parseNum(lamEl?.value);
+      const dGeom = num('sfShearAnaD');
       let lambdaWeb = null;
       if (Number.isFinite(typedLambda) && typedLambda > 0) {
         lambdaWeb = typedLambda;
@@ -1860,10 +1613,13 @@
         Number.isFinite(hGeom) &&
         hGeom > 0 &&
         Number.isFinite(aw) &&
-        aw > 0
+        aw > 0 &&
+        Number.isFinite(dGeom) &&
+        dGeom > 0
       ) {
-        lambdaWeb = (hGeom * hGeom) / aw;
-        if (lamEl) lamEl.value = fmtGeom(lambdaWeb, 6);
+        // Rolled W-shape convention in catalog: A_w ≈ d·t_w and λ_w = h/t_w ⇒ λ_w = h·d/A_w.
+        lambdaWeb = (hGeom * dGeom) / aw;
+        if (lamEl && lamEl.readOnly) lamEl.value = fmtGeom(lambdaWeb, 6);
       }
       const kv = num('sfShearAnaKv');
       const E = num('sfShearAnaE');
@@ -1989,6 +1745,7 @@
     const demandField = input('sfShearAnaVu');
 
     pane.querySelectorAll('input, select').forEach((el) => {
+      if (el === steelEl) return;
       el.addEventListener('input', update);
       el.addEventListener('change', update);
     });
@@ -2003,7 +1760,10 @@
         if (shapeSel.value) applyShape(shapeSel.value);
         else {
           const lamFEl = input('sfShearAnaLambdaF');
+          const dEl = input('sfShearAnaD');
           if (lamFEl) lamFEl.value = '';
+          if (dEl) dEl.value = '';
+          setManualGeometryMode(true);
           syncWebSpacingAndKv();
         }
         update();
@@ -2089,8 +1849,9 @@
 
     const phiB = 0.9;
     const omegaB = 1.67;
-    const phiV = 1;
-    const omegaV = 1.5;
+    /** Workbook shear *design* pane uses φv = 0.9 and Ωv = 1.67 (CSV cols ~33–36); analysis pane stays φ = 1, Ω = 1.5. */
+    const phiV = 0.9;
+    const omegaV = 1.67;
     const kv = 5;
     const E = 29000;
 
@@ -2150,6 +1911,13 @@
         designShapeImgs[1].style.opacity = isLRFD ? '0.35' : '1';
       }
 
+      const beamKind = String(input('sfShearDesBeamType')?.value || 'cantilever').toLowerCase();
+      const isCantilever = beamKind === 'cantilever';
+      const momentFac = isCantilever ? 1 / 3 : 1 / 8;
+      const shearFac = isCantilever ? 1 : 0.5;
+      const beamMomentFormulaHtml = isCantilever ? 'WL²/3' : 'WL²/8';
+      const beamDeflFormulaHtml = isCantilever ? 'WL³/5EI' : '5WL<sup>4</sup>/384EI';
+
       const setText = (id, value) => {
         const el = out(id);
         if (el) el.textContent = value;
@@ -2183,8 +1951,8 @@
       const beamDeflFormula = pane.querySelector('#sfShearDesBeamDeflFormula');
       if (beamMomentLbl) beamMomentLbl.innerHTML = layout.beamMomentRow;
       if (beamDeflLbl) beamDeflLbl.innerHTML = layout.beamDeflRow;
-      if (beamMomentFormula) beamMomentFormula.innerHTML = layout.beamMomentFormula;
-      if (beamDeflFormula) beamDeflFormula.innerHTML = layout.beamDeflFormula;
+      if (beamMomentFormula) beamMomentFormula.innerHTML = beamMomentFormulaHtml;
+      if (beamDeflFormula) beamDeflFormula.innerHTML = beamDeflFormulaHtml;
 
       const bottomRow = out('sfShearDesLoadBottomRow');
       if (bottomRow) bottomRow.style.display = layout.showBottomRow ? '' : 'none';
@@ -2232,14 +2000,14 @@
         wTop = 1.2 * dl + 1.6 * ll;
         w14 = 1.4 * dl;
         wComb = Math.max(wTop, w14);
-        M = (wComb * L ** 2) / 8;
-        V = (wComb * L) / 2;
+        M = wComb * L ** 2 * momentFac;
+        V = wComb * L * shearFac;
       } else {
         wTop = dl + ll;
         w14 = null;
         wComb = dl + ll;
-        M = (wComb * L ** 2) / 8;
-        V = (wComb * L) / 2;
+        M = wComb * L ** 2 * momentFac;
+        V = wComb * L * shearFac;
       }
 
       const zxReq =
@@ -2322,7 +2090,7 @@
       if (isSafe == null) {
         setText('sfShearDesRemarks', '—');
       } else {
-        setText('sfShearDesRemarks', isSafe ? 'SAFE' : 'UNSAFE');
+        setText('sfShearDesRemarks', isSafe ? 'SAFE' : 'NOT SAFE');
       }
 
       if (shearDebugEnabled()) {
@@ -2399,22 +2167,22 @@
     };
 
     pane.querySelectorAll('input, select').forEach((el) => {
+      if (el === steelTypeEl) return;
       el.addEventListener('input', update);
       el.addEventListener('change', update);
     });
-    if (steelTypeEl) steelTypeEl.addEventListener('change', () => {
-      syncSteelPropsFromGrade();
-      update();
-    });
+    if (steelTypeEl) {
+      steelTypeEl.addEventListener('change', () => {
+        syncSteelPropsFromGrade();
+        update();
+      });
+    }
 
     syncSteelPropsFromGrade();
     update();
   }
 
   window.SteelForge.initTensionRod = (panelRoot) => {
-    if (window.SteelForge?.initTensionRodModern?.(panelRoot ?? document)) {
-      return;
-    }
     const compRoot =
       panelRoot?.querySelector?.('.sf-comp.sf-comp--tensionRod') ??
       panelRoot?.querySelector?.('.sf-comp') ??
@@ -2426,9 +2194,6 @@
     }
     if (window.SteelForge?.initTensionRodDesign) {
       window.SteelForge.initTensionRodDesign(panelRoot ?? document);
-    }
-    if (window.SteelForge?.initTensionRodDesignUi) {
-      window.SteelForge.initTensionRodDesignUi(panelRoot ?? document);
     }
     const tr =
       compRoot?.classList?.contains?.('sf-comp--tensionRod') ? compRoot : compRoot?.querySelector?.('.sf-comp--tensionRod');
@@ -2446,13 +2211,17 @@
     }
   };
 
-  window.SteelForge.initShear = (panelRoot) => {
+  window.SteelForge.initShear = (panelRoot, opts = {}) => {
     const root = panelRoot.querySelector('.sf-comp') ? panelRoot : document;
     attachModeToggle(root, { topic: 'SHEAR' });
     attachShearThumbs(root);
+    const initialMode = opts.initialMode === 'design' ? 'design' : 'analysis';
     const runAttach = () => {
       attachShearAnalysis(root);
       attachShearDesign(root);
+      if (initialMode === 'design') {
+        window.SteelForge.activateModuleMode(panelRoot, 'design');
+      }
     };
     if (typeof window.SteelForge?.ensureShearShapesFromCsv === 'function') {
       window.SteelForge.ensureShearShapesFromCsv().finally(runAttach);
