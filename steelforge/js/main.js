@@ -13,30 +13,9 @@
       .filter(Boolean)
   );
 
-  /**
-   * URL path of the directory containing index.html, always "/" or "/project/…/" so assets work when deployed under a subpath.
-   */
-  function appDirectoryPrefix() {
-    const path = window.location.pathname || '/';
-    if (path === '/' || path === '') return '/';
-    if (path.endsWith('/')) return path;
-    const i = path.lastIndexOf('/');
-    const last = i >= 0 ? path.slice(i + 1) : '';
-    if (last.includes('.')) {
-      const d = path.slice(0, i + 1);
-      return d || '/';
-    }
-    return `${path}/`;
-  }
-
-  /**
-   * Fetched page fragments use ./assets/ or ../assets/; once injected into index.html, browsers resolve them against the wrong base on some hosts. Rewrite to absolute-from-root paths under the app folder.
-   */
-  function rewriteFragmentAssetUrls(html) {
-    const prefix = appDirectoryPrefix();
-    return html
-      .replace(/\.\/assets\//g, `${prefix}assets/`)
-      .replace(/\.\.\/assets\//g, `${prefix}assets/`);
+  /** @returns {Record<string, unknown>|undefined} */
+  function sfAssets() {
+    return window.SteelForge?.assets;
   }
 
   function setActiveButton(activeId) {
@@ -164,10 +143,13 @@
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`Failed to load ${url} (${res.status})`);
       let html = await res.text();
-      html = rewriteFragmentAssetUrls(html);
+      const assets = sfAssets();
+      if (assets?.rewriteFragmentHtml) html = assets.rewriteFragmentHtml(html);
 
       // Expect each page file to contain a fragment (no <html>/<head>/<body>).
       panel.innerHTML = html;
+      if (assets?.normalizeInjectedRoot) assets.normalizeInjectedRoot(panel);
+      if (assets?.attachImageFallbacks) assets.attachImageFallbacks(panel);
       panel.classList.remove('comp-design-active');
       const isDashboard = safeId === 'dashboard';
       panel.classList.toggle('dash-no-scroll', isDashboard);
