@@ -4,7 +4,8 @@
  */
 (() => {
   const CSV_NAME = 'exel program EWIWIWI(S(STEEL SELECTION)).csv';
-  const COL = { type: 0, label: 2, w: 4, d: 6, tw: 8, lamF: 23, lamW: 24, zx: 33 };
+  /** Column indices follow `exel program EWIWIWI(S(STEEL SELECTION)).csv` header row. */
+  const COL = { type: 0, label: 2, w: 4, ag: 5, d: 6, tw: 8, lamF: 23, lamW: 24, zx: 33 };
 
   function parseCsvLine(line) {
     const out = [];
@@ -75,6 +76,7 @@
           const tw = parseNumLike(row[COL.tw]);
           const lamW = parseNumLike(row[COL.lamW]);
           const lamF = parseNumLike(row[COL.lamF]);
+          const Ag = parseNumLike(row[COL.ag]);
           if (![d, tw, lamW].every((x) => Number.isFinite(x) && x > 0)) continue;
           const h = lamW * tw;
           const Aw = d * tw;
@@ -86,6 +88,7 @@
             tw,
             h,
             Aw,
+            Ag: Number.isFinite(Ag) && Ag > 0 ? Ag : null,
             lambdaW: lamW,
             lambdaF: lamF,
             lambda_w: lamW,

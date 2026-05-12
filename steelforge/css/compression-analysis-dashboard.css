@@ -1,0 +1,669 @@
+/* Analysis Compression dashboard — matches Tension analysis palette (see tension-analysis-layout.css) */
+.sf-compAnaDash,
+.sf-compAnaDash * {
+  box-sizing: border-box;
+}
+
+.sf-compAnaDash {
+  --cad-bg: #eef1f4;
+  --cad-card: rgba(255, 255, 255, 0.96);
+  --cad-border: rgba(148, 163, 184, 0.24);
+  --cad-ink: #0f172a;
+  --cad-muted: #475569;
+  --cad-accent: #134e8a;
+  --cad-section-title: #1a365d;
+  --cad-radius: 18px;
+  --cad-pill-warn: rgba(254, 243, 199, 0.95);
+  --cad-pill-warn-border: rgba(251, 191, 36, 0.35);
+  --cad-orange: #ea580c;
+  --cad-orange-soft: #fff7ed;
+
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--cad-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.sf-compAnaDash .cad-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: clamp(10px, 1.5vw, 18px);
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-content: start;
+}
+
+.sf-compAnaDash .cad-section {
+  background: var(--cad-card);
+  border: 1px solid var(--cad-border);
+  border-radius: var(--cad-radius);
+  padding: clamp(12px, 2vw, 18px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  min-width: 0;
+}
+
+.sf-compAnaDash .cad-sectionTitle {
+  display: block;
+  margin: 0 0 14px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, var(--cad-accent) 50%, #0f3d6e 100%);
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 10px rgba(19, 78, 138, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.sf-compAnaDash .cad-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.sf-compAnaDash .cad-fieldRow {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 38%) 1fr;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sf-compAnaDash .cad-fieldRow--wrap {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.sf-compAnaDash .cad-fieldRow--wrap .cad-fieldLab {
+  margin-bottom: 4px;
+}
+
+.sf-compAnaDash .cad-fieldLab {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--cad-muted);
+}
+
+.sf-compAnaDash .cad-select,
+.sf-compAnaDash .cad-input {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--cad-ink);
+  background: rgba(248, 250, 252, 0.95);
+}
+
+.sf-compAnaDash .cad-select:focus,
+.sf-compAnaDash .cad-input:focus {
+  outline: 2px solid rgba(19, 78, 138, 0.35);
+  outline-offset: 1px;
+}
+
+.sf-compAnaDash .cad-input:read-only {
+  background: rgba(241, 245, 249, 0.9);
+  color: var(--cad-muted);
+}
+
+.sf-compAnaDash .cad-input--sm {
+  padding: 6px 8px;
+  font-size: 0.78rem;
+}
+
+.sf-compAnaDash .cad-methodOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sf-compAnaDash .cad-methodOptions label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cad-muted);
+  cursor: pointer;
+}
+
+.sf-compAnaDash .cad-subsection {
+  background: rgba(248, 250, 252, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+}
+
+.sf-compAnaDash .cad-subsection h4 {
+  font-size: 11px;
+  font-weight: 800;
+  margin: 0 0 10px;
+  letter-spacing: 0.06em;
+  color: var(--cad-section-title);
+}
+
+.sf-compAnaDash .cad-dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.sf-compAnaDash .cad-dataTable--props td:first-child {
+  font-weight: 700;
+  color: var(--cad-muted);
+  width: 32%;
+  padding: 4px 8px 4px 0;
+}
+
+.sf-compAnaDash .cad-dataTable--props td.cad-unit {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cad-muted);
+  padding-left: 6px;
+  white-space: nowrap;
+}
+
+.sf-compAnaDash .cad-lengthGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+}
+
+.sf-compAnaDash .cad-lenRow {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sf-compAnaDash .cad-lenLab {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cad-muted);
+}
+
+.sf-compAnaDash .cad-unit {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--cad-muted);
+}
+
+.sf-compAnaDash .cad-compactWrap {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.sf-compAnaDash .cad-compactBox {
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  padding: 12px;
+  border-radius: 12px;
+  flex: 0 0 auto;
+  min-width: min(220px, 100%);
+}
+
+.sf-compAnaDash .cad-stressDiagrams {
+  display: flex;
+  gap: 10px;
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.sf-compAnaDash .cad-diagramPh {
+  flex: 1 1 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--cad-border);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+  min-width: 0;
+}
+
+.sf-compAnaDash .cad-diagramPh img {
+  max-width: 100%;
+  max-height: 130px;
+  object-fit: contain;
+}
+
+.sf-compAnaDash .cad-compactHeader {
+  text-align: center;
+  font-weight: 800;
+  color: var(--cad-accent);
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.sf-compAnaDash .cad-compactRows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sf-compAnaDash .cad-compactRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+
+.sf-compAnaDash .cad-compactRow .cad-label {
+  font-weight: 700;
+  color: var(--cad-muted);
+  flex: 0 0 auto;
+}
+
+.sf-compAnaDash .cad-compactRow .cad-num {
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.sf-compAnaDash .cad-compactRow .cad-pill {
+  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.sf-compAnaDash .cad-compactRow .cad-pill.cad-pill--warn {
+  background: var(--cad-pill-warn);
+  color: #92400e;
+  border: 1px solid var(--cad-pill-warn-border);
+}
+
+.sf-compAnaDash .cad-compactRow .cad-pill.cad-pill--gov {
+  background: rgba(19, 78, 138, 0.12);
+  color: var(--cad-accent);
+  border: 1px solid rgba(19, 78, 138, 0.22);
+}
+
+.sf-compAnaDash .cad-middleCol {
+  margin-top: 10px;
+  min-width: 0;
+}
+
+.sf-compAnaDash .cad-middleCol h4 {
+  font-size: 12px;
+  font-weight: 800;
+  margin: 0 0 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cad-section-title);
+}
+
+.sf-compAnaDash .cad-tableScroll {
+  overflow-x: auto;
+  min-width: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+/*
+  Critical slenderness table — classic grid (reference layout):
+  tan rows, horizontal rules, first column left / others centered — not full “pill” cells.
+*/
+.sf-compAnaDash .cad-stiffTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-bottom: 10px;
+  background: #d4c7bc;
+  table-layout: fixed;
+}
+
+.sf-compAnaDash .cad-stiffTable thead {
+  background: #6b7280;
+  color: #fff;
+}
+
+.sf-compAnaDash .cad-stiffTable th {
+  padding: 10px 8px;
+  text-align: center;
+  font-weight: 800;
+  border: none;
+  border-bottom: 2px solid #5a6370;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+
+.sf-compAnaDash .cad-stiffTable th:nth-child(1),
+.sf-compAnaDash .cad-stiffTable td:nth-child(1) {
+  width: 9%;
+}
+
+.sf-compAnaDash .cad-stiffTable th:nth-child(2),
+.sf-compAnaDash .cad-stiffTable td:nth-child(2) {
+  width: 22%;
+}
+
+.sf-compAnaDash .cad-stiffTable th:nth-child(3),
+.sf-compAnaDash .cad-stiffTable td:nth-child(3) {
+  width: 11%;
+}
+
+.sf-compAnaDash .cad-stiffTable th:nth-child(4),
+.sf-compAnaDash .cad-stiffTable td:nth-child(4) {
+  width: 14%;
+}
+
+.sf-compAnaDash .cad-stiffTable th:nth-child(5),
+.sf-compAnaDash .cad-stiffTable td:nth-child(5) {
+  width: 11%;
+}
+
+.sf-compAnaDash .cad-stiffTable th:nth-child(6),
+.sf-compAnaDash .cad-stiffTable td:nth-child(6) {
+  width: 33%;
+}
+
+.sf-compAnaDash .cad-stiffTable tbody td {
+  display: table-cell;
+  padding: 8px 8px;
+  vertical-align: middle;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  background: #d4c7bc;
+  color: #4b5563;
+  word-break: break-word;
+}
+
+.sf-compAnaDash .cad-stiffTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sf-compAnaDash .cad-stiffTable tbody td.cad-stiffEl {
+  text-align: left;
+  padding-left: 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.sf-compAnaDash .cad-stiffTable tbody td:not(.cad-stiffEl) {
+  text-align: center;
+}
+
+.sf-compAnaDash .cad-stiffTable .cad-select {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 5px 8px;
+  min-height: 0;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.3;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--cad-ink);
+}
+
+/* Plain numeric cells (no pill chrome) */
+.sf-compAnaDash .cad-stiffTable .sf-compAnaCritical__input {
+  display: inline;
+  font-weight: 700;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: #4b5563;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+.sf-compAnaDash .cad-krCell {
+  padding: 8px;
+}
+
+.sf-compAnaDash .cad-krOut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.sf-compAnaDash .cad-krOut .sf-compAnaCritical__output {
+  display: block;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: #4b5563;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-height: 0;
+}
+
+.sf-compAnaDash .cad-barTrack {
+  width: 100%;
+  max-width: 120px;
+  height: 6px;
+  margin: 0 auto;
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sf-compAnaDash .cad-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
+  border-radius: 4px;
+  transition: width 0.2s ease;
+}
+
+/*
+  Beat global Analysis Compression rules (style.css) that turn slenderness rows into flex grids
+  and pill-wrap every .sf-compAnaCritical__input — the dashboard uses a real <table>.
+*/
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaDash .cad-stiffTable tbody tr.sf-compAnaCritical__row {
+  display: table-row;
+  grid-template-columns: none;
+  column-gap: normal;
+  min-height: 0;
+  align-items: unset;
+  font-size: inherit;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaDash .cad-stiffTable tbody tr.sf-compAnaCritical__row > td {
+  display: table-cell;
+  align-items: unset;
+  justify-content: unset;
+  align-self: unset;
+  min-height: 0;
+  height: auto;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaDash .cad-stiffTable .sf-compAnaCritical__select.cad-select {
+  align-self: center;
+  min-height: 0;
+  height: auto;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  padding: 5px 8px;
+  text-align: left;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaDash .cad-stiffTable .sf-compAnaCritical__input,
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaDash .cad-stiffTable .sf-compAnaCritical__output {
+  display: inline;
+  align-self: unset;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: #4b5563;
+  font-weight: 700;
+  justify-content: unset;
+  align-items: unset;
+  line-height: inherit;
+  box-sizing: border-box;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaDash .cad-stiffTable .cad-krOut .sf-compAnaCritical__output {
+  display: block;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaDash .cad-stiffTable .sf-compAnaCritical__output--empty {
+  background: transparent;
+  color: rgba(107, 114, 128, 0.55);
+}
+
+.sf-compAnaDash .cad-calcNote {
+  background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
+  color: #78350f;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+}
+
+.sf-compAnaDash .cad-capacityBox {
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.sf-compAnaDash .cad-capacityItem {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 10px;
+}
+
+.sf-compAnaDash .cad-capacityItem:last-child {
+  margin-bottom: 0;
+}
+
+.sf-compAnaDash .cad-capacityItem .cad-capLab {
+  font-size: 10px;
+  color: var(--cad-muted);
+  font-weight: 800;
+  margin: 0 0 6px;
+  letter-spacing: 0.03em;
+}
+
+.sf-compAnaDash .cad-capacityItem .cad-capVal {
+  font-size: 13px;
+  margin: 0;
+  font-weight: 600;
+  color: var(--cad-ink);
+}
+
+.sf-compAnaDash .cad-hlOrange {
+  display: inline-block;
+  background: linear-gradient(180deg, #fb923c 0%, var(--cad-orange) 100%);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.sf-compAnaDash .cad-governingBox {
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  padding: 14px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.sf-compAnaDash .cad-governingBox h4 {
+  font-size: 10px;
+  font-weight: 800;
+  margin: 0 0 12px;
+  letter-spacing: 0.05em;
+  color: var(--cad-muted);
+}
+
+.sf-compAnaDash .cad-govVal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  background: var(--cad-orange-soft);
+  border: 1px solid rgba(234, 88, 12, 0.2);
+  border-radius: 12px;
+}
+
+.sf-compAnaDash .cad-govVal .cad-govLab {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--cad-ink);
+}
+
+.sf-compAnaDash .cad-govVal .cad-govNum {
+  background: linear-gradient(180deg, #fb923c 0%, var(--cad-orange) 100%);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sf-compAnaDash .cad-govVal .cad-govUnit {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--cad-muted);
+}
+
+@media (max-width: 1100px) {
+  .sf-compAnaDash .cad-main {
+    grid-template-columns: 1fr;
+  }
+}

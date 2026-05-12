@@ -1,7 +1,7 @@
 (() => {
   const CSV_NAME = 'exel program EWIWIWI(S(STEEL SELECTION)).csv';
   /** Column indices from steel selection workbook (0-based). */
-  const COL = { type: 0, label: 2, lamF: 23, lamW: 24, Sx: 30, Zx: 33 };
+  const COL = { type: 0, label: 2, lamF: 23, lamW: 24, Ix: 29, Sx: 30, Zx: 33 };
   const PHI_B = 0.9;
   const OMEGA_B = 1.67;
   const E_DEFAULT = 29000;
@@ -50,6 +50,62 @@
   function fmt(v, d = 3) {
     if (!Number.isFinite(v)) return '—';
     return v.toFixed(d).replace(/\.?0+$/, '');
+  }
+
+  /** Δ_allow (in) from span L (ft) and workbook denominator n (Δ = L/n). */
+  function allowableDeflectionInches(L_ft, denomRaw) {
+    const n = parseNumLike(denomRaw);
+    if (!Number.isFinite(L_ft) || L_ft <= 0 || !Number.isFinite(n) || n <= 0) return null;
+    return (L_ft * 12) / n;
+  }
+
+  function deltaInches(W_klf, L_ft, E_ksi, I_in4, deflectionK) {
+    if (![W_klf, L_ft, E_ksi, I_in4].every((x) => Number.isFinite(x) && x > 0)) return null;
+    const k = deflectionK;
+    if (!Number.isFinite(k) || k <= 0) return null;
+    return (k * W_klf * Math.pow(12, 3) * Math.pow(L_ft, 4)) / (E_ksi * I_in4);
+  }
+
+  function workbookBeamCaseAna(rawId) {
+    return window.SteelForgeWorkbookBeamCaseById
+      ? window.SteelForgeWorkbookBeamCaseById(rawId)
+      : {
+          id: 'simple-u',
+          deflectionK: 5 / 384,
+        };
+  }
+
+  function populateAnalysisDeflectionSelect(selectEl, preferredDenom) {
+    if (!selectEl) return;
+    const presets = window.SteelForgeWorkbookDeflectionLimitPresets;
+    if (!presets || presets.length === 0) return;
+    const prior = String(selectEl.value || '').trim();
+    selectEl.innerHTML = '';
+    for (const p of presets) {
+      const opt = document.createElement('option');
+      opt.value = String(p.denom);
+      opt.textContent = p.label;
+      selectEl.appendChild(opt);
+    }
+    const pref = String(preferredDenom ?? '').trim();
+    const pick =
+      presets.some((p) => String(p.denom) === prior)
+        ? prior
+        : presets.some((p) => String(p.denom) === pref)
+          ? pref
+          : String(presets.find((x) => x.denom === 360)?.denom ?? presets[0].denom);
+    selectEl.value = pick;
+  }
+
+  function preferredAnaDeflDenom() {
+    const g = window.SteelForge?.activeStructuralSteelGrade;
+    const d = g?.workbookDeflectionDenom;
+    return Number.isFinite(d) && d > 0 ? d : 360;
+  }
+
+  function formatDeflectionDual(deltaIn) {
+    if (!Number.isFinite(deltaIn)) return '—';
+    return `${fmt(deltaIn / 12, 9)} ft (${fmt(deltaIn, 4)} in)`;
   }
 
   function steelPropsFromGradeSelect(selectValue) {
@@ -130,48 +186,92 @@
     if (picked && !String(el.value || '').trim()) el.value = gradeLabel(picked);
   }
 
+  function normalizeGradeLoose(s) {
+    return String(s || '')
+      .toLowerCase()
+      .replace(/\./g, '')
+      .replace(/[=,_]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   function steelPropsFromControlValue(v) {
     const t = String(v || '').trim();
     if (!t) return null;
     const grades = window.SteelForgeStructuralSteelGrades ?? [];
+    const byId = grades.find((g) => g.id === t);
+    if (byId) return byId;
+    const tl = t.toLowerCase();
+    const byLabel = grades.find((g) => String(g.label || '').toLowerCase() === tl);
+    if (byLabel) return byLabel;
+    const byFull = grades.find((g) => gradeLabel(g).toLowerCase() === tl);
+    if (byFull) return byFull;
+    const nk = normalizeGradeLoose(t);
     return (
-      grades.find((g) => g.id === t) ||
-      grades.find((g) => String(g.label || '').toLowerCase() === t.toLowerCase()) ||
-      grades.find((g) => gradeLabel(g).toLowerCase() === t.toLowerCase()) ||
+      grades.find((g) => normalizeGradeLoose(g.label) === nk) ||
+      grades.find((g) => nk.length >= 4 && normalizeGradeLoose(g.label).includes(nk)) ||
+      grades.find((g) => nk.length >= 4 && nk.includes(normalizeGradeLoose(g.label))) ||
       null
     );
   }
 
   /**
-   * Nominal flexural strength (kip·ft) — matches workbook stepping: Mp when λ ≤ λr;
-   * slender flange/web uses 0.7My (no λp–λr linear interpolation).
+   * Flange local buckling (AISC-style limits used with student workbook):
+   * λ_pf = 0.38√(E/Fy), λ_rf = 1.0√(E/Fy).
+   * Compact: M_n = M_p = F_y Z_x / 12.
+   * Non-compact: M_n = M_p − (M_p − 0.7 F_y S_x / 12)((λ_f − λ_pf)/(λ_rf − λ_pf)).
+   * Slender flange (simplified): M_n = 0.7 F_y S_x / 12.
    */
-  function nominalMomentKipFt(Fy, E, Zx, Sx, lamF, lamW) {
-    if (![Fy, E, Zx, Sx, lamF, lamW].every((x) => Number.isFinite(x) && x > 0)) return null;
-
-    const My = (Fy * Sx) / 12;
+  function nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF) {
+    if (![Fy, E, Zx, Sx, lamF].every((x) => Number.isFinite(x) && x > 0)) return null;
     const Mp = (Fy * Zx) / 12;
-
+    const My = (Fy * Sx) / 12;
+    const lpF = 0.38 * Math.sqrt(E / Fy);
     const lrF = 1.0 * Math.sqrt(E / Fy);
-    const lrW = 5.7 * Math.sqrt(E / Fy);
-
-    /** Workbook stepping: full Mp when λ ≤ λr (no λp–λr interpolation); slender uses 0.7My. */
-    const branch = (lam, lr) => {
-      if (lam <= lr) return Mp;
-      return 0.7 * My;
-    };
-
-    const MnF = branch(lamF, lrF);
-    const MnW = branch(lamW, lrW);
-    return Math.min(MnF, MnW);
+    if (lamF <= lpF) return Mp;
+    if (lamF <= lrF) {
+      const den = lrF - lpF;
+      if (!(den > 0)) return Mp;
+      return Mp - (Mp - 0.7 * My) * ((lamF - lpF) / den);
+    }
+    return 0.7 * My;
   }
 
-  function compactnessVerdict(lamF, lamW, Fy, E) {
-    if (![lamF, lamW, Fy, E].every((x) => Number.isFinite(x) && x > 0)) return '—';
-    const lrF = 1.0 * Math.sqrt(E / Fy);
+  /**
+   * Web flexural limits (AISC Table B4.1b — rolled I-shape web): λ_pw = 3.76√(E/Fy), λ_rw = 5.70√(E/Fy).
+   * Same interpolation form between M_p and 0.7 M_y as flange; governing strength is min(flange, web).
+   */
+  function nominalMomentWebKipFt(Fy, E, Zx, Sx, lamW) {
+    if (![Fy, E, Zx, Sx, lamW].every((x) => Number.isFinite(x) && x > 0)) return null;
+    const Mp = (Fy * Zx) / 12;
+    const My = (Fy * Sx) / 12;
+    const lpW = 3.76 * Math.sqrt(E / Fy);
     const lrW = 5.7 * Math.sqrt(E / Fy);
-    if (lamF <= lrF && lamW <= lrW) return 'COMPACT FLANGE';
-    return 'SLENDER SECTION';
+    if (lamW <= lpW) return Mp;
+    if (lamW <= lrW) {
+      const den = lrW - lpW;
+      if (!(den > 0)) return Mp;
+      return Mp - (Mp - 0.7 * My) * ((lamW - lpW) / den);
+    }
+    return 0.7 * My;
+  }
+
+  /** Governing nominal flexural strength M_n = min(M_n,flange, M_n,web) in kip·ft. */
+  function nominalMomentKipFt(Fy, E, Zx, Sx, lamF, lamW) {
+    const mnF = nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF);
+    const mnW = nominalMomentWebKipFt(Fy, E, Zx, Sx, lamW);
+    if (mnF == null || mnW == null) return null;
+    return Math.min(mnF, mnW);
+  }
+
+  /** UI verdict for CHECK COMPACTNESS card — flange slenderness only (matches λ_pf / λ_rf labels). */
+  function flangeCompactnessVerdict(lamF, Fy, E) {
+    if (![lamF, Fy, E].every((x) => Number.isFinite(x) && x > 0)) return '—';
+    const lpF = 0.38 * Math.sqrt(E / Fy);
+    const lrF = 1.0 * Math.sqrt(E / Fy);
+    if (lamF <= lpF) return 'COMPACT FLANGE';
+    if (lamF <= lrF) return 'NON-COMPACT FLANGE';
+    return 'SLENDER FLANGE';
   }
 
   window.SteelForge = window.SteelForge || {};
@@ -204,10 +304,25 @@
     const outPhiMn = $('sfBendAnaMu');
     const capLrfdLbl = $('sfBendAnaCapLrfdLbl');
     const solveBtn = $('sfBendAnaSolve');
+    const anaDefNo = $('sfBendAnaDefNo');
+    const anaDefYes = $('sfBendAnaDefYes');
+    const spanFt = $('sfBendAnaSpanFt');
+    const wsvc = $('sfBendAnaWsvc');
+    const deflLimSel = $('sfBendAnaDeflLim');
+    const ixDisp = $('sfBendAnaIxDisp');
+    const deltaAllow = $('sfBendAnaDeltaAllow');
+    const deltaMax = $('sfBendAnaDeltaMax');
+    const deflRm = $('sfBendAnaDeflRm');
 
     if (!methodEl || !shapeEl || !steelEl || !fyEl || !eEl || !mpEl) return;
 
     let wRows = [];
+    let curIx = null;
+
+    function syncAnaDeflDataset() {
+      if (!root || !anaDefYes || !anaDefNo) return;
+      root.dataset.sfBendAnaDefl = anaDefYes.checked ? 'with' : 'without';
+    }
 
     const isManual = () => String(shapeEl.value || '') === 'manual';
 
@@ -226,6 +341,9 @@
       if (lwEl) lwEl.value = fmt(parseNumLike(hit[COL.lamW]), 6);
       if (zxEl) zxEl.value = fmt(parseNumLike(hit[COL.Zx]), 3);
       if (sxEl) sxEl.value = fmt(parseNumLike(hit[COL.Sx]), 3);
+      const ix = parseNumLike(hit[COL.Ix]);
+      curIx = Number.isFinite(ix) && ix > 0 ? ix : null;
+      if (ixDisp) ixDisp.textContent = Number.isFinite(ix) ? fmt(ix, 1) : '—';
       return true;
     }
 
@@ -240,7 +358,8 @@
         return;
       }
       if (g && fyEl) {
-        steelEl.value = gradeLabel(g);
+        if (steelEl.tagName === 'SELECT') steelEl.value = g.id;
+        else steelEl.value = gradeLabel(g);
         fyEl.value = String(g.fy);
         fyEl.readOnly = true;
         fyEl.classList.add('sf-bend__readonly');
@@ -258,10 +377,62 @@
       num(lwEl, 6, 0);
       num(zxEl, 3, 0);
       num(sxEl, 3, 0);
+      num(spanFt, 3, 0);
+      num(wsvc, 4, 0);
       num(fyEl, 3, 0);
     }
 
+    function updateDeflectionOutputs() {
+      const clearPill = () => {
+        if (!deflRm) return;
+        deflRm.textContent = '—';
+        deflRm.classList.remove('sf-bendAna__verdictPill--safe', 'sf-bendAna__verdictPill--unsafe');
+      };
+
+      if (!anaDefYes?.checked) {
+        if (deltaAllow) deltaAllow.textContent = '—';
+        if (deltaMax) deltaMax.textContent = '—';
+        clearPill();
+        return;
+      }
+
+      const L = parseNumLike(spanFt?.value);
+      const W = parseNumLike(wsvc?.value);
+      const denom = deflLimSel?.value;
+      const dAllow = allowableDeflectionInches(L, denom);
+
+      if (deltaAllow) deltaAllow.textContent = formatDeflectionDual(dAllow);
+
+      if (!Number.isFinite(curIx) || curIx <= 0 || !Number.isFinite(W) || W <= 0 || !Number.isFinite(L) || L <= 0) {
+        if (deltaMax) deltaMax.textContent = '—';
+        clearPill();
+        return;
+      }
+
+      const bc = workbookBeamCaseAna('simple-u');
+      const k = bc.deflectionK ?? 5 / 384;
+      const dMax = deltaInches(W, L, E_DEFAULT, curIx, k);
+
+      if (deltaMax) deltaMax.textContent = formatDeflectionDual(dMax);
+
+      if (deflRm) {
+        const ok =
+          Number.isFinite(dMax) &&
+          Number.isFinite(dAllow) &&
+          dAllow > 0 &&
+          dMax <= dAllow + 1e-9;
+        deflRm.textContent =
+          !Number.isFinite(dMax) || !Number.isFinite(dAllow) || dAllow <= 0 ? '—' : ok ? 'SAFE' : 'UNSAFE';
+        deflRm.classList.toggle('sf-bendAna__verdictPill--safe', ok);
+        deflRm.classList.toggle(
+          'sf-bendAna__verdictPill--unsafe',
+          Number.isFinite(dMax) && Number.isFinite(dAllow) && dAllow > 0 && !ok,
+        );
+      }
+    }
+
     function recompute() {
+      syncAnaDeflDataset();
       normalizeInputs();
       syncSteel();
       if (eEl) eEl.value = String(E_DEFAULT);
@@ -288,7 +459,7 @@
       if (outLpf) outLpf.textContent = Number.isFinite(lpF) ? fmt(lpF, 8) : '—';
       if (outLrf) outLrf.textContent = Number.isFinite(lrF) ? fmt(lrF, 8) : '—';
 
-      if (outClass) outClass.textContent = compactnessVerdict(lamF, lamW, Fy, E);
+      if (outClass) outClass.textContent = flangeCompactnessVerdict(lamF, Fy, E);
 
       const Mp =
         Number.isFinite(Fy) && Number.isFinite(Zx) ? (Fy * Zx) / 12 : null;
@@ -305,6 +476,8 @@
       if (outPhiMn) outPhiMn.textContent = fmt(phiMn, 3);
       const govEl = $('sfBendAnaGovCap');
       if (govEl) govEl.textContent = fmt(design, 3);
+
+      updateDeflectionOutputs();
     }
 
     function buildShapeOptions() {
@@ -333,8 +506,11 @@
         });
       });
       shapeEl.addEventListener('change', () => {
-        if (isManual()) setGeomReadOnly(false);
-        else if (wRows.length) {
+        if (isManual()) {
+          setGeomReadOnly(false);
+          curIx = null;
+          if (ixDisp) ixDisp.textContent = '—';
+        } else if (wRows.length) {
           applyWRowByLabel(shapeEl.value);
           setGeomReadOnly(true);
         }
@@ -353,13 +529,16 @@
       mpEl.classList.add('sf-bend__readonly');
     }
     populateSteelControl(steelEl, getPreferredSteelGradeId());
+    populateAnalysisDeflectionSelect(deflLimSel, preferredAnaDeflDenom());
     syncSteel();
+    syncAnaDeflDataset();
     buildShapeOptions();
     wire();
 
     window.addEventListener('sf:steel-grade-change', () => {
       const pid = window.SteelForge?.activeStructuralSteelGrade?.id ?? getPreferredSteelGradeId();
       populateSteelControl(steelEl, pid);
+      populateAnalysisDeflectionSelect(deflLimSel, preferredAnaDeflDenom());
       syncSteel();
       recompute();
     });

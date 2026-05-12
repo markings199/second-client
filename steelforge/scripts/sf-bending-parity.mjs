@@ -7,20 +7,42 @@ const PHI_B = 0.9;
 const OMEGA_B = 1.67;
 const E = 29000;
 
-function nominalMomentKipFt(Fy, Zx, Sx, lamF, lamW) {
-  const My = (Fy * Sx) / 12;
+function nominalMomentFlangeKipFt(Fy, Zx, Sx, lamF) {
   const Mp = (Fy * Zx) / 12;
+  const My = (Fy * Sx) / 12;
+  const lpF = 0.38 * Math.sqrt(E / Fy);
   const lrF = 1.0 * Math.sqrt(E / Fy);
-  const lrW = 5.7 * Math.sqrt(E / Fy);
-  const branch = (lam, lr) => (lam <= lr ? Mp : 0.7 * My);
-  return Math.min(branch(lamF, lrF), branch(lamW, lrW));
+  if (lamF <= lpF) return Mp;
+  if (lamF <= lrF) {
+    const den = lrF - lpF;
+    return Mp - (Mp - 0.7 * My) * ((lamF - lpF) / den);
+  }
+  return 0.7 * My;
 }
 
-function compactnessVerdict(lamF, lamW, Fy) {
-  const lrF = 1.0 * Math.sqrt(E / Fy);
+function nominalMomentWebKipFt(Fy, Zx, Sx, lamW) {
+  const Mp = (Fy * Zx) / 12;
+  const My = (Fy * Sx) / 12;
+  const lpW = 3.76 * Math.sqrt(E / Fy);
   const lrW = 5.7 * Math.sqrt(E / Fy);
-  if (lamF <= lrF && lamW <= lrW) return 'COMPACT FLANGE';
-  return 'SLENDER SECTION';
+  if (lamW <= lpW) return Mp;
+  if (lamW <= lrW) {
+    const den = lrW - lpW;
+    return Mp - (Mp - 0.7 * My) * ((lamW - lpW) / den);
+  }
+  return 0.7 * My;
+}
+
+function nominalMomentKipFt(Fy, Zx, Sx, lamF, lamW) {
+  return Math.min(nominalMomentFlangeKipFt(Fy, Zx, Sx, lamF), nominalMomentWebKipFt(Fy, Zx, Sx, lamW));
+}
+
+function flangeCompactnessVerdict(lamF, Fy) {
+  const lpF = 0.38 * Math.sqrt(E / Fy);
+  const lrF = 1.0 * Math.sqrt(E / Fy);
+  if (lamF <= lpF) return 'COMPACT FLANGE';
+  if (lamF <= lrF) return 'NON-COMPACT FLANGE';
+  return 'SLENDER FLANGE';
 }
 
 function lpFlange(Fy) {
@@ -39,11 +61,14 @@ function add(name, ok, detail = '') {
 
 // --- BENDING ANALYSIS sample (CSV rows ~4–27): W21×44 @ Fy = 100 ksi
 const Mn1 = nominalMomentKipFt(100, 95.4, 81.6, 7.22, 53.6);
-add('Analysis W21×44 Mn (795)', nearly(Mn1, 795, 0.05), `got ${Mn1}`);
-add('Analysis φMn LRFD (715.5)', nearly(PHI_B * Mn1, 715.5, 0.05), `got ${PHI_B * Mn1}`);
-add('Analysis Mn/Ω ASD (476.048)', nearly(Mn1 / OMEGA_B, 476.0479042, 0.01), `got ${Mn1 / OMEGA_B}`);
+add('Analysis W21×44 Mn — flange non-compact governs (~772.38)', nearly(Mn1, 772.375183, 0.02), `got ${Mn1}`);
+add('Analysis φMn LRFD (~695.14)', nearly(PHI_B * Mn1, 695.137665, 0.02), `got ${PHI_B * Mn1}`);
+add('Analysis Mn/Ω ASD (~462.50)', nearly(Mn1 / OMEGA_B, 462.50011, 0.02), `got ${Mn1 / OMEGA_B}`);
 add('Analysis λpf limit (6.471167)', nearly(lpFlange(100), 6.471166819, 1e-5), `got ${lpFlange(100)}`);
-add('Analysis verdict COMPACT FLANGE', compactnessVerdict(7.22, 53.6, 100) === 'COMPACT FLANGE');
+add(
+  'Analysis verdict NON-COMPACT FLANGE',
+  flangeCompactnessVerdict(7.22, 100) === 'NON-COMPACT FLANGE',
+);
 
 // Second sample: W18×40 @ 100 ksi (design subsection Mn)
 const Mn2 = nominalMomentKipFt(100, 78.4, 68.4, 5.73, 50.9);

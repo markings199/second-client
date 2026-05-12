@@ -131,13 +131,12 @@ body::before {
 }
 
 /*
-  Compression: prefer min-height over hard max-height traps so short viewports can scroll.
-  Thin scrollbar on the content panel so wheel/touch scrolling is discoverable.
+  Compression: one vertical scrollbar only — scroll on .content-panel (not nested with notebook-full).
 */
 .notebook-full:has(.sf-comp.sf-comp--compression) {
   min-height: 100vh;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 .notebook-full:has(.sf-comp.sf-comp--compression) > .content-panel {
@@ -1312,6 +1311,20 @@ body::before {
   box-sizing: border-box;
 }
 
+/*
+  ANALYSIS COMPRESSION: let the taupe shell grow with the dashboard — single scrollbar on .content-panel
+  (avoid nested scroll inside .sf-compAnaWorkspace).
+*/
+.content-panel.comp-panel
+  > .sf-comp.sf-comp--compression
+  > .sf-comp__mode[data-comp-mode-pane="analysis"].is-active
+  > .sf-comp__emptyPane {
+  flex: 0 0 auto;
+  min-height: min-content;
+  overflow: visible;
+  align-items: stretch;
+}
+
 /* Compression: manual knobs — tabs offset, gray box width & height */
 .content-panel.comp-panel > .sf-comp.sf-comp--compression {
   --sf-compression-tabs-offset-top: 5px;
@@ -1322,12 +1335,12 @@ body::before {
   --sf-compression-gray-h: clamp(520px, calc(100vh - 130px), 680px);
   /* --sf-compression-gray-h-design / compact+critical density → set in :root */
   /* Gray taupe box padding left/right (smaller = beige panel can sit closer to outer edges) */
-  --sf-compression-gray-pad-x: 14px;
+  --sf-compression-gray-pad-x: 12px;
   /*
     WHITE BOX WIDTH (analysis form panel: METHOD → LENGTH).
     Edit px only — larger = wider panel (try 340–440). Applied via width on .sf-compAna__sidebar.
   */
-  --sf-compAna-sidebar-w: 320px;
+  --sf-compAna-sidebar-w: 396px;
   /* Move panel sideways inside gray area (+ = right). */
   --sf-compAna-sidebar-shift-x: 0px;
   /* Whole right column (CHECK COMPACTNESS + Critical Slenderness): +Y = down */
@@ -1340,7 +1353,7 @@ body::before {
   /* Space below slenderness card (capacity sits beside photos; keep 0 unless you stack extra blocks below) */
   --sf-compAna-gap-after-critical: 0px;
   /* Horizontal gap between compact | beam imgs | checking columns */
-  --sf-compAna-compact-grid-col-gap: 6px;
+  --sf-compAna-compact-grid-col-gap: 8px;
   /* Middle column width (beam visuals) */
   --sf-compAna-beam-img-col-w: 220px;
   /* CHECKING CAPACITY column width (top row, right of beam photos) */
@@ -1359,26 +1372,33 @@ body::before {
   /* Fine-tune verdict pills vertically (+ = down) if needed after layout fixes */
   --sf-compAna-compact-badge-nudge-flange: 0px;
   --sf-compAna-compact-badge-nudge-web: 0px;
-  --sf-compAna-compact-title-font-size: 19px;
+  /* Analysis workspace: one size for CHECK COMPACTNESS, CRITICAL SLENDERNESS, CHECKING CAPACITY, LRFD/ASD card */
+  --sf-compAna-unified-section-title-fs: 17px;
+  --sf-compAna-compact-title-font-size: var(--sf-compAna-unified-section-title-fs);
   /* Critical Slenderness card manual size/scale */
   --sf-compAna-critical-card-w: 536px;
   /* Box height: keep `auto` for natural height; or set e.g. 480px / 52vh for a fixed tall box */
   --sf-compAna-critical-card-h: auto;
-  /* Use min-content so the card cannot shrink shorter than rows + footer (0px caused overlap with CHECKING CAPACITY) */
-  --sf-compAna-critical-card-min-h:230px;
-  --sf-compAna-critical-pad-x: 10px;
+  --sf-compAna-critical-card-min-h: min-content;
+  --sf-compAna-critical-pad-x: 5px;
   /* pad-y / pad-bottom — defaults :root */
-  --sf-compAna-critical-title-font-size: 12px;
-  --sf-compAna-critical-grid-cols: 36px 126px 44px 58px 46px minmax(90px, 1fr);
-  --sf-compAna-critical-col-gap: 4px;
+  --sf-compAna-critical-title-font-size: var(--sf-compAna-unified-section-title-fs);
+  /*
+    Slenderness: wider Connection + K/L/r; KL/r capped; minimal side padding so labels start closer to card edge.
+  */
+  --sf-compAna-critical-grid-cols: 30px 158px 56px 76px 60px minmax(120px, 200px);
+  --sf-compAna-critical-col-gap: 14px;
+  --sf-compAna-critical-row-gap: 4px;
   /* row-gap, select-h, pill-h — component sizing inside table */
-  --sf-compAna-critical-select-h: 18px;
-  --sf-compAna-critical-pill-h: 17px;
-  --sf-compAna-critical-font-size: 11px;
-  --sf-compAna-critical-governing-font-size: 11px;
+  --sf-compAna-critical-select-h: 26px;
+  --sf-compAna-critical-pill-h: 24px;
+  --sf-compAna-critical-font-size: 16px;
+  --sf-compAna-critical-governing-font-size: 16px;
+  --sf-compAna-critical-pad-y: 10px;
+  --sf-compAna-critical-pad-bottom: 10px;
   /* governing-reserve — default :root */
   /* Governing row inset from card bottom (+ = move yellow pill up, − = down toward edge) */
-  --sf-compAna-critical-governing-bottom: 6px;
+  --sf-compAna-critical-governing-bottom: 0px;
   /*
     “Governing K·L/r =” label only — horizontal nudge (− = move left, + = move right).
     Does not move the yellow value pill.
@@ -1391,15 +1411,16 @@ body::before {
   --sf-compAna-critical-governing-highlight-shift-x: 0px;
   /* Critical Slenderness card only: vertical nudge (+ = down, − = up); 0 = flush under compactness */
   --sf-compAna-critical-shift-y: 0px;
-  /* Extra bottom pad inside slenderness card so governing KL/r row is not clipped */
-  --sf-compAna-critical-governing-reserve: 44px;
+  /* Governing row is in-flow (not absolutely positioned); keep small reserve for title pill clearance */
+  --sf-compAna-critical-governing-reserve: 0px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__grayShell {
   position: relative;
   box-sizing: border-box;
   width: min(var(--sf-compression-gray-w), 100%);
-  height: var(--sf-compression-gray-h);
+  min-height: var(--sf-compression-gray-h);
+  height: auto;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
@@ -1413,26 +1434,22 @@ body::before {
   padding: 11px var(--sf-compression-gray-pad-x, 14px) 10px;
 }
 
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-comp__grayShell {
+  overflow: visible;
+  max-height: none;
+}
+
 /*
-  DESIGN: taupe shell grows with content; no max-height inner scroll (tables visible; page scrolls).
+  DESIGN: taupe shell grows with content; outer .content-panel scrolls only (no inner scrollbar).
 */
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__mode[data-comp-mode-pane="design"] .sf-comp__grayShell {
   height: auto;
   min-height: min(var(--sf-compression-gray-h-design), var(--sf-compression-gray-max-h-design));
-  max-height: min(var(--sf-compression-gray-h-design), var(--sf-compression-gray-max-h-design));
+  max-height: none;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: visible;
   box-sizing: border-box;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-gutter: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   padding: 14px var(--sf-compression-gray-pad-x, 14px) 14px;
-}
-
-.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__mode[data-comp-mode-pane="design"] .sf-comp__grayShell::-webkit-scrollbar {
-  width: 0;
-  height: 0;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__mode[data-comp-mode-pane="design"]
@@ -1454,7 +1471,7 @@ body::before {
   background: transparent;
 }
 
-/* ========== COMPRESSION · ANALYSIS (scroll inside taupe shell when content exceeds height) ========== */
+/* ========== COMPRESSION · ANALYSIS (no nested scroll — page scrolls via .content-panel) ========== */
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__grayShell-body--analysis {
   display: flex;
   flex-direction: row;
@@ -1463,11 +1480,47 @@ body::before {
   gap: 12px;
   padding: 0;
   box-sizing: border-box;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: visible;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__grayShell-body--analysis-clean {
+  position: relative;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  flex: 0 0 auto;
+  min-height: min-content;
+  overflow: visible;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__grayShell-body--analysis-clean > .sf-compAnaWorkspace {
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: min-content;
+  max-height: none;
+  overflow: visible;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaHiddenBridge {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
 }
 
 /* ========== COMPRESSION · DESIGN (same taupe gray shell size as analysis — vars --sf-compression-gray-w/h) ========== */
@@ -1883,8 +1936,7 @@ body::before {
   flex: 0 1 auto;
   min-height: 0;
   overflow-x: auto;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow-y: visible;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compDes__slenderTable {
@@ -2477,17 +2529,15 @@ body::before {
 }
 
 /*
-  Analysis workspace grid (locks panel positions):
-  Row 1: CHECK COMPACTNESS | beam imgs | CHECKING CAPACITY
-  Row 2: CRITICAL SLENDERNESS spans cols 1–2 only; col 3 row 2 is reserved for an extra card (e.g. Pu)
-  so new content in col 3 does not push the slenderness block downward.
+  Legacy grid when .sf-compAnaCompact is used with inner cards. Empty analysis UI uses
+  .sf-comp__grayShell-body--analysis-clean + .sf-compAnaWorkspace instead (~1469).
 */
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact {
   flex: 1 1 auto;
   align-self: var(--sf-compAna-compact-align-self, stretch);
   min-height: 0;
-  height: 100%;
-  max-height: 100%;
+  height: auto;
+  max-height: none;
   margin-top: calc(var(--sf-compAna-compact-margin-top, 6px) + var(--sf-compAna-compact-shift-y, 0px));
   display: grid;
   grid-template-columns:
@@ -2544,21 +2594,21 @@ body::before {
   border-radius: 14px;
   font-weight: 800;
   color: #2f5fa7;
-  font-size: var(--sf-compAna-compact-title-font-size, 16px);
+  font-size: var(--sf-compAna-compact-title-font-size, 17px);
   letter-spacing: 0.5px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact__inner {
   background: #efefef;
   border-radius: 12px;
-  padding: 8px 8px 8px 10px;
+  padding: 10px 10px 10px 11px;
   box-sizing: border-box;
   display: grid;
   /* max-content lets the grid shrink-wrap so place-content can center it in the card */
   grid-template-columns: max-content max-content;
   grid-template-rows: auto auto;
-  column-gap: 8px;
-  row-gap: 6px;
+  column-gap: 10px;
+  row-gap: 9px;
   align-items: start;
   justify-items: stretch;
   place-content: center;
@@ -2584,34 +2634,34 @@ body::before {
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact__sectionTitle {
   font-weight: 800;
   color: #444;
-  margin-bottom: 2px;
-  font-size: 12px;
+  margin-bottom: 4px;
+  font-size: 14px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact__row {
   display: flex;
   align-items: center;
-  margin-bottom: 2px;
-  font-size: 11px;
+  margin-bottom: 4px;
+  font-size: 13.5px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact__lambda {
   width: 42px;
-  font-size: 11px;
+  font-size: 13.5px;
   color: #3c3c3c;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact__value {
   background: linear-gradient(#9bb7d3, #7fa4c6);
   color: #fff;
-  padding: 2px 8px;
-  min-height: 22px;
+  padding: 3px 9px;
+  min-height: 24px;
   border-radius: 10px;
   font-weight: 700;
   margin-left: 4px;
-  min-width: 70px;
+  min-width: 74px;
   text-align: center;
-  font-size: 11px;
+  font-size: 13.5px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact__aside {
@@ -2673,12 +2723,12 @@ body::before {
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCompact__badge {
   background: linear-gradient(#ffe27a, #f4c542);
   border-radius: 12px;
-  padding: 4px 5px;
+  padding: 5px 7px;
   font-weight: 800;
-  font-size: 10px;
+  font-size: 11px;
   margin-bottom: 0;
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .content-panel.comp-panel
@@ -2754,7 +2804,7 @@ body::before {
   background: #ece9df;
   border: 1px solid rgba(101, 94, 84, 0.15);
   font-weight: 800;
-  font-size: clamp(10px, 1.3vw, 12px);
+  font-size: var(--sf-compAna-unified-section-title-fs, 17px);
   letter-spacing: 0.02em;
   color: #2f5fa7;
 }
@@ -2767,7 +2817,7 @@ body::before {
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compCap__label {
   font-weight: 800;
-  font-size: 10px;
+  font-size: 14.5px;
   line-height: 1.25;
   color: #4a4a4a;
   letter-spacing: 0.02em;
@@ -2778,7 +2828,7 @@ body::before {
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 6px;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compCap__sym {
@@ -2821,7 +2871,7 @@ body::before {
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compCap__unit {
   font-weight: 700;
-  font-size: 12px;
+  font-size: 16px;
   color: #444;
 }
 
@@ -2856,8 +2906,9 @@ body::before {
   padding: 10px 14px;
   background: #ebe6dc;
   font-weight: 800;
-  font-size: 11px;
-  letter-spacing: 0.04em;
+  font-size: var(--sf-compAna-unified-section-title-fs, 17px);
+  letter-spacing: 0.035em;
+  line-height: 1.25;
   color: #2f5fa7;
   border-bottom: 1px solid rgba(101, 94, 84, 0.12);
 }
@@ -2871,7 +2922,7 @@ body::before {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 8px;
-  font-size: 13px;
+  font-size: 17px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compGov__sym {
@@ -2907,7 +2958,7 @@ body::before {
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compGov__unit {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 17px;
   color: #444;
 }
 
@@ -2930,9 +2981,7 @@ body::before {
   border: 1px solid rgba(109, 103, 93, 0.22);
   border-radius: 14px;
   padding: var(--sf-compAna-critical-pad-y, 10px) var(--sf-compAna-critical-pad-x, 12px)
-    calc(
-      var(--sf-compAna-critical-pad-bottom, 10px) + var(--sf-compAna-critical-governing-reserve, 34px)
-    );
+    var(--sf-compAna-critical-pad-bottom, 10px);
   position: relative;
   box-sizing: border-box;
   transform: translateY(var(--sf-compAna-critical-shift-y, 0px));
@@ -2941,16 +2990,31 @@ body::before {
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__title {
   position: absolute;
   top: -9px;
-  left: 10px;
+  left: 6px;
   right: auto;
   background: #ece9e2;
   padding: 3px 12px;
   border-radius: 999px;
   font-weight: 800;
   color: #2f5fa7;
-  font-size: var(--sf-compAna-critical-title-font-size, 15px);
+  font-size: var(--sf-compAna-critical-title-font-size, 17px);
   letter-spacing: 0.05em;
   border: 1px solid rgba(101, 94, 84, 0.18);
+}
+
+/* Slenderness workspace: put new markup inside .sf-compAnaCritical__body (Analysis Compression only). */
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__body {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+/* Blank shell until you paste a new layout (no header strip / table inside the gray card). */
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__card--empty {
+  --sf-compAna-critical-card-h: auto;
+  min-height: var(--sf-compAna-critical-card-empty-min-h, 2.5rem);
+  padding-top: 10px;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__header {
@@ -2959,12 +3023,15 @@ body::before {
   grid-template-columns: var(--sf-compAna-critical-grid-cols, 44px 148px 52px 70px 56px 104px);
   column-gap: var(--sf-compAna-critical-col-gap, 6px);
   align-items: center;
-  font-size: 10px;
+  font-size: var(--sf-compAna-critical-font-size, 16px);
   font-weight: 800;
   color: rgba(78, 72, 65, 0.88);
-  margin-top: 8px;
+  margin-top: 6px;
   margin-bottom: 0;
+  padding-bottom: 4px;
   letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-align: center;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__row {
@@ -2982,12 +3049,21 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
+}
+
+/* Header labels sit over the same tracks as body columns (Connection … KL/r). */
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__header > div:not(.sf-compAnaCritical__element) {
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__element {
-  justify-content: flex-start !important;
+  justify-content: center !important;
   align-self: center;
-  padding-left: 4px;
+  padding-left: 0;
   font-weight: 700;
   color: #444;
   font-size: var(--sf-compAna-critical-font-size, 12px);
@@ -2996,6 +3072,9 @@ body::before {
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__select {
   align-self: stretch;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   min-height: var(--sf-compAna-critical-select-h, 19px);
   height: auto;
   border-radius: 999px;
@@ -3004,7 +3083,7 @@ body::before {
   font-size: var(--sf-compAna-critical-font-size, 12px);
   font-weight: 700;
   text-align: center;
-  padding: 0 16px 0 7px;
+  padding: 0 16px 0 10px;
   color: rgba(44, 40, 36, 0.95);
 }
 
@@ -3024,6 +3103,12 @@ body::before {
   box-sizing: border-box;
 }
 
+/* KL/r: center value in column so it lines up under the header with other rows */
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__output {
+  justify-content: center;
+  padding-inline: 12px 14px;
+}
+
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__input {
   background: linear-gradient(#9bb7d3, #7fa4c6);
   color: #fff;
@@ -3038,51 +3123,62 @@ body::before {
   background: #c8d1da;
 }
 
+/*
+  Governing KL/r: same grid as data rows so the footer sits under the KL/r column (reads as part of the table).
+*/
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__governing {
-  position: absolute;
-  left: var(--sf-compAna-critical-pad-x, 12px);
-  right: var(--sf-compAna-critical-pad-x, 12px);
-  bottom: var(--sf-compAna-critical-governing-bottom, 10px);
-  margin-top: 0;
+  position: static;
   display: grid;
   grid-template-columns: var(--sf-compAna-critical-grid-cols, 44px 148px 52px 70px 56px 104px);
   column-gap: var(--sf-compAna-critical-col-gap, 6px);
   align-items: center;
-  font-size: var(--sf-compAna-critical-governing-font-size, 13px);
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 4px;
+  padding-bottom: 0;
+  border-top: 1px solid rgba(109, 103, 93, 0.22);
+  font-size: var(--sf-compAna-critical-governing-font-size, 16px);
   font-weight: 800;
   color: rgba(65, 59, 52, 0.95);
   line-height: 1.2;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__governingSpan {
-  grid-column: 1 / 5;
+  display: block;
+  grid-column: 1 / 6;
+  min-height: 0;
+  pointer-events: none;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__governingKlr {
-  /* Columns 5–6 (r + K·L/r): wide enough for label left of yellow pill on one row */
-  grid-column: 5 / -1;
+  grid-column: 6 / -1;
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-start;
-  gap: 4px;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__highlight {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 0 1 auto;
   margin-left: 0;
   background: linear-gradient(#ffe27a, #f4c542);
-  padding: 5px 12px;
+  padding: 6px 14px;
   min-height: calc(var(--sf-compAna-critical-pill-h, 18px) + 2px);
   border-radius: 999px;
   border: 1px solid rgba(168, 129, 64, 0.3);
   font-weight: 800;
-  font-size: var(--sf-compAna-critical-font-size, 12px);
-  line-height: 1;
+  font-size: var(--sf-compAna-critical-governing-font-size, 16px);
+  line-height: 1.1;
   box-sizing: border-box;
+  max-width: 100%;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAnaCritical__governingLab {
@@ -3165,6 +3261,47 @@ body::before {
     0 4px 14px rgba(43, 38, 32, 0.08);
   font-family: 'Inter', system-ui, sans-serif;
   color: var(--sf-compAna-text);
+}
+
+/* ANALYSIS COMPRESSION — wider panel + larger type (fills dead space; easier to read) */
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAna__sidebar:not(.sf-compDes__sidebar) {
+  --sf-compAna-sidebar-w: min(418px, 100%);
+  --sf-compAna-kv-label-w: 5.65rem;
+  --sf-compAna-kv-coord-label-w: 3.28rem;
+  --sf-compAna-input-w: 80px;
+  --sf-compAna-method-label-font-size: 0.84rem;
+  --sf-compAna-method-select-font-size: 1.17rem;
+  --sf-compAna-method-select-height: 40px;
+  --sf-compAna-steel-label-font-size: 0.74rem;
+  --sf-compAna-steel-select-font-size: 0.8rem;
+  --sf-compAna-steel-select-height: 30px;
+  --sf-compAna-shape-head-label-font-size: 0.74rem;
+  --sf-compAna-shape-select-font-size: 0.82rem;
+  --sf-compAna-shape-select-height: 28px;
+  --sf-compAna-head-select-col: 142px;
+  gap: 9px 0;
+  padding: 12px 12px 13px;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAna__sidebar:not(.sf-compDes__sidebar) .sf-compAna__kvLab {
+  font-size: 0.78rem;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAna__sidebar:not(.sf-compDes__sidebar) .sf-compAna__pillInput {
+  height: 21px;
+  font-size: 0.76rem;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAna__sidebar:not(.sf-compDes__sidebar) .sf-compAna__unit {
+  font-size: 0.72rem;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAna__sidebar:not(.sf-compDes__sidebar) .sf-compAna__lengthTitle {
+  font-size: 0.76rem;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAna__sidebar:not(.sf-compDes__sidebar) .sf-compAna__lengthBlock .sf-compAna__pillInput {
+  font-size: 0.74rem;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAna__sidebar::before {
@@ -3506,8 +3643,8 @@ body::before {
 .content-panel.comp-panel > .sf-comp.sf-comp--compression
   .sf-compAna__sidebar:not(.sf-compDes__sidebar)
   > .sf-compAna__headRow:nth-child(3) .sf-compAna__select {
-  height: 24px;
-  font-size: 0.66rem;
+  height: 26px;
+  font-size: 0.78rem;
   padding: 0 20px 0 9px;
 }
 
@@ -3533,7 +3670,7 @@ body::before {
   padding: 0 !important;
   text-align: left !important;
   justify-self: start !important;
-  font-size: 0.68rem !important;
+  font-size: 0.76rem !important;
   letter-spacing: 0.02em !important;
   color: rgba(62, 55, 49, 0.92) !important;
 }
@@ -3544,18 +3681,18 @@ body::before {
 .content-panel.comp-panel > .sf-comp.sf-comp--compression
   .sf-compAna__sidebar:not(.sf-compDes__sidebar)
   > .sf-compAna__headRow:nth-child(3) .sf-compAna__selectWrap {
-  width: 90px !important;
-  min-width: 90px !important;
-  max-width: 90px !important;
+  width: 98px !important;
+  min-width: 98px !important;
+  max-width: 98px !important;
   justify-self: start !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression
   .sf-compAna__sidebar:not(.sf-compDes__sidebar)
   > .sf-compAna__headRow:first-child .sf-compAna__selectWrap--method {
-  width: 90px !important;
-  min-width: 90px !important;
-  max-width: 90px !important;
+  width: 98px !important;
+  min-width: 98px !important;
+  max-width: 98px !important;
   justify-self: start !important;
 }
 
@@ -3851,7 +3988,7 @@ body::before {
   overflow: visible;
   padding-inline: 6px;
   box-sizing: border-box;
-  transform: translateX(-10px);
+  transform: translateX(-4px);
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-compAna__lengthBlock .sf-compAna__pillInput {
@@ -9841,19 +9978,23 @@ body:has(.sf-comp.sf-comp--shear .sf-comp__mode.is-active) .content-panel.sheet-
 @media (max-height: 900px), (max-width: 1500px) {
   .content-panel.comp-panel > .sf-comp.sf-comp--compression {
     --sf-compression-gray-pad-x: 10px;
-    --sf-compAna-sidebar-w: 270px;
+    --sf-compAna-sidebar-w: 318px;
     --sf-compAna-sidebar-shift-x: 8px;
-    --sf-compAna-compact-grid-col-gap: 4px;
+    --sf-compAna-compact-grid-col-gap: 6px;
     --sf-compAna-beam-img-col-w: 185px;
     --sf-compAna-capacity-card-w: 185px;
     --sf-compAna-compact-card-w: 255px;
     --sf-compAna-compact-card-min-h: 112px;
     --sf-compAna-critical-card-w: 470px;
-    --sf-compAna-critical-title-font-size: 11px;
-    --sf-compAna-critical-font-size: 9px;
-    --sf-compAna-critical-governing-font-size: 10px;
-    --sf-compAna-critical-grid-cols: 30px 108px 36px 48px 40px minmax(72px, 1fr);
-    --sf-compAna-critical-col-gap: 3px;
+    --sf-compAna-unified-section-title-fs: 15px;
+    --sf-compAna-critical-title-font-size: var(--sf-compAna-unified-section-title-fs);
+    --sf-compAna-critical-font-size: 14px;
+    --sf-compAna-critical-governing-font-size: 14px;
+    --sf-compAna-critical-grid-cols: 28px 118px 46px 56px 48px minmax(108px, 178px);
+    --sf-compAna-critical-col-gap: 11px;
+    --sf-compAna-critical-row-gap: 4px;
+    --sf-compAna-critical-select-h: 24px;
+    --sf-compAna-critical-pill-h: 22px;
   }
 
   .content-panel.comp-panel > .sf-comp.sf-comp--compression .sf-comp__grayShell {
@@ -9959,6 +10100,25 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
 }
 .sf-comp--bending:has(#sfBendDefNo:checked) .sf-bendDes__branch--defl {
   display: none !important;
+}
+
+/* Reliable toggle via data-sf-bend-defl (JS sync) — works when :has() is flaky in nested shells */
+.sf-comp.sf-comp--bending[data-sf-bend-defl='with'] .sf-bendDes__branch--noDefl {
+  display: none !important;
+}
+.sf-comp.sf-comp--bending[data-sf-bend-defl='without'] .sf-bendDes__branch--defl {
+  display: none !important;
+}
+
+/* Analysis: optional deflection card (hidden unless WITH DEFLECTION) */
+.sf-comp.sf-comp--bending[data-sf-bend-ana-defl='without'] .sf-bendAna__deflBlock {
+  display: none !important;
+}
+
+.sf-comp--bending[data-sf-bend-ana-defl='without'] label.sf-bendDes__subBtn[for='sfBendAnaDefNo'],
+.sf-comp--bending[data-sf-bend-ana-defl='with'] label.sf-bendDes__subBtn[for='sfBendAnaDefYes'] {
+  background: rgba(205, 218, 232, 0.92);
+  border-color: rgba(29, 120, 179, 0.35);
 }
 
 .sf-bendDes__subNav {
@@ -10415,6 +10575,16 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   font-weight: 800;
 }
 
+.sf-comp.sf-comp--bending .sf-bendAna__verdictPill.sf-bendAna__verdictPill--safe {
+  background: #ffb64a;
+  color: #3d2300;
+}
+
+.sf-comp.sf-comp--bending .sf-bendAna__verdictPill.sf-bendAna__verdictPill--unsafe {
+  background: #f66b2d;
+  color: #ffffff;
+}
+
 .sf-comp.sf-comp--bending .sf-bendAna__nominalResult {
   margin-top: 6px;
   padding: 18px;
@@ -10708,6 +10878,66 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   font-size: 0.8rem;
   color: var(--muted);
   line-height: 1.4;
+}
+
+.sf-comp.sf-comp--bending .sf-bendNoDef__panelHeading--sub {
+  margin-top: 14px;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  opacity: 0.88;
+}
+
+.sf-comp.sf-comp--bending .sf-bendNoDef__unitHint {
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.sf-comp.sf-comp--bending .sf-bendNoDef__bendPair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+  align-items: start;
+}
+
+.sf-comp.sf-comp--bending .sf-bendNoDef__bendCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sf-comp.sf-comp--bending .sf-bendNoDef__bendHdr {
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: #25603a;
+}
+
+.sf-comp.sf-comp--bending .sf-bendWithDef .sf-bendNoDef__bendHdr {
+  color: #2e436c;
+}
+
+.sf-comp.sf-comp--bending .sf-bendNoDef__bendLine {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 0.76rem;
+}
+
+.sf-comp.sf-comp--bending .sf-bendNoDef__bendCol > .sf-bendNoDef__remarkPill {
+  margin-top: 2px;
+  font-size: 0.72rem;
+  padding: 8px 10px;
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.sf-comp.sf-comp--bending .sf-bendNoDef__hiddenLegacy {
+  display: none !important;
 }
 
 .sf-comp.sf-comp--bending .sf-bendNoDef__compactValue {

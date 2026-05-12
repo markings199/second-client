@@ -322,9 +322,10 @@
   font-size: 0.95rem;
 }
 
+/* Final-answer accent (#ff751f) — selected section label */
 .sf-comp--tensionRod .tr-rod-shell .value-pill.blue {
-  background: #e0f2fe !important;
-  color: #0f4f9a !important;
+  background: #ff751f !important;
+  color: #ffffff !important;
 }
 
 .sf-comp--tensionRod .tr-rod-shell .value-pill.light {
@@ -401,8 +402,9 @@
   color: #1f2937 !important;
 }
 
+/* Governing demand / capacity pills — client final-answer color */
 .sf-comp--tensionRod .tr-rod-shell .result-pill.orange {
-  background: #f97316 !important;
+  background: #ff751f !important;
 }
 
 .sf-comp--tensionRod .tr-rod-shell .result-pill.gray {

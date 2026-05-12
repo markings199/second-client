@@ -93,27 +93,52 @@
     return v.toFixed(d).replace(/\.?0+$/, '');
   }
 
-  function nominalMomentKipFt(Fy, E, Zx, Sx, lamF, lamW) {
-    if (![Fy, E, Zx, Sx, lamF, lamW].every((x) => Number.isFinite(x) && x > 0)) return null;
-    const My = (Fy * Sx) / 12;
+  /** Same flexural strength model as Analysis Bending (`bending-analysis.js`). */
+  function nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF) {
+    if (![Fy, E, Zx, Sx, lamF].every((x) => Number.isFinite(x) && x > 0)) return null;
     const Mp = (Fy * Zx) / 12;
+    const My = (Fy * Sx) / 12;
+    const lpF = 0.38 * Math.sqrt(E / Fy);
     const lrF = 1.0 * Math.sqrt(E / Fy);
-    const lrW = 5.7 * Math.sqrt(E / Fy);
-    const branch = (lam, lr) => {
-      if (lam <= lr) return Mp;
-      return 0.7 * My;
-    };
-    const MnF = branch(lamF, lrF);
-    const MnW = branch(lamW, lrW);
-    return Math.min(MnF, MnW);
+    if (lamF <= lpF) return Mp;
+    if (lamF <= lrF) {
+      const den = lrF - lpF;
+      if (!(den > 0)) return Mp;
+      return Mp - (Mp - 0.7 * My) * ((lamF - lpF) / den);
+    }
+    return 0.7 * My;
   }
 
-  function compactnessVerdict(lamF, lamW, Fy, E) {
-    if (![lamF, lamW, Fy, E].every((x) => Number.isFinite(x) && x > 0)) return '—';
-    const lrF = 1.0 * Math.sqrt(E / Fy);
+  function nominalMomentWebKipFt(Fy, E, Zx, Sx, lamW) {
+    if (![Fy, E, Zx, Sx, lamW].every((x) => Number.isFinite(x) && x > 0)) return null;
+    const Mp = (Fy * Zx) / 12;
+    const My = (Fy * Sx) / 12;
+    const lpW = 3.76 * Math.sqrt(E / Fy);
     const lrW = 5.7 * Math.sqrt(E / Fy);
-    if (lamF <= lrF && lamW <= lrW) return 'COMPACT FLANGE';
-    return 'SLENDER SECTION';
+    if (lamW <= lpW) return Mp;
+    if (lamW <= lrW) {
+      const den = lrW - lpW;
+      if (!(den > 0)) return Mp;
+      return Mp - (Mp - 0.7 * My) * ((lamW - lpW) / den);
+    }
+    return 0.7 * My;
+  }
+
+  function nominalMomentKipFt(Fy, E, Zx, Sx, lamF, lamW) {
+    const mnF = nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF);
+    const mnW = nominalMomentWebKipFt(Fy, E, Zx, Sx, lamW);
+    if (mnF == null || mnW == null) return null;
+    return Math.min(mnF, mnW);
+  }
+
+  /** CHECK COMPACTNESS card — flange classification vs λ_pf / λ_rf only. */
+  function flangeCompactnessVerdict(lamF, Fy, E) {
+    if (![lamF, Fy, E].every((x) => Number.isFinite(x) && x > 0)) return '—';
+    const lpF = 0.38 * Math.sqrt(E / Fy);
+    const lrF = 1.0 * Math.sqrt(E / Fy);
+    if (lamF <= lpF) return 'COMPACT FLANGE';
+    if (lamF <= lrF) return 'NON-COMPACT FLANGE';
+    return 'SLENDER FLANGE';
   }
 
   function populateSteelSelect(selectEl, preferredId = 'a992') {
@@ -183,16 +208,32 @@
     if (picked && !String(el.value || '').trim()) el.value = gradeLabel(picked);
   }
 
+  function normalizeGradeLoose(s) {
+    return String(s || '')
+      .toLowerCase()
+      .replace(/\./g, '')
+      .replace(/[=,_]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   function steelPropsFromControlValue(v) {
     const t = String(v || '').trim();
     if (!t) return null;
     const grades = window.SteelForgeStructuralSteelGrades ?? [];
-    return (
-      grades.find((g) => g.id === t) ||
-      grades.find((g) => String(g.label || '').toLowerCase() === t.toLowerCase()) ||
-      grades.find((g) => gradeLabel(g).toLowerCase() === t.toLowerCase()) ||
-      null
-    );
+    const byId = grades.find((g) => g.id === t);
+    if (byId) return byId;
+    const tl = t.toLowerCase();
+    const byLabel = grades.find((g) => String(g.label || '').toLowerCase() === tl);
+    if (byLabel) return byLabel;
+    const byFull = grades.find((g) => gradeLabel(g).toLowerCase() === tl);
+    if (byFull) return byFull;
+    const nk = normalizeGradeLoose(t);
+    const loose =
+      grades.find((g) => normalizeGradeLoose(g.label) === nk) ||
+      grades.find((g) => nk.length >= 4 && normalizeGradeLoose(g.label).includes(nk)) ||
+      grades.find((g) => nk.length >= 4 && nk.includes(normalizeGradeLoose(g.label)));
+    return loose || null;
   }
 
   function fyFromSelect(sel) {
@@ -234,6 +275,51 @@
     return (k * W_svc_klf * Math.pow(12, 3) * Math.pow(L_ft, 4)) / (E_ksi * delta_in);
   }
 
+  /** Lightest W-shape in CSV order whose I<sub>x</sub> meets the serviceability minimum. */
+  function pickLightestMeetingIx(I_min, sorted) {
+    if (!sorted.length) return null;
+    const lo = Number.isFinite(I_min) && I_min > 0 ? I_min : 0;
+    for (const s of sorted) {
+      if (s.Ix >= lo) return s;
+    }
+    return null;
+  }
+
+  function pickBeamSelfWeightShape(isLRFD, sorted, I_min, dl, ll, L_ft, KMOM, Fy, E) {
+    let w_self = 0;
+    let picked = null;
+    let Wu_tot = 0;
+    let Mu_tot = 0;
+    let Wa_tot = 0;
+    let Ma_tot = 0;
+    for (let iter = 0; iter < 15; iter++) {
+      Wu_tot = Math.max(1.2 * (dl + w_self) + 1.6 * ll, 1.4 * (dl + w_self));
+      Wa_tot = dl + ll + w_self;
+      Mu_tot = Wu_tot * L_ft * L_ft * KMOM;
+      Ma_tot = Wa_tot * L_ft * L_ft * KMOM;
+      const demand = isLRFD ? Mu_tot : Ma_tot;
+      picked = null;
+      for (const s of sorted) {
+        if (s.Ix < I_min) continue;
+        const cap = designStrengthKipFt(Fy, E, s.row, isLRFD);
+        if (cap != null && cap >= demand) {
+          picked = s;
+          break;
+        }
+      }
+      if (!picked) break;
+      const w_new = picked.wLb / 1000;
+      if (Math.abs(w_new - w_self) < 1e-5) break;
+      w_self = w_new;
+    }
+    return { picked, Wu_tot, Mu_tot, Wa_tot, Ma_tot, w_self };
+  }
+
+  /**
+   * Excel-style iteration: factored/nominal line loads include beam self-weight (w in kip/ft).
+   * LRFD and ASD are converged separately — picks may differ (client workbook).
+   */
+
   window.SteelForge = window.SteelForge || {};
 
   window.SteelForge.initBendingDesign = (panelRoot) => {
@@ -268,6 +354,7 @@
       formulaDeflN: $('sfBendDesDeflFormulaN'),
       formulaMomY: $('sfBendDesMomentFormulaY'),
       formulaDeflY: $('sfBendDesDeflFormulaY'),
+      beamLblN: $('sfBendDesBeamLblN'),
       outN: {
         c12: $('sfBendDesN_c12'),
         c14: $('sfBendDesN_c14'),
@@ -277,6 +364,7 @@
         Wa: $('sfBendDesN_Wa'),
         Ma: $('sfBendDesMaN'),
         ZxReq: $('sfBendDesN_ZxReq'),
+        ZxReqAsd: $('sfBendDesN_ZxReqAsd'),
       },
       outY: {
         c12: $('sfBendDesY_c12'),
@@ -287,6 +375,7 @@
         Wa: $('sfBendDesY_Wa'),
         Ma: $('sfBendDesMaY'),
         ZxReq: $('sfBendDesY_ZxReq'),
+        ZxReqAsd: $('sfBendDesY_ZxReqAsd'),
       },
       lw: { Wu: $('sfBendDesLwWu'), Mu: $('sfBendDesLwMu'), Wa: $('sfBendDesLwWa'), Ma: $('sfBendDesLwMa') },
       ass1: {
@@ -294,8 +383,13 @@
         zx: $('sfBendDesZxY'),
         w: $('sfBendDesAss1W'),
         sx: $('sfBendDesAss1Sx'),
+        ix: $('sfBendDesAss1Ix'),
         lf: $('sfBendDesAss1Lf'),
         rm: $('sfBendDesAss1Rm'),
+        secAsd: $('sfBendDesAss1SecAsd'),
+        zxAsd: $('sfBendDesAss1ZxAsd'),
+        ixAsd: $('sfBendDesAss1IxAsd'),
+        rmAsd: $('sfBendDesAss1RmAsd'),
       },
       lpf: $('sfBendDesLpf'),
       lrf: $('sfBendDesLrf'),
@@ -312,6 +406,16 @@
       ixW: $('sfBendDesIxW'),
       capSym: $('sfBendDesCapSym'),
       capVal: $('sfBendDesCapVal'),
+      capLrfdDem: $('sfBendDesCapLrfdDem'),
+      capLrfdCap: $('sfBendDesCapLrfdCap'),
+      capLrfdRm: $('sfBendDesCapLrfdRm'),
+      capAsdDem: $('sfBendDesCapAsdDem'),
+      capAsdCap: $('sfBendDesCapAsdCap'),
+      capAsdRm: $('sfBendDesCapAsdRm'),
+      deflYLrfd: $('sfBendDesDeflYLrfd'),
+      deflYAsd: $('sfBendDesDeflYAsd'),
+      deflRmLrfd: $('sfBendDesDeflRmLrfd'),
+      deflRmAsd: $('sfBendDesDeflRmAsd'),
       finalSec: $('sfBendDesSecN'),
       finalRm: $('sfBendDesRmN'),
       solve: $('sfBendDesSolve'),
@@ -344,6 +448,16 @@
         deltaMax: $('sfBendDesDeflDeltaMax'),
         capSym: $('sfBendDesDeflCapSym'),
         capVal: $('sfBendDesDeflCapVal'),
+        capLrfdDem: $('sfBendDesDeflCapLrfdDem'),
+        capLrfdCap: $('sfBendDesDeflCapLrfdCap'),
+        capLrfdRm: $('sfBendDesDeflCapLrfdRm'),
+        capAsdDem: $('sfBendDesDeflCapAsdDem'),
+        capAsdCap: $('sfBendDesDeflCapAsdCap'),
+        capAsdRm: $('sfBendDesDeflCapAsdRm'),
+        deltaLrfd: $('sfBendDesDeflDeltaLrfd'),
+        deltaAsd: $('sfBendDesDeflDeltaAsd'),
+        staRmLrfd: $('sfBendDesDeflStaRmLrfd'),
+        staRmAsd: $('sfBendDesDeflStaRmAsd'),
         finalSec: $('sfBendDesDeflFinalSec'),
         finalRm: $('sfBendDesDeflFinalRm'),
       },
@@ -380,6 +494,20 @@
       if (el) el.textContent = text;
     }
 
+    /** @param {boolean | null | undefined} safe null => neutral dash */
+    function setRemarkSafe(el, safe) {
+      if (!el) return;
+      if (safe === null || safe === undefined) {
+        el.textContent = '—';
+        el.classList.remove('sf-bendNoDef__remarkPill--safe', 'sf-bendNoDef__remarkPill--unsafe');
+        return;
+      }
+      const ok = Boolean(safe);
+      el.textContent = ok ? 'SAFE' : 'UNSAFE';
+      el.classList.toggle('sf-bendNoDef__remarkPill--safe', ok);
+      el.classList.toggle('sf-bendNoDef__remarkPill--unsafe', !ok);
+    }
+
     function beamCaseLabel(beamId) {
       const cs = window.SteelForgeWorkbookBeamCases;
       const hit = cs?.find((c) => c.id === beamId);
@@ -400,6 +528,16 @@
       if (toEl && fromEl) toEl.innerHTML = fromEl.innerHTML;
     }
 
+    function copyRemarkPill(toEl, fromEl) {
+      if (!toEl || !fromEl) return;
+      toEl.textContent = fromEl.textContent;
+      toEl.classList.toggle('sf-bendNoDef__remarkPill--safe', fromEl.classList.contains('sf-bendNoDef__remarkPill--safe'));
+      toEl.classList.toggle(
+        'sf-bendNoDef__remarkPill--unsafe',
+        fromEl.classList.contains('sf-bendNoDef__remarkPill--unsafe')
+      );
+    }
+
     function clearDeflMirrorPanels() {
       const d = els.defl;
       if (!d) return;
@@ -407,6 +545,12 @@
         if (el) el.textContent = '—';
       });
       if (d.capSym) d.capSym.innerHTML = 'M<sub>u</sub>';
+      [d.capLrfdRm, d.capAsdRm, d.staRmLrfd, d.staRmAsd, d.finalRm].forEach((el) => {
+        if (el) {
+          el.textContent = '—';
+          el.classList.remove('sf-bendNoDef__remarkPill--safe', 'sf-bendNoDef__remarkPill--unsafe');
+        }
+      });
     }
 
     /** Keep “WITH DEFLECTION” dashboard cells aligned with computed outputs (single source of truth). */
@@ -420,7 +564,7 @@
       copySpan(d.ass1W, els.ass1.w);
       copySpan(d.ass1Sx, els.ass1.sx);
       copySpan(d.ass1Lf, els.ass1.lf);
-      copySpan(d.ass1Rm, els.ass1.rm);
+      copyRemarkPill(d.ass1Rm, els.ass1.rm);
       copySpan(d.lwWu, els.lw.Wu);
       copySpan(d.lwMu, els.lw.Mu);
       copySpan(d.lwWa, els.lw.Wa);
@@ -433,8 +577,18 @@
       copySpan(d.deltaMax, els.deflY);
       copyHtml(d.capSym, els.capSym);
       copySpan(d.capVal, els.capVal);
+      copySpan(d.capLrfdDem, els.capLrfdDem);
+      copySpan(d.capLrfdCap, els.capLrfdCap);
+      copyRemarkPill(d.capLrfdRm, els.capLrfdRm);
+      copySpan(d.capAsdDem, els.capAsdDem);
+      copySpan(d.capAsdCap, els.capAsdCap);
+      copyRemarkPill(d.capAsdRm, els.capAsdRm);
+      copySpan(d.deltaLrfd, els.deflYLrfd);
+      copySpan(d.deltaAsd, els.deflYAsd);
+      copyRemarkPill(d.staRmLrfd, els.deflRmLrfd);
+      copyRemarkPill(d.staRmAsd, els.deflRmAsd);
       copySpan(d.finalSec, els.finalSec);
-      copySpan(d.finalRm, els.finalRm);
+      copyRemarkPill(d.finalRm, els.finalRm);
       copySpan(d.ixSec, els.ixSec);
       copySpan(d.ixZx, els.ixZx);
       copySpan(d.ixSx, els.ixSx);
@@ -447,15 +601,6 @@
       const peer = source === methodEl ? methodDefl : methodEl;
       if (peer && source && peer.value !== source.value) peer.value = source.value;
     }
-
-    let c12v,
-      c14v,
-      Wu_val,
-      Mu_val,
-      Ma_req_val,
-      dlll_val,
-      Wa_val,
-      Zx_req;
 
     function normalizeInputs() {
       const norm = (el, d = 3, min = 0) => {
@@ -470,18 +615,6 @@
       norm(els.dlY, 4, 0);
       norm(els.llY, 4, 0);
       norm(els.lY, 3, 0);
-    }
-
-    function syncBeamFormulaLabels(beamRaw) {
-      const bc = workbookBeamCase(beamRaw);
-      const mom = bc.momentFormula || '—';
-      const def = bc.deflectionFormula || '—';
-      [els.formulaMomN, els.formulaMomY].forEach((el) => {
-        if (el) el.textContent = mom;
-      });
-      [els.formulaDeflN, els.formulaDeflY].forEach((el) => {
-        if (el) el.textContent = def;
-      });
     }
 
     function preferredWorkbookDeflectionDenom() {
@@ -510,17 +643,111 @@
       sel.value = pick;
     }
 
+    function loadPack(dl, ll, L, KMOM, fy) {
+      if (
+        ![dl, ll, L, KMOM, fy].every((x) => Number.isFinite(x) && x >= 0) ||
+        !Number.isFinite(L) ||
+        L <= 0 ||
+        !Number.isFinite(fy) ||
+        fy <= 0 ||
+        !Number.isFinite(KMOM) ||
+        KMOM <= 0
+      )
+        return null;
+      const c12v = 1.2 * dl + 1.6 * ll;
+      const c14v = 1.4 * dl;
+      const Wu_val = Math.max(c12v, c14v);
+      const dlll_val = dl + ll;
+      const Wa_val = dlll_val;
+      const Mu_val = Wu_val * L * L * KMOM;
+      const Ma_req_val = Wa_val * L * L * KMOM;
+      const Zxl = (12 * Mu_val) / (PHI_B * fy);
+      const Zxa = (12 * Ma_req_val * OMEGA_B) / fy;
+      return { c12v, c14v, Wu_val, Mu_val, dlll_val, Wa_val, Ma_req_val, Zxl, Zxa };
+    }
+
+    function fillLoadOut(o, pack) {
+      if (!o) return;
+      if (!pack) {
+        Object.values(o).forEach((el) => {
+          if (el) el.textContent = '—';
+        });
+        return;
+      }
+      setOutSpan(o.c12, fmt(pack.c12v, 4));
+      setOutSpan(o.c14, fmt(pack.c14v, 4));
+      setOutSpan(o.Wu, fmt(pack.Wu_val, 4));
+      setOutSpan(o.Mu, fmt(pack.Mu_val, 3));
+      setOutSpan(o.dlll, fmt(pack.dlll_val, 4));
+      setOutSpan(o.Wa, fmt(pack.Wa_val, 4));
+      setOutSpan(o.Ma, fmt(pack.Ma_req_val, 3));
+      setOutSpan(o.ZxReq, fmt(pack.Zxl, 3));
+      setOutSpan(o.ZxReqAsd, fmt(pack.Zxa, 3));
+    }
+
+    function syncBeamFormulasFromInputs() {
+      const bcN = workbookBeamCase(String(els.beamN?.value || 'simple-u'));
+      const bcY = workbookBeamCase(String(els.beamY?.value || 'simple-u'));
+      if (els.formulaMomN) els.formulaMomN.textContent = bcN.momentFormula || '—';
+      if (els.formulaDeflN) els.formulaDeflN.textContent = bcN.deflectionFormula || '—';
+      if (els.formulaMomY) els.formulaMomY.textContent = bcY.momentFormula || '—';
+      if (els.formulaDeflY) els.formulaDeflY.textContent = bcY.deflectionFormula || '—';
+      if (els.beamLblN) els.beamLblN.textContent = beamCaseLabel(String(els.beamN?.value || 'simple-u'));
+    }
+
+    function shapeProps(shape, Fy, E) {
+      const row = shape.row;
+      const Zx = parseNumLike(row[COL.Zx]);
+      const Sx = parseNumLike(row[COL.Sx]);
+      const lamF = parseNumLike(row[COL.lamF]);
+      const lamW = parseNumLike(row[COL.lamW]);
+      const Mn = nominalMomentKipFt(Fy, E, Zx, Sx, lamF, lamW);
+      const verdict = flangeCompactnessVerdict(lamF, Fy, E);
+      return { row, Zx, Sx, lamF, lamW, Mn, verdict };
+    }
+
     function recompute() {
       normalizeInputs();
-      const ins = activeInputs();
       const method = String(methodEl.value || 'lrfd').toLowerCase();
       const isLRFD = method === 'lrfd';
       const E = E_DEFAULT;
+      const FyN = fyFromSelect(steelN);
+      const FyY = fyFromSelect(steelY);
+      setOutSpan(els.fyDispN, Number.isFinite(FyN) ? `${fmt(FyN, 3)} ksi` : '—');
+      setOutSpan(els.fyDispY, Number.isFinite(FyY) ? `${fmt(FyY, 3)} ksi` : '—');
+
+      const ins = activeInputs();
       const Fy = fyFromSelect(ins.steel);
-      setOutSpan(els.fyDispN, Number.isFinite(Fy) ? `${fmt(Fy, 3)} ksi` : '—');
-      setOutSpan(els.fyDispY, Number.isFinite(Fy) ? `${fmt(Fy, 3)} ksi` : '—');
-      const bc = workbookBeamCase(ins.beam);
-      const KMOM = bc.momentCoeff;
+      const bcDesign = workbookBeamCase(ins.beam);
+      const KMOM = bcDesign.momentCoeff;
+
+      const dlN = parseNumLike(els.dlN?.value);
+      const llN = parseNumLike(els.llN?.value);
+      const LN = parseNumLike(els.lN?.value);
+      const dlY = parseNumLike(els.dlY?.value);
+      const llY = parseNumLike(els.llY?.value);
+      const LY = parseNumLike(els.lY?.value);
+
+      const bcN = workbookBeamCase(String(els.beamN?.value || 'simple-u'));
+      const bcY = workbookBeamCase(String(els.beamY?.value || 'simple-u'));
+
+      const validN =
+        [dlN, llN, LN].every((x) => Number.isFinite(x) && x >= 0) &&
+        Number.isFinite(LN) &&
+        LN > 0 &&
+        Number.isFinite(FyN) &&
+        FyN > 0;
+      const validY =
+        [dlY, llY, LY].every((x) => Number.isFinite(x) && x >= 0) &&
+        Number.isFinite(LY) &&
+        LY > 0 &&
+        Number.isFinite(FyY) &&
+        FyY > 0;
+
+      fillLoadOut(els.outN, validN ? loadPack(dlN, llN, LN, bcN.momentCoeff, FyN) : null);
+      fillLoadOut(els.outY, validY ? loadPack(dlY, llY, LY, bcY.momentCoeff, FyY) : null);
+
+      syncBeamFormulasFromInputs();
 
       if (els.capSym) {
         els.capSym.innerHTML = isLRFD ? 'M<sub>u</sub> =' : 'M<sub>a</sub> =';
@@ -541,22 +768,25 @@
       const deltaLimIn =
         deflOn && Number.isFinite(L) && L > 0 ? allowableDeflectionInches(L, denomSrc) : null;
 
-      syncBeamFormulaLabels(ins.beam);
+      const invalid =
+        ![dl, ll, L].every((x) => Number.isFinite(x) && x >= 0) ||
+        !Number.isFinite(L) ||
+        L <= 0 ||
+        !Number.isFinite(Fy) ||
+        Fy <= 0;
 
-      const invalid = ![dl, ll, L].every((x) => Number.isFinite(x) && x >= 0) || !Number.isFinite(L) || L <= 0;
-
-      if (invalid) {
+      const clearDesignOutputs = () => {
+        if (els.beamLblN) els.beamLblN.textContent = '—';
         [
-          ...Object.values(els.outN),
-          ...Object.values(els.outY),
           ...Object.values(els.lw),
-          ...Object.values(els.ass1),
           els.lpf,
           els.lrf,
           els.verdict,
           els.Mn,
           els.allowDefl,
           els.deflY,
+          els.deflYLrfd,
+          els.deflYAsd,
           els.ixChip,
           els.ixSec,
           els.ixZx,
@@ -565,53 +795,54 @@
           els.ixLf,
           els.ixW,
           els.capVal,
+          els.capLrfdDem,
+          els.capLrfdCap,
+          els.capAsdDem,
+          els.capAsdCap,
           els.finalSec,
-          els.finalRm,
-          els.fyDispN,
-          els.fyDispY,
+          els.ass1.sec,
+          els.ass1.zx,
+          els.ass1.w,
+          els.ass1.sx,
+          els.ass1.ix,
+          els.ass1.lf,
+          els.ass1.rm,
+          els.ass1.secAsd,
+          els.ass1.zxAsd,
+          els.ass1.ixAsd,
         ].forEach((el) => {
           if (el) el.textContent = '—';
         });
+        [
+          els.capLrfdRm,
+          els.capAsdRm,
+          els.deflRmLrfd,
+          els.deflRmAsd,
+          els.ass1.rm,
+          els.ass1.rmAsd,
+          els.finalRm,
+        ].forEach((el) => {
+          if (el) {
+            el.textContent = '—';
+            el.classList.remove('sf-bendNoDef__remarkPill--safe', 'sf-bendNoDef__remarkPill--unsafe');
+          }
+        });
         if (els.capSym) els.capSym.innerHTML = 'M<sub>u</sub>';
         clearDeflMirrorPanels();
+      };
+
+      if (invalid) {
+        clearDesignOutputs();
         return;
       }
 
-      c12v = 1.2 * dl + 1.6 * ll;
-      c14v = 1.4 * dl;
-      Wu_val = Math.max(c12v, c14v);
-      dlll_val = dl + ll;
-      Wa_val = dlll_val;
-
-      Mu_val = Wu_val * L * L * KMOM;
-      Ma_req_val = Wa_val * L * L * KMOM;
-
-      if (isLRFD) {
-        Zx_req = (12 * Mu_val) / (PHI_B * Fy);
-      } else {
-        Zx_req = (12 * Ma_req_val * OMEGA_B) / Fy;
-      }
-
-      const oActive = deflOn ? els.outY : els.outN;
-      const oIdle = deflOn ? els.outN : els.outY;
-
-      setOutSpan(oActive.c12, fmt(c12v, 4));
-      setOutSpan(oActive.c14, fmt(c14v, 4));
-      setOutSpan(oActive.Wu, fmt(Wu_val, 4));
-      setOutSpan(oActive.Mu, fmt(Mu_val, 3));
-      setOutSpan(oActive.dlll, fmt(dlll_val, 4));
-      setOutSpan(oActive.Wa, fmt(Wa_val, 4));
-      setOutSpan(oActive.Ma, fmt(Ma_req_val, 3));
-      setOutSpan(oActive.ZxReq, fmt(Zx_req, 3));
-
-      setOutSpan(oIdle.c12, '—');
-      setOutSpan(oIdle.c14, '—');
-      setOutSpan(oIdle.Wu, '—');
-      setOutSpan(oIdle.Mu, '—');
-      setOutSpan(oIdle.dlll, '—');
-      setOutSpan(oIdle.Wa, '—');
-      setOutSpan(oIdle.Ma, '—');
-      setOutSpan(oIdle.ZxReq, '—');
+      const c12v = 1.2 * dl + 1.6 * ll;
+      const c14v = 1.4 * dl;
+      const Wu_val = Math.max(c12v, c14v);
+      const dlll_val = dl + ll;
+      const Wa_val = dlll_val;
+      const Mu_val = Wu_val * L * L * KMOM;
+      const Ma_req_val = Wa_val * L * L * KMOM;
 
       const demandStrength = isLRFD ? Mu_val : Ma_req_val;
       if (els.capVal) els.capVal.textContent = fmt(demandStrength, 3);
@@ -623,32 +854,29 @@
 
       let I_min = 0;
       if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
-        const Wsvc = dlll_val;
-        const ixReq = requiredIx(Wsvc, L, E, deltaLimIn, bc.deflectionK);
-        if (Number.isFinite(ixReq) && ixReq > 0) I_min = ixReq;
-        setOutSpan(els.ixChip, fmt(ixReq, 1));
+        const ixReqDisp = requiredIx(dlll_val, L, E, deltaLimIn, bcDesign.deflectionK);
+        if (Number.isFinite(ixReqDisp) && ixReqDisp > 0) I_min = ixReqDisp;
+        setOutSpan(els.ixChip, Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
         setOutSpan(els.allowDefl, formatDeflectionDual(deltaLimIn));
       } else {
         setOutSpan(els.ixChip, '—');
         setOutSpan(els.allowDefl, '—');
         setOutSpan(els.deflY, '—');
+        setOutSpan(els.deflYLrfd, '—');
+        setOutSpan(els.deflYAsd, '—');
+        setRemarkSafe(els.deflRmLrfd, null);
+        setRemarkSafe(els.deflRmAsd, null);
       }
 
       if (wRows.length === 0) {
-        setOutSpan(els.lw.Wu, '—');
-        setOutSpan(els.lw.Mu, '—');
-        setOutSpan(els.lw.Wa, '—');
-        setOutSpan(els.lw.Ma, '—');
-        setOutSpan(els.ass1.sec, '—');
-        setOutSpan(els.ass1.zx, '—');
-        setOutSpan(els.ass1.w, '—');
-        setOutSpan(els.ass1.sx, '—');
-        setOutSpan(els.ass1.lf, '—');
-        setOutSpan(els.ass1.rm, '—');
-        setOutSpan(els.verdict, '—');
-        setOutSpan(els.Mn, '—');
-        setOutSpan(els.finalSec, '—');
-        setOutSpan(els.finalRm, '—');
+        clearDesignOutputs();
+        /* Allowable Δ and required I<sub>c</sub> use span, service load, and limit only — not the W-shape CSV.
+           clearDesignOutputs() wipes them; restore so WITH DEFLECTION card is not stuck on “—” while CSV loads or if fetch fails. */
+        if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
+          const ixReqDisp = requiredIx(dlll_val, L, E, deltaLimIn, bcDesign.deflectionK);
+          setOutSpan(els.ixChip, Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
+          setOutSpan(els.allowDefl, formatDeflectionDual(deltaLimIn));
+        }
         mirrorDeflPanels(ins.beam);
         return;
       }
@@ -663,52 +891,87 @@
         .filter((x) => x.lab && Number.isFinite(x.wLb) && x.wLb > 0 && Number.isFinite(x.Ix) && x.Ix > 0)
         .sort((a, b) => a.wLb - b.wLb || a.Ix - b.Ix);
 
-      let w_self = 0;
-      let picked = null;
-      let Wu_tot = Wu_val;
-      let Wa_tot = Wa_val;
-      let Mu_tot = Mu_val;
-      let Ma_tot = Ma_req_val;
+      const lrfdR = pickBeamSelfWeightShape(true, sorted, I_min, dl, ll, L, KMOM, Fy, E);
+      const asdR = pickBeamSelfWeightShape(false, sorted, I_min, dl, ll, L, KMOM, Fy, E);
+      const ixPick =
+        deflOn && Number.isFinite(I_min) && I_min > 0 ? pickLightestMeetingIx(I_min, sorted) : null;
 
-      for (let iter = 0; iter < 15; iter++) {
-        Wu_tot = Math.max(1.2 * (dl + w_self) + 1.6 * ll, 1.4 * (dl + w_self));
-        Wa_tot = dl + ll + w_self;
-        Mu_tot = Wu_tot * L * L * KMOM;
-        Ma_tot = Wa_tot * L * L * KMOM;
-        const demand = isLRFD ? Mu_tot : Ma_tot;
+      setOutSpan(els.lw.Wu, fmt(lrfdR.Wu_tot, 4));
+      setOutSpan(els.lw.Mu, fmt(lrfdR.Mu_tot, 3));
+      setOutSpan(els.lw.Wa, fmt(asdR.Wa_tot, 4));
+      setOutSpan(els.lw.Ma, fmt(asdR.Ma_tot, 3));
 
-        picked = null;
-        for (const s of sorted) {
-          if (s.Ix < I_min) continue;
-          const cap = designStrengthKipFt(Fy, E, s.row, isLRFD);
-          if (cap != null && cap >= demand) {
-            picked = s;
-            break;
+      const applyAss1Dual = () => {
+        if (lrfdR.picked) {
+          const p = shapeProps(lrfdR.picked, Fy, E);
+          setOutSpan(els.ass1.sec, lrfdR.picked.lab);
+          setOutSpan(els.ass1.zx, fmt(p.Zx, 3));
+          setOutSpan(els.ass1.w, fmt(lrfdR.picked.wLb, 1));
+          setOutSpan(els.ass1.sx, fmt(p.Sx, 3));
+          setOutSpan(els.ass1.ix, fmt(lrfdR.picked.Ix, 1));
+          setOutSpan(els.ass1.lf, fmt(p.lamF, 6));
+          const capL = designStrengthKipFt(Fy, E, p.row, true);
+          const detailL = `Demand ${fmt(lrfdR.Mu_tot, 3)} kips·ft; φMₙ ${fmt(capL, 3)} kips·ft.`;
+          const WsvcL = dl + ll + lrfdR.w_self;
+          let ok = capL != null && capL >= lrfdR.Mu_tot;
+          if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
+            const dMax = deltaInches(WsvcL, L, E, lrfdR.picked.Ix, bcDesign.deflectionK);
+            const ixOk = !(Number.isFinite(I_min) && I_min > 0) || lrfdR.picked.Ix >= I_min - 1e-6;
+            const delOk =
+              Number.isFinite(dMax) && Number.isFinite(deltaLimIn) ? dMax <= deltaLimIn + 1e-9 : false;
+            ok = ok && ixOk && delOk;
           }
+          setOutSpan(els.ass1.rm, `${detailL} — ${ok ? 'SAFE' : 'UNSAFE'}`);
+          els.ass1.rm.classList.toggle('sf-bendNoDef__remarkPill--safe', ok);
+          els.ass1.rm.classList.toggle('sf-bendNoDef__remarkPill--unsafe', !ok);
+        } else {
+          ['sec', 'zx', 'w', 'sx', 'ix', 'lf'].forEach((k) => setOutSpan(els.ass1[k], '—'));
+          setOutSpan(els.ass1.rm, '—');
+          els.ass1.rm.classList.remove('sf-bendNoDef__remarkPill--safe', 'sf-bendNoDef__remarkPill--unsafe');
         }
 
-        if (!picked) break;
+        if (asdR.picked) {
+          const p = shapeProps(asdR.picked, Fy, E);
+          setOutSpan(els.ass1.secAsd, asdR.picked.lab);
+          setOutSpan(els.ass1.zxAsd, fmt(p.Zx, 3));
+          setOutSpan(els.ass1.ixAsd, fmt(asdR.picked.Ix, 1));
+          const capA = designStrengthKipFt(Fy, E, p.row, false);
+          const WsvcA = dl + ll + asdR.w_self;
+          let ok = capA != null && capA >= asdR.Ma_tot;
+          if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
+            const dMax = deltaInches(WsvcA, L, E, asdR.picked.Ix, bcDesign.deflectionK);
+            const ixOk = !(Number.isFinite(I_min) && I_min > 0) || asdR.picked.Ix >= I_min - 1e-6;
+            const delOk =
+              Number.isFinite(dMax) && Number.isFinite(deltaLimIn) ? dMax <= deltaLimIn + 1e-9 : false;
+            ok = ok && ixOk && delOk;
+          }
+          setRemarkSafe(els.ass1.rmAsd, ok);
+        } else {
+          setOutSpan(els.ass1.secAsd, '—');
+          setOutSpan(els.ass1.zxAsd, '—');
+          setOutSpan(els.ass1.ixAsd, '—');
+          setRemarkSafe(els.ass1.rmAsd, null);
+        }
+      };
 
-        const w_new = picked.wLb / 1000;
-        if (Math.abs(w_new - w_self) < 1e-5) break;
-        w_self = w_new;
-      }
-
-      if (!picked) {
-        setOutSpan(els.lw.Wu, fmt(Wu_tot, 4));
-        setOutSpan(els.lw.Mu, fmt(Mu_tot, 3));
-        setOutSpan(els.lw.Wa, fmt(Wa_tot, 4));
-        setOutSpan(els.lw.Ma, fmt(Ma_tot, 3));
-        setOutSpan(els.ass1.sec, '—');
-        setOutSpan(els.ass1.zx, '—');
-        setOutSpan(els.ass1.w, '—');
-        setOutSpan(els.ass1.sx, '—');
-        setOutSpan(els.ass1.lf, '—');
+      if (!lrfdR.picked && !asdR.picked) {
+        applyAss1Dual();
         setOutSpan(els.verdict, '—');
         setOutSpan(els.Mn, '—');
         setOutSpan(els.finalSec, '—');
-        setOutSpan(els.finalRm, 'No W-shape satisfies strength / inertia checks.');
-        setOutSpan(els.ass1.rm, '—');
+        setRemarkSafe(els.finalRm, null);
+        [
+          els.capLrfdDem,
+          els.capLrfdCap,
+          els.capAsdDem,
+          els.capAsdCap,
+          els.deflYLrfd,
+          els.deflYAsd,
+        ].forEach((el) => setOutSpan(el, '—'));
+        setRemarkSafe(els.capLrfdRm, null);
+        setRemarkSafe(els.capAsdRm, null);
+        setRemarkSafe(els.deflRmLrfd, null);
+        setRemarkSafe(els.deflRmAsd, null);
         if (deflOn) {
           ['ixSec', 'ixZx', 'ixSx', 'ixI', 'ixLf', 'ixW'].forEach((k) => setOutSpan(els[k], '—'));
         }
@@ -716,58 +979,103 @@
         return;
       }
 
-      const row = picked.row;
-      const lab = picked.lab;
-      const Zx = parseNumLike(row[COL.Zx]);
-      const Sx = parseNumLike(row[COL.Sx]);
-      const lamF = parseNumLike(row[COL.lamF]);
-      const lamW = parseNumLike(row[COL.lamW]);
-      const Mn = nominalMomentKipFt(Fy, E, Zx, Sx, lamF, lamW);
-      const verdict = compactnessVerdict(lamF, lamW, Fy, E);
+      applyAss1Dual();
 
-      setOutSpan(els.lw.Wu, fmt(Wu_tot, 4));
-      setOutSpan(els.lw.Mu, fmt(Mu_tot, 3));
-      setOutSpan(els.lw.Wa, fmt(Wa_tot, 4));
-      setOutSpan(els.lw.Ma, fmt(Ma_tot, 3));
-
-      setOutSpan(els.ass1.sec, lab);
-      setOutSpan(els.ass1.zx, fmt(Zx, 3));
-      setOutSpan(els.ass1.w, fmt(picked.wLb, 1));
-      setOutSpan(els.ass1.sx, fmt(Sx, 3));
-      setOutSpan(els.ass1.lf, fmt(lamF, 6));
-      setOutSpan(els.verdict, verdict);
-      setOutSpan(els.Mn, fmt(Mn, 3));
-
-      const rm = `${isLRFD ? 'LRFD' : 'ASD'} demand ${fmt(isLRFD ? Mu_tot : Ma_tot, 3)} kips·ft; ${isLRFD ? 'φMₙ' : 'Mₙ/Ω'} ${fmt(designStrengthKipFt(Fy, E, row, isLRFD), 3)} kips·ft.`;
-      setOutSpan(els.ass1.rm, rm);
-
-      setOutSpan(els.finalSec, lab);
-      setOutSpan(
-        els.finalRm,
-        verdict.includes('SLENDER SECTION')
-          ? 'Check slender-element provisions; nominal strength reduced.'
-          : 'Section satisfies bending strength for governing combination.'
-      );
-
-      if (deflOn) {
-        const Wsvc = dl + ll + w_self;
-        const dMax = deltaInches(Wsvc, L, E, picked.Ix, bc.deflectionK);
-        setOutSpan(els.deflY, Number.isFinite(dMax) ? formatDeflectionDual(dMax) : '—');
-        setOutSpan(els.ixSec, lab);
-        setOutSpan(els.ixZx, fmt(Zx, 3));
-        setOutSpan(els.ixSx, fmt(Sx, 3));
-        setOutSpan(els.ixI, fmt(picked.Ix, 1));
-        setOutSpan(els.ixLf, fmt(lamF, 6));
-        setOutSpan(els.ixW, fmt(picked.wLb, 1));
+      const govPick = isLRFD ? lrfdR.picked : asdR.picked;
+      if (govPick) {
+        const p = shapeProps(govPick, Fy, E);
+        setOutSpan(els.verdict, p.verdict);
+        setOutSpan(els.Mn, fmt(p.Mn, 3));
       } else {
-        ['ixSec', 'ixZx', 'ixSx', 'ixI', 'ixLf', 'ixW'].forEach((k) => {
-          if (els[k]) els[k].textContent = '—';
-        });
+        setOutSpan(els.verdict, '—');
+        setOutSpan(els.Mn, '—');
+      }
+
+      const capL =
+        lrfdR.picked != null ? designStrengthKipFt(Fy, E, lrfdR.picked.row, true) : null;
+      const capA =
+        asdR.picked != null ? designStrengthKipFt(Fy, E, asdR.picked.row, false) : null;
+
+      setOutSpan(els.capLrfdDem, fmt(lrfdR.Mu_tot, 3));
+      setOutSpan(els.capLrfdCap, capL != null ? fmt(capL, 3) : '—');
+      setRemarkSafe(els.capLrfdRm, capL != null && capL >= lrfdR.Mu_tot);
+
+      setOutSpan(els.capAsdDem, fmt(asdR.Ma_tot, 3));
+      setOutSpan(els.capAsdCap, capA != null ? fmt(capA, 3) : '—');
+      setRemarkSafe(els.capAsdRm, capA != null && capA >= asdR.Ma_tot);
+
+      const finalLab = govPick ? govPick.lab : '—';
+      setOutSpan(els.finalSec, finalLab);
+
+      const bendGovOk = isLRFD
+        ? capL != null && capL >= lrfdR.Mu_tot
+        : capA != null && capA >= asdR.Ma_tot;
+
+      let deflGovOk = true;
+      if (deflOn && govPick && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
+        const Wsvc = dl + ll + (isLRFD ? lrfdR.w_self : asdR.w_self);
+        const dMax = deltaInches(Wsvc, L, E, govPick.Ix, bcDesign.deflectionK);
+        deflGovOk =
+          Number.isFinite(dMax) &&
+          dMax <= deltaLimIn + 1e-9 &&
+          (!(Number.isFinite(I_min) && I_min > 0) || govPick.Ix >= I_min - 1e-6);
+      }
+
+      /** SAFE when strength and serviceability pass; M_n already reflects non-compact/slender limits. */
+      const overallOk = Boolean(govPick && bendGovOk && deflGovOk);
+
+      setRemarkSafe(els.finalRm, govPick ? overallOk : null);
+
+      if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
+        if (lrfdR.picked) {
+          const Wl = dl + ll + lrfdR.w_self;
+          const dL = deltaInches(Wl, L, E, lrfdR.picked.Ix, bcDesign.deflectionK);
+          setOutSpan(els.deflYLrfd, Number.isFinite(dL) ? fmt(dL, 9) : '—');
+          const ok =
+            Number.isFinite(dL) &&
+            dL <= deltaLimIn + 1e-9 &&
+            (!(Number.isFinite(I_min) && I_min > 0) || lrfdR.picked.Ix >= I_min - 1e-6);
+          setRemarkSafe(els.deflRmLrfd, ok);
+        } else {
+          setOutSpan(els.deflYLrfd, '—');
+          setRemarkSafe(els.deflRmLrfd, null);
+        }
+        if (asdR.picked) {
+          const Wa = dl + ll + asdR.w_self;
+          const dA = deltaInches(Wa, L, E, asdR.picked.Ix, bcDesign.deflectionK);
+          setOutSpan(els.deflYAsd, Number.isFinite(dA) ? fmt(dA, 9) : '—');
+          const ok =
+            Number.isFinite(dA) &&
+            dA <= deltaLimIn + 1e-9 &&
+            (!(Number.isFinite(I_min) && I_min > 0) || asdR.picked.Ix >= I_min - 1e-6);
+          setRemarkSafe(els.deflRmAsd, ok);
+        } else {
+          setOutSpan(els.deflYAsd, '—');
+          setRemarkSafe(els.deflRmAsd, null);
+        }
+        const dLegacy =
+          lrfdR.picked &&
+          deltaInches(dl + ll + lrfdR.w_self, L, E, lrfdR.picked.Ix, bcDesign.deflectionK);
+        setOutSpan(
+          els.deflY,
+          Number.isFinite(dLegacy) ? formatDeflectionDual(dLegacy) : '—'
+        );
+      }
+
+      if (deflOn && ixPick) {
+        const ip = shapeProps(ixPick, Fy, E);
+        setOutSpan(els.ixSec, ixPick.lab);
+        setOutSpan(els.ixZx, fmt(ip.Zx, 3));
+        setOutSpan(els.ixSx, fmt(ip.Sx, 3));
+        setOutSpan(els.ixI, fmt(ixPick.Ix, 1));
+        setOutSpan(els.ixLf, fmt(ip.lamF, 6));
+        setOutSpan(els.ixW, fmt(ixPick.wLb, 1));
+      } else {
+        ['ixSec', 'ixZx', 'ixSx', 'ixI', 'ixLf', 'ixW'].forEach((k) => setOutSpan(els[k], '—'));
       }
 
       mirrorDeflPanels(ins.beam);
     }
-
     function wire() {
       pane.querySelectorAll('input, select').forEach((el) => {
         if (el === methodEl || el === methodDefl) return;
@@ -780,12 +1088,14 @@
           recompute();
         });
       });
-      steelN.addEventListener('change', () => {
-        steelY.value = steelN.value;
-      });
-      steelY.addEventListener('change', () => {
-        steelN.value = steelY.value;
-      });
+      /** Sync paired steel controls before bubble handlers so Fy / load rows stay aligned. */
+      function syncSteelPeersFrom(source) {
+        if (!steelN || !steelY) return;
+        if (source === steelN) steelY.value = steelN.value;
+        else if (source === steelY) steelN.value = steelY.value;
+      }
+      steelN.addEventListener('change', () => syncSteelPeersFrom(steelN), true);
+      steelY.addEventListener('change', () => syncSteelPeersFrom(steelY), true);
       els.beamN?.addEventListener('change', () => {
         if (els.beamY) els.beamY.value = els.beamN.value;
       });
@@ -823,6 +1133,13 @@
     applyDefaults();
     wire();
     if (methodDefl && methodEl) methodDefl.value = methodEl.value;
+
+    function syncDesignDeflDataset() {
+      if (!root || !deflYes || !deflNo) return;
+      root.dataset.sfBendDefl = deflYes.checked ? 'with' : 'without';
+    }
+    syncDesignDeflDataset();
+    [deflNo, deflYes].filter(Boolean).forEach((el) => el.addEventListener('change', syncDesignDeflDataset));
 
     window.addEventListener('sf:steel-grade-change', () => {
       const pid = window.SteelForge?.activeStructuralSteelGrade?.id ?? getPreferredSteelGradeId();

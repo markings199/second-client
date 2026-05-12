@@ -108,7 +108,8 @@
     });
   }
 
-  const MODE_PAGES = new Set(['bending', 'compression', 'tension', 'shear', 'tension-rod']);
+  // Pages that support #…/analysis vs #…/design routing (tension rod is design-only).
+  const MODE_PAGES = new Set(['bending', 'compression', 'tension', 'shear']);
 
   function applyRouteMode(safeId, modeWant) {
     if (!MODE_PAGES.has(safeId) || !window.SteelForge?.activateModuleMode) return;

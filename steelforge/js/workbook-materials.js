@@ -18,6 +18,31 @@
       deflectionFormula: '5WL⁴/384EI',
     },
     {
+      id: 'simple-tri-to-end',
+      label: 'SIMPLE BEAM - Load increasing uniformly to one end',
+      /** Peak intensity w (klf); M_max = w L²/(9√3) kip·ft */
+      momentCoeff: 1 / (9 * Math.sqrt(3)),
+      deflectionK: 1 / 60,
+      momentFormula: 'wL²/(9√3)',
+      deflectionFormula: 'wL⁴/(60EI)',
+    },
+    {
+      id: 'simple-tri-to-center',
+      label: 'SIMPLE BEAM - Load increasing uniformly to the center',
+      momentCoeff: 1 / 12,
+      deflectionK: 1 / 60,
+      momentFormula: 'wL²/12',
+      deflectionFormula: 'wL⁴/(60EI)',
+    },
+    {
+      id: 'simple-tri-from-center',
+      label: 'SIMPLE BEAM - Load increasing uniformly from center',
+      momentCoeff: 1 / 12,
+      deflectionK: 1 / 60,
+      momentFormula: 'wL²/12',
+      deflectionFormula: 'wL⁴/(60EI)',
+    },
+    {
       id: 'fixed-pinned-u',
       label: 'FIXED AND PIN - Uniformly distributed load',
       momentCoeff: 1 / 8,
@@ -34,6 +59,15 @@
       deflectionFormula: 'WL⁴/384EI',
     },
     {
+      id: 'fixed-free-u',
+      label: 'FIXED AND FREE - Uniformly distributed load',
+      /** Cantilever UDL: M = wL²/2 at fixed end */
+      momentCoeff: 1 / 2,
+      deflectionK: 1 / 8,
+      momentFormula: 'WL²/2',
+      deflectionFormula: 'WL⁴/(8EI)',
+    },
+    {
       id: 'cantilever-u',
       label: 'CANTILEVER - Uniformly distributed load',
       momentCoeff: 1 / 3,
@@ -42,8 +76,16 @@
       deflectionFormula: 'WL⁴/24EI',
     },
     {
+      id: 'cantilever-tri-to-fixed',
+      label: 'CANTILEVER - Load increasing uniformly to fixed end',
+      momentCoeff: 1 / 6,
+      deflectionK: 1 / 30,
+      momentFormula: 'wL²/6',
+      deflectionFormula: 'wL⁴/(30EI)',
+    },
+    {
       id: 'overhang-u',
-      label: 'BEAM OVERHANG ONE SUPPORT - Uniformly distributed load between support',
+      label: 'BEAM OVERHANGING ONE SUPPORT - Uniformly distributed load between supports',
       momentCoeff: 1 / 8,
       deflectionK: 5 / 384,
       momentFormula: 'WL²/8',

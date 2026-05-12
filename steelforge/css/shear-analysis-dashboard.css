@@ -2,16 +2,17 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash {
   box-sizing: border-box;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.92rem;
   color: #1f2937;
   width: 100%;
   max-width: none;
   margin: 0 auto;
-  padding: clamp(14px, 2vw, 20px) clamp(10px, 1.4vw, 18px) clamp(16px, 2.2vw, 22px);
+  padding: clamp(8px, 1.2vw, 12px) clamp(8px, 1vw, 14px) clamp(10px, 1.4vw, 14px);
   /* Align with DESIGN SHEAR outer `.sf-comp__card` chrome */
   background: rgba(151, 148, 140, 0.95);
   border: 1px solid rgba(90, 86, 78, 0.25);
-  border-radius: 14px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash *,
@@ -21,15 +22,15 @@
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__header {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__panelTitle {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
-  max-width: 280px;
+  gap: 6px;
+  max-width: 260px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__label {
@@ -37,16 +38,16 @@
   width: 100%;
   box-sizing: border-box;
   margin: 0;
-  padding: 9px 12px;
+  padding: 6px 10px;
   border-radius: 999px;
   background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
   border: 1px solid rgba(15, 61, 110, 0.55);
   box-shadow:
     0 2px 8px rgba(19, 78, 138, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  font-size: clamp(0.72rem, 1.05vw, 0.82rem);
+  font-size: clamp(0.62rem, 0.85vw, 0.72rem);
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #f0f7ff;
   text-align: center;
@@ -61,8 +62,8 @@
   border-radius: 999px;
   background: rgba(232, 227, 216, 0.98);
   border: 1px solid rgba(105, 100, 90, 0.16);
-  padding: 0 16px 0 20px;
-  min-height: 52px;
+  padding: 0 12px 0 14px;
+  min-height: 40px;
   box-shadow: 0 1px 2px rgba(62, 55, 49, 0.05);
 }
 
@@ -72,9 +73,9 @@
   border: 0;
   background: transparent;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 0.88rem;
   color: #111827;
-  padding: 14px 32px 14px 0;
+  padding: 8px 28px 8px 0;
   cursor: pointer;
   font-family: inherit;
   width: 100%;
@@ -94,30 +95,30 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__workspace {
   display: grid;
   /* Give the results column enough room so limiting-slenderness + verdict do not overlap */
-  grid-template-columns: minmax(320px, 1.35fr) minmax(280px, 1fr);
-  gap: 20px;
+  grid-template-columns: minmax(280px, 1.35fr) minmax(260px, 1fr);
+  gap: 12px;
   align-items: start;
 }
 
 @media (min-width: 1100px) {
   .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__workspace {
-    grid-template-columns: minmax(400px, 1.25fr) minmax(480px, 1.15fr);
-    gap: 22px;
+    grid-template-columns: minmax(340px, 1.25fr) minmax(380px, 1.15fr);
+    gap: 14px;
   }
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__resultsStack {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 /* Match DESIGN SHEAR `.sf-shearDes__miniCard` cream panels */
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__sheet {
   background: rgba(248, 246, 239, 0.98);
   border: 1px solid rgba(176, 168, 150, 0.3);
-  border-radius: 16px;
-  padding: clamp(18px, 2.2vw, 24px);
+  border-radius: 12px;
+  padding: clamp(10px, 1.4vw, 14px);
   box-shadow: 0 1px 2px rgba(62, 55, 49, 0.06);
   min-width: 0;
 }
@@ -127,10 +128,10 @@
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__sectionHeading {
-  margin: 0 0 16px;
-  padding: 10px 14px;
+  margin: 0 0 10px;
+  padding: 7px 10px;
   border-radius: 999px;
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -147,26 +148,26 @@
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__fieldGroup {
   display: grid;
-  gap: 8px;
-  margin-bottom: 18px;
+  gap: 5px;
+  margin-bottom: 12px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__fieldLabel {
   display: block;
   box-sizing: border-box;
   width: 100%;
-  margin-bottom: 8px;
-  padding: 9px 12px;
+  margin-bottom: 5px;
+  padding: 6px 10px;
   border-radius: 999px;
   background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%);
   border: 1px solid rgba(15, 61, 110, 0.55);
   box-shadow:
     0 2px 8px rgba(19, 78, 138, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   color: #f0f7ff;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   font-weight: 800;
   text-align: center;
   line-height: 1.35;
@@ -176,9 +177,9 @@
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 50px;
+  min-height: 38px;
   width: 100%;
-  padding: 0 36px 0 18px;
+  padding: 0 30px 0 14px;
   border-radius: 999px;
   border: 1px solid rgba(176, 168, 150, 0.35);
   background: rgba(205, 218, 232, 0.55);
@@ -190,10 +191,10 @@
   width: 100%;
   border: 0;
   background: transparent;
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #111827;
-  min-height: 50px;
+  min-height: 38px;
   cursor: pointer;
   font-family: inherit;
 }
@@ -212,14 +213,14 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricCard {
-  min-height: 96px;
-  padding: 16px 14px;
-  border-radius: 16px;
+  min-height: 64px;
+  padding: 8px 10px;
+  border-radius: 12px;
   background: rgba(248, 244, 234, 0.85);
   border: 1px solid rgba(105, 100, 90, 0.18);
   display: grid;
@@ -228,7 +229,7 @@
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricLabel {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: #6b7280;
   letter-spacing: 0.03em;
@@ -237,7 +238,7 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__metricInput {
   border: 0;
   background: transparent;
-  font-size: 1.45rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: #111827;
   width: 100%;
@@ -252,10 +253,10 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__gradeInput {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
-  padding: 0 12px 0 14px;
-  min-height: 50px;
+  padding: 0 10px 0 12px;
+  min-height: 38px;
   border-radius: 999px;
   border: 1px solid rgba(176, 168, 150, 0.35);
   background: rgba(205, 218, 232, 0.45);
@@ -263,12 +264,12 @@
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__gradeChip {
   flex-shrink: 0;
-  min-width: 52px;
-  font-size: 0.95rem;
+  min-width: 40px;
+  font-size: 0.78rem;
   font-weight: 800;
   text-align: center;
-  padding: 12px 8px;
-  border-radius: 20px;
+  padding: 6px 6px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #0057b8, #1e90ff);
   color: #fff;
 }
@@ -281,9 +282,9 @@
   border: 0;
   background: transparent;
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.74rem;
   color: #111827;
-  padding: 12px 8px;
+  padding: 6px 4px;
   cursor: pointer;
   font-family: inherit;
 }
@@ -293,16 +294,16 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  margin-top: 8px;
-  font-size: 0.85rem;
+  margin-top: 6px;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #475569;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__fyInput {
-  width: 72px;
-  padding: 8px 10px;
-  border-radius: 14px;
+  width: 68px;
+  padding: 5px 8px;
+  border-radius: 10px;
   border: 1px solid rgba(105, 100, 90, 0.2);
   background: rgba(255, 255, 255, 0.92);
   font-weight: 700;
@@ -313,13 +314,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 50px;
+  min-height: 38px;
   width: 100%;
-  padding: 0 20px;
+  padding: 0 14px;
   border-radius: 999px;
   border: 1px solid rgba(176, 168, 150, 0.35);
   background: rgba(205, 218, 232, 0.45);
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #111827;
 }
@@ -359,10 +360,10 @@
   display: block;
   box-sizing: border-box;
   width: 100%;
-  margin: 0 0 14px;
-  padding: 9px 14px;
+  margin: 0 0 8px;
+  padding: 6px 10px;
   border-radius: 999px;
-  font-size: 0.68rem;
+  font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -384,16 +385,16 @@
     the results column is often ~380–520px wide, which caused overlap before.
   */
   grid-template-columns: 1fr;
-  gap: 18px;
+  gap: 10px;
   align-items: stretch;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 
 /* Side-by-side formulas + verdict only on very wide viewports (entire dash is wide enough). */
 @media (min-width: 1520px) {
   .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__compactnessLayout {
     grid-template-columns: minmax(360px, 1fr) minmax(280px, 360px);
-    gap: 18px 24px;
+    gap: 12px 16px;
     align-items: stretch;
   }
 }
@@ -402,14 +403,14 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual {
   display: grid;
   grid-template-columns: minmax(160px, 1fr) minmax(112px, max-content);
-  grid-template-rows: repeat(3, minmax(44px, 1fr));
-  gap: 10px 20px;
+  grid-template-rows: repeat(3, minmax(32px, auto));
+  gap: 6px 12px;
   align-items: center;
-  padding: 18px 20px;
+  padding: 10px 12px;
   /* Match DESIGN SHEAR `.sf-shearDes__steelBox` inner tone */
   background: rgba(248, 244, 234, 0.94);
   border: 1px solid rgba(105, 100, 90, 0.2);
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: 0 1px 2px rgba(62, 55, 49, 0.05);
   min-width: 0;
   width: 100%;
@@ -419,7 +420,8 @@
   grid-column: 1;
   grid-row: 1 / 4;
   width: 100%;
-  max-width: min(360px, 100%);
+  max-width: min(240px, 100%);
+  max-height: 140px;
   height: auto;
   object-fit: contain;
   object-position: left center;
@@ -450,17 +452,17 @@
   align-items: center;
   justify-content: center;
   margin-left: 0;
-  min-width: 118px;
-  padding: 8px 14px;
+  min-width: 100px;
+  padding: 5px 10px;
   border-radius: 999px;
   font-weight: 800;
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   text-align: center;
   white-space: nowrap;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaBar--stacked {
-  min-width: 130px;
+  min-width: 108px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaBar--muted {
@@ -476,13 +478,13 @@
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__verdictBox {
-  padding: 16px 14px;
-  border-radius: 16px;
+  padding: 10px 10px;
+  border-radius: 12px;
   background: #fef9e7;
   border: 1px solid #f5e6b3;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   align-items: stretch;
   text-align: center;
   justify-content: center;
@@ -497,10 +499,10 @@
   display: block;
   box-sizing: border-box;
   width: 100%;
-  margin: 0 0 8px;
-  padding: 8px 12px;
+  margin: 0 0 6px;
+  padding: 6px 10px;
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -522,13 +524,13 @@
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__verdictPill {
   display: inline-flex;
-  padding: 11px 18px;
+  padding: 7px 12px;
   border-radius: 999px;
   background: #fce883;
   color: #1e3a8a;
   border: 1px solid #e6cc3a;
   font-weight: 800;
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   line-height: 1.3;
   text-align: center;
   letter-spacing: 0.04em;
@@ -538,16 +540,16 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__coefRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
-  margin-top: 4px;
-  font-size: 0.68rem;
+  margin-top: 2px;
+  font-size: 0.6rem;
   font-weight: 700;
   color: #4b5563;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__coefPill {
-  padding: 8px 11px;
+  padding: 5px 8px;
   border-radius: 999px;
   background: rgba(248, 246, 239, 0.98);
   border: 1px solid rgba(176, 168, 150, 0.28);
@@ -556,15 +558,15 @@
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__nominalFooter {
   display: grid;
-  gap: 10px;
+  gap: 6px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__nominalRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 8px;
+  padding: 8px 10px;
   border-radius: 999px;
   background: rgba(232, 227, 216, 0.85);
   border: 1px solid rgba(176, 168, 150, 0.35);
@@ -572,16 +574,16 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-size: 0.65rem;
+  font-size: 0.58rem;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__nominalValue {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 12px 16px;
-  border-radius: 14px;
+  min-height: 34px;
+  padding: 8px 12px;
+  border-radius: 10px;
   background: #fef3c7;
   color: #92400e;
   font-weight: 800;
@@ -595,33 +597,33 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  margin-top: 14px;
-  padding: 20px 18px;
-  border-radius: 16px;
+  gap: 0;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
   background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
   color: #ffffff;
   text-align: center;
-  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35);
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.28);
   font-weight: 800;
-  font-size: clamp(1.25rem, 2.2vw, 1.85rem);
-  line-height: 1.2;
+  font-size: clamp(0.95rem, 1.35vw, 1.15rem);
+  line-height: 1.15;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capHeroPill #sfShearAnaCapHeroLead {
   color: #ffffff;
-  font-size: 0.92em;
+  font-size: 0.85em;
   font-weight: 800;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capHeroPill .sf-shearDash__capNum {
   color: #ffffff;
-  font-size: 1.15em;
+  font-size: 1.05em;
   font-weight: 900;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capHeroUnit {
-  font-size: 0.72em;
+  font-size: 0.68em;
   font-weight: 700;
   opacity: 0.95;
   margin-top: 2px;
@@ -629,10 +631,10 @@
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capSub {
   display: grid;
-  gap: 10px;
-  margin-top: 16px;
+  gap: 6px;
+  margin-top: 10px;
   width: 100%;
-  font-size: 0.88rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #475569;
 }
@@ -641,9 +643,9 @@
   display: grid;
   grid-template-columns: minmax(140px, 1.2fr) minmax(100px, auto) minmax(48px, auto);
   align-items: center;
-  gap: 12px 16px;
-  padding: 12px 16px;
-  border-radius: 12px;
+  gap: 8px 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
   background: rgba(248, 244, 234, 0.75);
   border: 1px solid rgba(176, 168, 150, 0.28);
   width: 100%;
@@ -669,14 +671,14 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capDemand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__capDemand input {
-  width: 120px;
-  padding: 8px 12px;
-  border-radius: 16px;
+  width: 100px;
+  padding: 5px 10px;
+  border-radius: 12px;
   border: 1px solid rgba(105, 100, 90, 0.2);
   background: rgba(255, 255, 255, 0.9);
   font-weight: 700;
@@ -684,12 +686,12 @@
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__remarks {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
   background: rgba(232, 227, 216, 0.65);
   border: 1px solid rgba(176, 168, 150, 0.3);
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: rgba(62, 55, 49, 0.85);
   line-height: 1.45;

@@ -45,20 +45,32 @@
 
               <div class="sf-shearDash__metricGrid">
                 <div class="sf-shearDash__metricCard">
-                  <span class="sf-shearDash__metricLabel">λ<sub>f</sub></span>
-                  <input class="sf-shearDash__metricInput" id="sfShearAnaLambdaF" inputmode="decimal" readonly title="Flange slenderness from catalog" />
+                  <span class="sf-shearDash__metricLabel">d</span>
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaD" inputmode="decimal" readonly title="Overall depth d from catalog (in)" />
                 </div>
                 <div class="sf-shearDash__metricCard">
                   <span class="sf-shearDash__metricLabel">λ<sub>w</sub></span>
-                  <input class="sf-shearDash__metricInput" id="sfShearAnaLambda" inputmode="decimal" readonly title="Web slenderness h/t<sub>w</sub>" />
-                </div>
-                <div class="sf-shearDash__metricCard">
-                  <span class="sf-shearDash__metricLabel">A<sub>w</sub></span>
-                  <input class="sf-shearDash__metricInput" id="sfShearAnaAw" inputmode="decimal" title="Web area (in²)" />
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaLambda" inputmode="decimal" readonly title="Web slenderness h/t<sub>w</sub> from Steel Sections catalog" />
                 </div>
                 <div class="sf-shearDash__metricCard">
                   <span class="sf-shearDash__metricLabel">h</span>
-                  <input class="sf-shearDash__metricInput" id="sfShearAnaH" inputmode="decimal" title="Clear web depth (in)" />
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaH" inputmode="decimal" title="Clear web depth h = λ<sub>w</sub>·t<sub>w</sub> (in)" />
+                </div>
+                <div class="sf-shearDash__metricCard">
+                  <span class="sf-shearDash__metricLabel">A<sub>w</sub></span>
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaAw" inputmode="decimal" title="Web area A<sub>w</sub> = t<sub>w</sub>·d (in²)" />
+                </div>
+                <div class="sf-shearDash__metricCard">
+                  <span class="sf-shearDash__metricLabel">A<sub>s</sub></span>
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaAs" inputmode="decimal" readonly title="Gross cross-sectional area A from catalog (in²)" />
+                </div>
+                <div class="sf-shearDash__metricCard">
+                  <span class="sf-shearDash__metricLabel">k<sub>v</sub></span>
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaKv" inputmode="decimal" readonly title="Web shear coefficient k<sub>v</sub> (5 unstiffened; stiffened uses AISC G2)" />
+                </div>
+                <div class="sf-shearDash__metricCard">
+                  <span class="sf-shearDash__metricLabel">λ<sub>f</sub></span>
+                  <input class="sf-shearDash__metricInput" id="sfShearAnaLambdaF" inputmode="decimal" readonly title="Flange slenderness from catalog" />
                 </div>
               </div>
 
@@ -105,10 +117,8 @@
               </div>
 
               <input type="hidden" id="sfShearAnaFu" />
-              <input type="hidden" id="sfShearAnaD" />
               <input type="hidden" id="sfShearAnaLambdaP" />
               <input type="hidden" id="sfShearAnaLambdaR" />
-              <input type="hidden" id="sfShearAnaKv" />
           </section>
 
           <div class="sf-shearDash__resultsStack" aria-label="Shear check results">
@@ -369,8 +379,8 @@
             <div class="sf-shearDes__beamRow sf-shearDes__beamRow--select">
               <span class="sf-shearDes__beamLabel">BEAM TYPE =</span>
               <select class="sf-shearDes__beamSelect" id="sfShearDesBeamType" aria-label="Beam type">
-                <option value="cantilever" selected>CANTILEVER - Uniformly distributed load</option>
-                <option value="simple">SIMPLE BEAM - Uniformly distributed load</option>
+                <option value="simple" selected>SIMPLE BEAM - Uniformly distributed load</option>
+                <option value="cantilever">CANTILEVER - Uniformly distributed load</option>
               </select>
             </div>
 

@@ -394,16 +394,101 @@
       'fixed-free': 1.2,
     };
 
-    function compactLimits(Fy) {
+    function compactLimits(Fy, Eksi = E_DEFAULT) {
       if (!Number.isFinite(Fy) || Fy <= 0) return null;
-      const root = Math.sqrt(E_DEFAULT / Fy);
+      const Euse = Number.isFinite(Eksi) && Eksi > 0 ? Eksi : E_DEFAULT;
+      const root = Math.sqrt(Euse / Fy);
       return {
         flange: { lp: 0.38 * root, lr: 1.0 * root },
         web: { lp: 3.76 * root, lr: 5.7 * root },
       };
     }
 
+    function syncShapeKindUI() {
+      const kind = pane.querySelector('input[name="cadShapeKind"]:checked')?.value || 'w';
+      const isW = kind === 'w';
+      if (shapeSel) shapeSel.disabled = !isW;
+
+      ['sfCompAnaAg', 'sfCompAnaRx', 'sfCompAnaRy', 'sfCompAnaLamF', 'sfCompAnaLamW'].forEach((id) => {
+        const el = input(id);
+        if (!el) return;
+        el.readOnly = isW;
+      });
+    }
+
+    function buildStiffnessRows() {
+      const tb = pane.querySelector('#sfCompAnaStiffTbody');
+      if (!tb || tb.dataset.sfBuilt === '1') return;
+      tb.dataset.sfBuilt = '1';
+      const subs = ['\u2081', '\u2082', '\u2083', '\u2084', '\u2085', '\u2086'];
+      const opts = [
+        ['fixed-pinned', 'Fixed-Pinned'],
+        ['pinned-pinned', 'Pinned-Pinned'],
+        ['fixed-fixed', 'Fixed-Fixed'],
+        ['free-pinned', 'Free-Pinned'],
+        ['fixed-free', 'Fixed-Free'],
+      ];
+      for (let idx = 0; idx < 12; idx++) {
+        const axis = idx < 6 ? 'x' : 'y';
+        const i = axis === 'x' ? idx : idx - 6;
+        const label = `${axis === 'x' ? 'x' : 'y'}${subs[i]}`;
+        const tr = document.createElement('tr');
+        tr.className = 'sf-compAnaCritical__row';
+        const sel = document.createElement('select');
+        sel.className = 'sf-compAnaCritical__select cad-select';
+        sel.setAttribute('aria-label', `Connection ${label}`);
+        opts.forEach(([v, t]) => {
+          const o = document.createElement('option');
+          o.value = v;
+          o.textContent = t;
+          sel.appendChild(o);
+        });
+        sel.value = axis === 'x' ? 'fixed-pinned' : 'pinned-pinned';
+        const kSpan = document.createElement('span');
+        kSpan.className = 'sf-compAnaCritical__input';
+        const lSpan = document.createElement('span');
+        lSpan.className = 'sf-compAnaCritical__input';
+        const rSpan = document.createElement('span');
+        rSpan.className = 'sf-compAnaCritical__input';
+        const out = document.createElement('span');
+        out.className = 'sf-compAnaCritical__output';
+        const bar = document.createElement('div');
+        bar.className = 'cad-bar';
+        bar.setAttribute('role', 'presentation');
+        const barTrack = document.createElement('div');
+        barTrack.className = 'cad-barTrack';
+        barTrack.appendChild(bar);
+        const td0 = document.createElement('td');
+        td0.className = 'cad-stiffEl';
+        td0.textContent = label;
+        const td1 = document.createElement('td');
+        td1.appendChild(sel);
+        const tdK = document.createElement('td');
+        tdK.appendChild(kSpan);
+        const tdL = document.createElement('td');
+        tdL.appendChild(lSpan);
+        const tdR = document.createElement('td');
+        tdR.appendChild(rSpan);
+        const tdOut = document.createElement('td');
+        tdOut.className = 'cad-krCell';
+        const outWrap = document.createElement('div');
+        outWrap.className = 'cad-krOut';
+        outWrap.appendChild(out);
+        outWrap.appendChild(barTrack);
+        tdOut.appendChild(outWrap);
+        tr.appendChild(td0);
+        tr.appendChild(td1);
+        tr.appendChild(tdK);
+        tr.appendChild(tdL);
+        tr.appendChild(tdR);
+        tr.appendChild(tdOut);
+        tb.appendChild(tr);
+      }
+    }
+
     const applyShape = (rows) => {
+      const kind = pane.querySelector('input[name="cadShapeKind"]:checked')?.value;
+      if (kind && kind !== 'w') return;
       const row = getSelectedWRow(rows);
       if (!row) return;
       const agEl = input('sfCompAnaAg');
@@ -444,9 +529,10 @@
 
     const eEl = input('sfCompAnaE');
     if (eEl && String(eEl.value).trim() === '') eEl.value = '29000';
-    if (eEl) eEl.readOnly = true;
 
     function updateCompactnessAndCapacity() {
+      const Eksi = parseNum(input('sfCompAnaE')?.value);
+      const Euse = Number.isFinite(Eksi) && Eksi > 0 ? Eksi : E_DEFAULT;
       const Fy = parseNum(input('sfCompAnaFy')?.value);
       const Ag = parseNum(input('sfCompAnaAg')?.value);
       const lamF = parseNum(input('sfCompAnaLamF')?.value);
@@ -454,99 +540,130 @@
       const rx = parseNum(input('sfCompAnaRx')?.value);
       const ry = parseNum(input('sfCompAnaRy')?.value);
 
-      const lim = compactLimits(Fy);
-      const fVals = pane.querySelectorAll('.sf-compAnaCompact__seg--flange .sf-compAnaCompact__value');
-      const wVals = pane.querySelectorAll('.sf-compAnaCompact__seg--web .sf-compAnaCompact__value');
-      if (lim && fVals.length >= 2) {
-        fVals[0].textContent = fmt(lim.flange.lp, 8);
-        fVals[1].textContent = fmt(lim.flange.lr, 8);
-      }
-      if (lim && wVals.length >= 2) {
-        wVals[0].textContent = fmt(lim.web.lp, 8);
-        wVals[1].textContent = fmt(lim.web.lr, 8);
-      }
-
-      const flangeBadge = pane.querySelector('.sf-compAnaCompact__asideRow--flange .sf-compAnaCompact__badge');
-      const webBadge = pane.querySelector('.sf-compAnaCompact__asideRow--web .sf-compAnaCompact__badge');
+      const lim = compactLimits(Fy, Euse);
       const classify = (lam, { lp, lr }, kind) => {
         if (!Number.isFinite(lam)) return `${kind.toUpperCase()} —`;
         if (lam <= lp) return `COMPACT ${kind.toUpperCase()}`;
         if (lam <= lr) return `NONCOMPACT ${kind.toUpperCase()}`;
         return `SLENDER ${kind.toUpperCase()}`;
       };
-      if (lim && flangeBadge) flangeBadge.textContent = classify(lamF, lim.flange, 'flange');
-      if (lim && webBadge) webBadge.textContent = classify(lamW, lim.web, 'web');
 
-      // Critical slenderness table based on x/y (ft) and connection K.
+      const lamFDash = pane.querySelector('#sfCompDashLamF');
+      const lamWDash = pane.querySelector('#sfCompDashLamW');
+      if (lamFDash) lamFDash.textContent = Number.isFinite(lamF) ? fmt(lamF, 4) : '—';
+      if (lamWDash) lamWDash.textContent = Number.isFinite(lamW) ? fmt(lamW, 4) : '—';
+
+      const pillF = pane.querySelector('#sfCompDashPillFlange');
+      const pillW = pane.querySelector('#sfCompDashPillWeb');
+      if (lim && pillF) pillF.textContent = classify(lamF, lim.flange, 'flange');
+      if (lim && pillW) pillW.textContent = classify(lamW, lim.web, 'web');
+
       const xs = [1, 2, 3, 4, 5, 6].map((i) => parseNum(input(`sfCompAnaX${i}`)?.value) ?? 0);
       const ys = [1, 2, 3, 4, 5, 6].map((i) => parseNum(input(`sfCompAnaY${i}`)?.value) ?? 0);
-      const rows = Array.from(pane.querySelectorAll('.sf-compAnaCritical__row'));
       let gov = null;
-      rows.forEach((rowEl, idx) => {
-        const axis = idx < 6 ? 'x' : 'y';
-        const i = axis === 'x' ? idx : idx - 6;
-        const Lft = axis === 'x' ? xs[i] : ys[i];
-        const sel = rowEl.querySelector('select.sf-compAnaCritical__select');
-        if (sel && sel.options.length <= 1) {
-          const prev = sel.value;
-          sel.innerHTML = '';
-          [
-            ['fixed-pinned', 'Fixed-Pinned'],
-            ['pinned-pinned', 'Pinned-Pinned'],
-            ['fixed-fixed', 'Fixed-Fixed'],
-            ['free-pinned', 'Free-Pinned'],
-            ['fixed-free', 'Fixed-Free'],
-          ].forEach(([v, t]) => {
-            const o = document.createElement('option');
-            o.value = v;
-            o.textContent = t;
-            sel.appendChild(o);
-          });
-          sel.value = prev && connK[prev] ? prev : axis === 'x' ? 'fixed-pinned' : 'pinned-pinned';
-        }
-        const K = sel ? connK[sel.value] ?? 1 : 1;
-        const Lin = Number.isFinite(Lft) ? Lft * 12 : null;
-        const rUse = axis === 'x' ? rx : ry;
-        const klr = Number.isFinite(Lin) && Lin > 0 && Number.isFinite(rUse) && rUse > 0 ? (K * Lin) / rUse : null;
-        const inputs = rowEl.querySelectorAll('.sf-compAnaCritical__input');
-        const out = rowEl.querySelector('.sf-compAnaCritical__output');
-        if (inputs.length >= 3) {
-          inputs[0].textContent = fmt(K, 2);
-          inputs[1].textContent = Number.isFinite(Lin) ? fmt(Lin, 0) : '0';
-          inputs[2].textContent = Number.isFinite(rUse) ? fmt(rUse, 2) : '—';
-        }
-        if (out) {
-          out.classList.toggle('sf-compAnaCritical__output--empty', !(Number.isFinite(klr) && klr > 0));
-          out.textContent = Number.isFinite(klr) && klr > 0 ? fmt(klr, 8) : '';
-        }
-        if (Number.isFinite(klr) && klr > 0) gov = gov == null ? klr : Math.max(gov, klr);
-      });
-      const govEl = pane.querySelector('.sf-compAnaCritical__highlight--governing-klr');
-      if (govEl) govEl.textContent = Number.isFinite(gov) ? fmt(gov, 8) : '—';
 
-      // Capacity (ksi/in).
-      const fe = Number.isFinite(gov) && gov > 0 ? (Math.PI ** 2 * E_DEFAULT) / (gov ** 2) : null;
+      const rowEls = Array.from(pane.querySelectorAll('.sf-compAnaCritical__row'));
+      if (rowEls.length > 0) {
+        rowEls.forEach((rowEl, idx) => {
+          const axis = idx < 6 ? 'x' : 'y';
+          const i = axis === 'x' ? idx : idx - 6;
+          const Lft = axis === 'x' ? xs[i] : ys[i];
+          const sel = rowEl.querySelector('select.sf-compAnaCritical__select');
+          if (sel && sel.options.length <= 1) {
+            const prev = sel.value;
+            sel.innerHTML = '';
+            [
+              ['fixed-pinned', 'Fixed-Pinned'],
+              ['pinned-pinned', 'Pinned-Pinned'],
+              ['fixed-fixed', 'Fixed-Fixed'],
+              ['free-pinned', 'Free-Pinned'],
+              ['fixed-free', 'Fixed-Free'],
+            ].forEach(([v, t]) => {
+              const o = document.createElement('option');
+              o.value = v;
+              o.textContent = t;
+              sel.appendChild(o);
+            });
+            sel.value = prev && connK[prev] ? prev : axis === 'x' ? 'fixed-pinned' : 'pinned-pinned';
+          }
+          const K = sel ? connK[sel.value] ?? 1 : 1;
+          const Lin = Number.isFinite(Lft) ? Lft * 12 : null;
+          const rUse = axis === 'x' ? rx : ry;
+          const klr =
+            Number.isFinite(Lin) && Lin > 0 && Number.isFinite(rUse) && rUse > 0 ? (K * Lin) / rUse : null;
+          const inputs = rowEl.querySelectorAll('.sf-compAnaCritical__input');
+          const out = rowEl.querySelector('.sf-compAnaCritical__output');
+          if (inputs.length >= 3) {
+            inputs[0].textContent = fmt(K, 2);
+            inputs[1].textContent = Number.isFinite(Lin) ? fmt(Lin, 0) : '0';
+            inputs[2].textContent = Number.isFinite(rUse) ? fmt(rUse, 2) : '—';
+          }
+          if (out) {
+            out.classList.toggle('sf-compAnaCritical__output--empty', !(Number.isFinite(klr) && klr > 0));
+            out.textContent = Number.isFinite(klr) && klr > 0 ? fmt(klr, 8) : '';
+          }
+          if (Number.isFinite(klr) && klr > 0) gov = gov == null ? klr : Math.max(gov, klr);
+        });
+
+        let maxKlr = 0;
+        rowEls.forEach((rowEl) => {
+          const out = rowEl.querySelector('.sf-compAnaCritical__output');
+          const v = parseNum(out?.textContent);
+          if (Number.isFinite(v) && v > 0) maxKlr = Math.max(maxKlr, v);
+        });
+        rowEls.forEach((rowEl) => {
+          const out = rowEl.querySelector('.sf-compAnaCritical__output');
+          const bar = rowEl.querySelector('.cad-bar');
+          const v = parseNum(out?.textContent);
+          if (bar && maxKlr > 0 && Number.isFinite(v) && v > 0)
+            bar.style.width = `${Math.min(100, (v / maxKlr) * 100)}%`;
+          else if (bar) bar.style.width = '0%';
+        });
+      } else {
+        for (let idx = 0; idx < 12; idx++) {
+          const axis = idx < 6 ? 'x' : 'y';
+          const i = axis === 'x' ? idx : idx - 6;
+          const Lft = axis === 'x' ? xs[i] : ys[i];
+          const K = axis === 'x' ? connK['fixed-pinned'] : connK['pinned-pinned'];
+          const Lin = Number.isFinite(Lft) ? Lft * 12 : null;
+          const rUse = axis === 'x' ? rx : ry;
+          const klr =
+            Number.isFinite(Lin) && Lin > 0 && Number.isFinite(rUse) && rUse > 0 ? (K * Lin) / rUse : null;
+          if (Number.isFinite(klr) && klr > 0) gov = gov == null ? klr : Math.max(gov, klr);
+        }
+      }
+
+      const govTxt = Number.isFinite(gov) ? fmt(gov, 8) : '—';
+      const govKlrEl = pane.querySelector('#sfCompDashGovKlr');
+      if (govKlrEl) govKlrEl.textContent = govTxt;
+      const govCompact = pane.querySelector('#sfCompDashGovKlrCompact');
+      if (govCompact) govCompact.textContent = govTxt;
+
+      const fe = Number.isFinite(gov) && gov > 0 ? (Math.PI ** 2 * Euse) / (gov ** 2) : null;
       const fcr = Number.isFinite(Fy) && Number.isFinite(fe) ? sfCompressionWorkbookFcr(Fy, fe) : null;
-      const pn = Number.isFinite(fcr) && Number.isFinite(Ag) ? fcr * Ag : null; // kips
+      const pn = Number.isFinite(fcr) && Number.isFinite(Ag) ? fcr * Ag : null;
       const method = String(input('sfCompAnaMethod')?.value || 'lrfd').toLowerCase();
       const cap = method === 'asd' ? (Number.isFinite(pn) ? pn / OMEGA_C : null) : (Number.isFinite(pn) ? PHI_C * pn : null);
 
-      const capSections = pane.querySelectorAll('.sf-compCap__section');
-      const fePill = capSections[0]?.querySelector('.sf-compCap__pill') ?? null;
-      const fcrPill = capSections[1]?.querySelector('.sf-compCap__pill') ?? null;
-      const pnPill = capSections[2]?.querySelector('.sf-compCap__pill') ?? null;
-      if (fePill) fePill.textContent = fmt(fe, 8);
-      if (fcrPill) fcrPill.textContent = fmt(fcr, 8);
-      if (pnPill) pnPill.textContent = Number.isFinite(pn) ? fmt(pn, 2) : '—';
+      const feEl = pane.querySelector('#sfCompDashFe');
+      const fcrEl = pane.querySelector('#sfCompDashFcr');
+      const pnEl = pane.querySelector('#sfCompDashPn');
+      if (feEl) feEl.textContent = fmt(fe, 8);
+      if (fcrEl) fcrEl.textContent = fmt(fcr, 8);
+      if (pnEl) pnEl.textContent = Number.isFinite(pn) ? fmt(pn, 2) : '—';
 
-      const govHeader = pane.querySelector('.sf-compGov__header');
-      const govSym = pane.querySelector('.sf-compGov__body .sf-compGov__sym');
-      if (govHeader)
-        govHeader.textContent =
+      const govHdr = pane.querySelector('#sfCompDashGovHdr');
+      const puLab = pane.querySelector('#sfCompDashPuLab');
+      if (govHdr)
+        govHdr.textContent =
           method === 'asd'
             ? 'ALLOWABLE STRENGTH DESIGN (ASD)'
             : 'LOAD AND RESISTANCE FACTORED DESIGN (LRFD)';
-      if (govSym) govSym.innerHTML = method === 'asd' ? 'P<sub>a</sub>' : 'P<sub>u</sub>';
+      if (puLab)
+        puLab.innerHTML =
+          method === 'asd'
+            ? 'P<sub>n</sub> / Ω<sub>c</sub> ='
+            : 'φ<sub>c</sub>P<sub>n</sub> =';
 
       const puPill = pane.querySelector('#sfCompGovPu');
       if (puPill) puPill.textContent = Number.isFinite(cap) ? fmt(cap, 2) : '—';
@@ -561,14 +678,21 @@
         applySteelGrade();
         updateCompactnessAndCapacity();
       });
-      pane.querySelectorAll('input, select').forEach((el) => {
+      pane.querySelectorAll('input[name="cadShapeKind"]').forEach((radio) => {
+        radio.addEventListener('change', () => {
+          syncShapeKindUI();
+          applyShape(rows);
+          updateCompactnessAndCapacity();
+        });
+      });
+      pane.querySelectorAll('input:not([name="cadShapeKind"]), select').forEach((el) => {
         el.addEventListener('input', updateCompactnessAndCapacity);
         el.addEventListener('change', updateCompactnessAndCapacity);
       });
     };
 
     applySteelGrade();
-      loadWShapesFromCsv().then((rows) => {
+    loadWShapesFromCsv().then((rows) => {
       shapeSel.innerHTML = '';
       rows.forEach((r) => {
         const lab = String(r[COL.label] || '').trim();
@@ -581,6 +705,8 @@
       const pref = rows.find((r) => String(r[COL.label] || '').trim().toUpperCase() === 'W40X503');
       if (pref) shapeSel.value = String(pref[COL.label] || '').trim();
       else if (rows[0]) shapeSel.value = String(rows[0][COL.label] || '').trim();
+      buildStiffnessRows();
+      syncShapeKindUI();
       applyShape(rows);
       wire(rows);
       updateCompactnessAndCapacity();
@@ -1006,15 +1132,6 @@
       }
     };
 
-    const syncLightestFromSafeTop = () => {
-      const sec = input('sfCompDesSafeSec1');
-      const lt = input('sfCompDesLightest');
-      if (sec && lt) {
-        const t = String(sec.value ?? '').trim();
-        if (t && !/^NO SECTION$/i.test(t)) lt.value = t.toUpperCase();
-      }
-    };
-
     const updateGoverningKLFromSlender = () => {
       let maxX = NaN;
       let maxY = NaN;
@@ -1037,7 +1154,6 @@
       if (klyEl) klyEl.value = Number.isFinite(maxY) ? fmtKlLocal(maxY) : '';
       // Reference: yellow pill is "Assuming KLy governed" → show KLy when present.
       if (govEl) govEl.value = Number.isFinite(maxY) ? fmtKlLocal(maxY) : '';
-      syncLightestFromSafeTop();
     };
 
     const updateSlenderKL = () => {
@@ -1079,12 +1195,30 @@
       rmEl.value = remark || 'SAFE';
     };
 
+    /** Client layout: four rows fixed as W14 → W12 → W10 → W8 (lightest safe in each family). */
+    const SAFE_SECTION_SERIES_ORDER = ['W14', 'W12', 'W10', 'W8'];
+
+    function depthSeriesFromWLabel(lab) {
+      const u = String(lab ?? '')
+        .trim()
+        .toUpperCase()
+        .replace(/\u00D7/g, 'X')
+        .replace(/\s+/g, '');
+      const m = u.match(/^W(14|12|10|8)X/i);
+      return m ? `W${m[1]}` : null;
+    }
+
     const updateSafeSections = (wRows) => {
       const methodEl = input('sfCompDesMethod');
       const isLRFD = methodEl?.value !== 'asd';
       const Fy = parseNum(input('sfCompDesFy')?.value);
       const Pu = parseNum(input('sfCompDesPu')?.value);
       const Pa = parseNum(input('sfCompDesPa')?.value);
+
+      const ltEl = input('sfCompDesLightest');
+      const clearLightest = () => {
+        if (ltEl) ltEl.value = '';
+      };
 
       // Governing KL in ft from the table.
       const KLx = parseNum(input('sfCompDesGovKLx')?.value);
@@ -1098,7 +1232,7 @@
       const candidates = [];
       if (!Number.isFinite(Fy) || Fy <= 0 || !demandOk || wRows.length === 0) {
         for (let i = 1; i <= 4; i++) setSafeRow(i, null);
-        syncLightestFromSafeTop();
+        clearLightest();
         return;
       }
 
@@ -1125,14 +1259,31 @@
         candidates.push({ lab, wt, cap });
       }
 
-      candidates.sort((a, b) => a.wt - b.wt || b.cap - a.cap || a.lab.localeCompare(b.lab));
-      const top = candidates.slice(0, 4);
-      for (let i = 1; i <= 4; i++) {
-        const c = top[i - 1];
-        if (!c) setSafeRow(i, null);
-        else setSafeRow(i, c.lab, c.wt, c.cap, 'SAFE');
+      let lightestLab = null;
+      let lightestWt = Infinity;
+      for (const c of candidates) {
+        if (c.wt < lightestWt) {
+          lightestWt = c.wt;
+          lightestLab = c.lab;
+        }
       }
-      syncLightestFromSafeTop();
+      if (ltEl) ltEl.value = lightestLab ? String(lightestLab).toUpperCase() : '';
+
+      const bySeries = new Map();
+      SAFE_SECTION_SERIES_ORDER.forEach((s) => bySeries.set(s, []));
+      for (const c of candidates) {
+        const series = depthSeriesFromWLabel(c.lab);
+        if (series && bySeries.has(series)) bySeries.get(series).push(c);
+      }
+
+      SAFE_SECTION_SERIES_ORDER.forEach((series, si) => {
+        const arr = bySeries.get(series) || [];
+        arr.sort((a, b) => a.wt - b.wt || b.cap - a.cap || a.lab.localeCompare(b.lab));
+        const pick = arr[0];
+        const i = si + 1;
+        if (!pick) setSafeRow(i, null);
+        else setSafeRow(i, pick.lab, pick.wt, pick.cap, 'SAFE');
+      });
     };
 
     /** Match reference DEMAND LOAD: whole kips as integers; decimals only when needed */
@@ -1354,20 +1505,42 @@
     return v.toFixed(8);
   }
 
-  function calcShearCv(lambda, lambdaP, lambdaR, Fy, E, kv) {
-    if (![lambda, lambdaP, lambdaR, Fy, E, kv].every(Number.isFinite)) return null;
-    if (lambda <= 0 || lambdaP <= 0 || lambdaR <= 0 || Fy <= 0 || E <= 0 || kv <= 0) return null;
+  /**
+   * Client workbook / spec: λ_w = h/t_w. Sequential limits:
+   * A = 2.24√(E/Fy), B = 1.10√(k_v E/Fy), C = 1.37√(k_v E/Fy).
+   * If A > λ → cond 1; else if B > λ → cond 2; else if C > λ → cond 3; else cond 4.
+   * Nominal V_n = 0.6 F_y A_w C_v with C_v and resistance factors per condition.
+   */
+  function shearClientShearState(lambda, fy, E, kv) {
+    if (![lambda, fy, E, kv].every((x) => Number.isFinite(x) && x > 0)) return null;
+    const limA = 2.24 * Math.sqrt(E / fy);
+    const limB = 1.1 * Math.sqrt((kv * E) / fy);
+    const limC = 1.37 * Math.sqrt((kv * E) / fy);
 
-    if (lambda <= lambdaP) return 1;
-    if (lambda <= lambdaR) return lambdaP / lambda;
-    return (1.51 * kv * E) / (Fy * lambda ** 2);
+    if (limA > lambda) {
+      return { condition: 1, cv: 1, phiV: 1, omegaV: 1.5, limA, limB, limC };
+    }
+    if (limB > lambda) {
+      return { condition: 2, cv: 1, phiV: 0.9, omegaV: 1.67, limA, limB, limC };
+    }
+    if (limC > lambda) {
+      return { condition: 3, cv: limB / lambda, phiV: 0.9, omegaV: 1.67, limA, limB, limC };
+    }
+    const cv = (1.51 * kv * E) / (fy * lambda * lambda);
+    return { condition: 4, cv, phiV: 0.9, omegaV: 1.67, limA, limB, limC };
   }
 
-  function webShearSlendernessClass(lambda, lambdaP, lambdaR) {
-    if (![lambda, lambdaP, lambdaR].every(Number.isFinite)) return '';
-    if (lambda <= lambdaP) return 'compact web (Cv = 1)';
-    if (lambda <= lambdaR) return 'inelastic web shear';
-    return 'slender web (elastic buckling)';
+  function calcShearCv(lambda, lambdaP, lambdaR, Fy, E, kv) {
+    const st = shearClientShearState(lambda, Fy, E, kv);
+    return st ? st.cv : null;
+  }
+
+  function webShearConditionLabel(condition) {
+    if (condition === 1) return 'CONDITION 1 (Cv = 1, φv = 1)';
+    if (condition === 2) return 'CONDITION 2 (Cv = 1, φv = 0.9)';
+    if (condition === 3) return 'CONDITION 3 (inelastic shear buckling)';
+    if (condition === 4) return 'CONDITION 4 (elastic shear buckling)';
+    return '';
   }
 
   function shearDebugEnabled() {
@@ -1445,9 +1618,6 @@
     if (!pane) return;
 
     const shapes = window.SteelForgeShearShapes ?? [];
-    /** Factors used in client workbook screenshots (differs from typical AISC φ=0.9, Ω=1.67). */
-    const PHI_V_CLIENT = 1;
-    const OMEGA_V_CLIENT = 1.5;
 
     const input = (id) => pane.querySelector(`#${id}`);
     const out = (id) => pane.querySelector(`#${id}`);
@@ -1467,6 +1637,7 @@
     };
 
     const shapeAw = (s) => (s && (s.Aw ?? s.aw)) ?? null;
+    const shapeAg = (s) => (s && (s.Ag ?? s.ag ?? s.area)) ?? null;
     const shapeLambdaW = (s) => (s && (s.lambdaW ?? s.lambda_w)) ?? null;
     const shapeLambdaF = (s) => (s && (s.lambdaF ?? s.lambda_f)) ?? null;
 
@@ -1474,6 +1645,7 @@
       const hEl = input('sfShearAnaH');
       const awEl = input('sfShearAnaAw');
       const lamEl = input('sfShearAnaLambda');
+      const asEl = input('sfShearAnaAs');
       if (hEl) hEl.readOnly = !isManual;
       if (awEl) awEl.readOnly = !isManual;
       if (lamEl) {
@@ -1481,6 +1653,12 @@
         lamEl.title = isManual
           ? 'Web slenderness λ_w = h/t_w — enter directly, or leave blank when h, d, and A_w match rolled-shape conventions'
           : 'Web slenderness h/t_w from steel catalog';
+      }
+      if (asEl) {
+        asEl.readOnly = !isManual;
+        asEl.title = isManual
+          ? 'Optional gross area A (in²) — not used in V_n = 0.6 F_y A_w C_v'
+          : 'Gross area A from Steel Sections catalog (in²)';
       }
     };
 
@@ -1528,6 +1706,7 @@
       norm('sfShearAnaFy', 3, 0);
       norm('sfShearAnaFu', 3, 0);
       norm('sfShearAnaAw', 4, 0);
+      norm('sfShearAnaAs', 4, 0);
       norm('sfShearAnaVu', 3, 0);
     };
 
@@ -1548,19 +1727,35 @@
     const applyShape = (name) => {
       const s = shapes.find((x) => x.name === name);
       if (!s) return;
-      const awVal = shapeAw(s);
+      const tw = Number.isFinite(s.tw) ? s.tw : null;
+      const d = Number.isFinite(s.d) ? s.d : null;
       const lamVal = shapeLambdaW(s);
+      const awCatalog = shapeAw(s);
+
+      /** Client spec: h = λ_w·t_w , A_w = t_w·d (Steel Sections V16 / selection CSV). */
+      let hGeom = null;
+      let awGeom = null;
+      if (tw != null && lamVal != null) hGeom = lamVal * tw;
+      else if (Number.isFinite(s.h)) hGeom = s.h;
+      if (tw != null && d != null) awGeom = tw * d;
+      else if (awCatalog != null) awGeom = awCatalog;
+
       const hEl = input('sfShearAnaH');
       const lamEl = input('sfShearAnaLambda');
       const lamFEl = input('sfShearAnaLambdaF');
       const awEl = input('sfShearAnaAw');
       const dEl = input('sfShearAnaD');
+      const asEl = input('sfShearAnaAs');
       const lamFVal = shapeLambdaF(s);
-      if (hEl) hEl.value = fmtGeom(s.h, 4);
-      if (lamEl && lamVal != null) lamEl.value = fmtGeom(lamVal, 3);
-      if (lamFEl) lamFEl.value = lamFVal != null ? fmtGeom(lamFVal, 3) : '';
-      if (awEl && awVal != null) awEl.value = fmtGeom(awVal, 4);
-      if (dEl) dEl.value = Number.isFinite(s.d) ? fmtGeom(s.d, 4) : '';
+      const agVal = shapeAg(s);
+
+      if (hEl) hEl.value = hGeom != null ? fmtGeom(hGeom, 4) : '';
+      if (lamEl && lamVal != null) lamEl.value = fmtGeom(lamVal, 4);
+      if (lamFEl) lamFEl.value = lamFVal != null ? fmtGeom(lamFVal, 4) : '';
+      if (awEl) awEl.value = awGeom != null ? fmtGeom(awGeom, 4) : '';
+      if (dEl) dEl.value = d != null ? fmtGeom(d, 4) : '';
+      if (asEl) asEl.value = agVal != null && Number.isFinite(agVal) ? fmtGeom(agVal, 4) : '';
+
       setManualGeometryMode(false);
       applyCatalogDefaults();
       syncWebSpacingAndKv();
@@ -1644,14 +1839,16 @@
       if (lamPEl) lamPEl.value = lambdaP != null ? fmtShearLimit(lambdaP) : '';
       if (lamREl) lamREl.value = lambdaR != null ? fmtShearLimit(lambdaR) : '';
 
-      const cv =
-        lambdaWeb != null && lambdaP != null && lambdaR != null && Number.isFinite(fy)
-          ? calcShearCv(lambdaWeb, lambdaP, lambdaR, fy, E, kv)
+      const shearSt =
+        lambdaWeb != null && Number.isFinite(fy) && Number.isFinite(E) && Number.isFinite(kv)
+          ? shearClientShearState(lambdaWeb, fy, E, kv)
           : null;
+      const cv = shearSt ? shearSt.cv : null;
       const Vn =
         Number.isFinite(cv) && Number.isFinite(fy) && Number.isFinite(aw) ? 0.6 * fy * aw * cv : null;
-      const phiVn = Number.isFinite(Vn) ? PHI_V_CLIENT * Vn : null;
-      const asdCap = Number.isFinite(Vn) ? Vn / OMEGA_V_CLIENT : null;
+      const phiVn =
+        Number.isFinite(Vn) && shearSt ? shearSt.phiV * Vn : null;
+      const asdCap = Number.isFinite(Vn) && shearSt ? Vn / shearSt.omegaV : null;
 
       const isASD = (methodEl?.value || 'lrfd') === 'asd';
       const demandLbl = out('sfShearAnaDemandLabel');
@@ -1675,8 +1872,8 @@
       const b3 = out('sfShearAnaBar3');
 
       if (cvEl) cvEl.textContent = fmtNum(cv, 6);
-      if (phiEl) phiEl.textContent = fmtNum(PHI_V_CLIENT, 3);
-      if (omgEl) omgEl.textContent = fmtNum(OMEGA_V_CLIENT, 2);
+      if (phiEl) phiEl.textContent = shearSt ? fmtNum(shearSt.phiV, 3) : '—';
+      if (omgEl) omgEl.textContent = shearSt ? fmtNum(shearSt.omegaV, 2) : '—';
       if (vnEl) vnEl.textContent = fmtNum(Vn, 2);
       if (b1) b1.textContent = fmtShearLimit(lim224);
       if (b2) b2.textContent = fmtShearLimit(lambdaP);
@@ -1684,10 +1881,8 @@
 
       const verdictEl = out('sfShearAnaVerdictPill');
       if (verdictEl) {
-        if (![lambdaWeb, lambdaP, lambdaR].every(Number.isFinite)) verdictEl.textContent = '—';
-        else if (lambdaWeb <= lambdaP) verdictEl.textContent = 'COMPACT WEB';
-        else if (lambdaWeb <= lambdaR) verdictEl.textContent = 'INELASTIC WEB';
-        else verdictEl.textContent = 'SLENDER WEB';
+        if (!shearSt || !Number.isFinite(lambdaWeb)) verdictEl.textContent = '—';
+        else verdictEl.textContent = webShearConditionLabel(shearSt.condition);
       }
 
       const fyChip = out('sfShearAnaFyChip');
@@ -1704,7 +1899,7 @@
       }
 
       const remarksEl = out('sfShearAnaRemarks');
-      const webCls = webShearSlendernessClass(lambdaWeb, lambdaP, lambdaR);
+      const webCls = shearSt ? webShearConditionLabel(shearSt.condition) : '';
       if (remarksEl) {
         const cap = isASD ? capacityASD : capacityLRFD;
         if (!Number.isFinite(cap)) {
@@ -1716,7 +1911,7 @@
             ? `${webCls}. Enter ${isASD ? 'Va' : 'Vu'} (demand).`
             : `Enter ${isASD ? 'Va' : 'Vu'} (demand).`;
         } else {
-          const ok = isASD ? VuDemand <= cap : VuDemand <= cap;
+          const ok = VuDemand <= cap;
           remarksEl.textContent = `${ok ? 'SAFE' : 'NOT SAFE'} · ${webCls || 'Shear check'}`;
         }
       }
@@ -1732,6 +1927,7 @@
           kv,
           E,
           fy,
+          shearCondition: shearSt?.condition,
           Cv: cv,
           Vn,
           phiVn,
@@ -1761,8 +1957,10 @@
         else {
           const lamFEl = input('sfShearAnaLambdaF');
           const dEl = input('sfShearAnaD');
+          const asEl = input('sfShearAnaAs');
           if (lamFEl) lamFEl.value = '';
           if (dEl) dEl.value = '';
+          if (asEl) asEl.value = '';
           setManualGeometryMode(true);
           syncWebSpacingAndKv();
         }
@@ -1783,11 +1981,21 @@
     if (E0 && String(E0.value).trim() === '') E0.value = '29000';
     if (kv0 && String(kv0.value).trim() === '') kv0.value = '5';
     if (E0) E0.readOnly = true;
-    if (kv0) kv0.readOnly = true;
+    if (kv0) {
+      kv0.readOnly = true;
+      kv0.setAttribute('aria-label', 'Web shear coefficient k_v');
+    }
     setManualGeometryMode(!(shapeSel?.value));
     syncWebSpacingAndKv();
     if (shapeSel?.value) applyShape(shapeSel.value);
     else applyDefaultShapeOnLoad();
+
+    window.addEventListener('sf:steel-grade-change', () => {
+      const pid = window.SteelForge?.activeStructuralSteelGrade?.id ?? getPreferredStructuralSteelGradeId();
+      populateStructuralSteelGradeSelect(steelEl, pid);
+      applySteelGradeProps();
+      update();
+    });
 
     updateImageState();
     update();
@@ -1849,9 +2057,6 @@
 
     const phiB = 0.9;
     const omegaB = 1.67;
-    /** Workbook shear *design* pane uses φv = 0.9 and Ωv = 1.67 (CSV cols ~33–36); analysis pane stays φ = 1, Ω = 1.5. */
-    const phiV = 0.9;
-    const omegaV = 1.67;
     const kv = 5;
     const E = 29000;
 
@@ -1874,11 +2079,31 @@
         Number.isFinite(fyV) && fyV > 0 && Number.isFinite(EV) && EV > 0 && Number.isFinite(kvV) && kvV > 0
           ? 1.37 * Math.sqrt((kvV * EV) / fyV)
           : null;
-      const cv = calcShearCv(lambda, lambdaP, lambdaR, fyV, EV, kvV);
+      const st =
+        Number.isFinite(lambda) && Number.isFinite(fyV) && Number.isFinite(EV) && Number.isFinite(kvV)
+          ? shearClientShearState(lambda, fyV, EV, kvV)
+          : null;
+      const cv = st ? st.cv : null;
       const Vn = Number.isFinite(cv) && Number.isFinite(fyV) && Number.isFinite(aw) ? 0.6 * fyV * aw * cv : null;
-      const phiVn = Number.isFinite(Vn) ? phiV * Vn : null;
-      const Vallow = Number.isFinite(Vn) ? Vn / omegaV : null;
-      return { lambda, aw, lambdaP, lambdaR, cv, Vn, phiVn, Vallow };
+      const phiVs = st?.phiV;
+      const omegaVs = st?.omegaV;
+      const phiVn =
+        Number.isFinite(Vn) && Number.isFinite(phiVs) ? phiVs * Vn : null;
+      const Vallow =
+        Number.isFinite(Vn) && Number.isFinite(omegaVs) ? Vn / omegaVs : null;
+      return {
+        lambda,
+        aw,
+        lambdaP,
+        lambdaR,
+        cv,
+        Vn,
+        phiVn,
+        Vallow,
+        phiV: phiVs,
+        omegaV: omegaVs,
+        condition: st?.condition ?? null,
+      };
     };
 
     const pickAssumedForMoment = (zxReqV) => {
@@ -2034,22 +2259,14 @@
         lightestShape?.name?.replace(/X/gi, '×') ?? '—',
       );
 
-      let asmLambda = null;
-      if (assumedShape) {
-        const ar = shearStrengthForShape(assumedShape, fy, E, kv);
-        asmLambda = ar.lambda;
-      }
-
       let cv;
       let Vn;
       let phiVn;
       let Vallow;
-      let condLambda = null;
       let shearCondShapeResult = null;
 
       if (condShape) {
         shearCondShapeResult = shearStrengthForShape(condShape, fy, E, kv);
-        condLambda = shearCondShapeResult.lambda;
         cv = shearCondShapeResult.cv;
         Vn = shearCondShapeResult.Vn;
         phiVn = shearCondShapeResult.phiVn;
@@ -2057,6 +2274,9 @@
       } else {
         cv = Vn = phiVn = Vallow = null;
       }
+
+      /** λ<sub>w</sub> for the governing shear section (lightest that satisfies Z<sub>x</sub> and shear) — matches V<sub>n</sub>, C<sub>v</sub> block. */
+      const lambdaWebDisplay = shearCondShapeResult?.lambda ?? null;
 
       setText('sfShearDesWult', fmtNum(wTop, 2));
       setText('sfShearDesWu', fmtNum(wComb, 2));
@@ -2068,14 +2288,20 @@
       setText('sfShearDesPlasticMod', assumedShape?.zx == null ? '—' : fmtNum(assumedShape.zx, 2));
       setText('sfShearDesTw', assumedShape?.tw == null ? '—' : fmtNum(assumedShape.tw, 3));
       setText('sfShearDesDepth', assumedShape?.d == null ? '—' : fmtNum(assumedShape.d, 2));
-      setText('sfShearDesLambdaWeb', asmLambda == null ? '—' : fmtNum(asmLambda, 2));
+      setText('sfShearDesLambdaWeb', lambdaWebDisplay == null ? '—' : fmtNum(lambdaWebDisplay, 2));
 
       setText('sfShearDesLambdaVal', fmtShearLimit(lim224));
       setText('sfShearDesLambdaP', fmtShearLimit(lambdaPglob));
       setText('sfShearDesLambdaR', fmtShearLimit(lambdaRglob));
       setText('sfShearDesCv', fmtNum(cv, 3));
-      setText('sfShearDesPhi', fmtNum(phiV, 2));
-      setText('sfShearDesOmega', fmtNum(omegaV, 2));
+      setText(
+        'sfShearDesPhi',
+        shearCondShapeResult?.phiV != null ? fmtNum(shearCondShapeResult.phiV, 2) : '—',
+      );
+      setText(
+        'sfShearDesOmega',
+        shearCondShapeResult?.omegaV != null ? fmtNum(shearCondShapeResult.omegaV, 2) : '—',
+      );
       setText('sfShearDesVn', fmtNum(Vn, 2));
 
       let isSafe;
@@ -2178,6 +2404,13 @@
       });
     }
 
+    window.addEventListener('sf:steel-grade-change', () => {
+      const pid = window.SteelForge?.activeStructuralSteelGrade?.id ?? getPreferredStructuralSteelGradeId();
+      populateStructuralSteelGradeSelect(steelTypeEl, pid);
+      syncSteelPropsFromGrade();
+      update();
+    });
+
     syncSteelPropsFromGrade();
     update();
   }
@@ -2188,26 +2421,9 @@
       panelRoot?.querySelector?.('.sf-comp') ??
       panelRoot ??
       document;
-    attachModeToggle(compRoot, { topic: 'TENSION ROD' });
-    if (window.SteelForge?.initTensionRodAnalysis) {
-      window.SteelForge.initTensionRodAnalysis(panelRoot ?? document);
-    }
+    // Tension rod is design-only (no `.sf-comp__modeNav`; skip attachModeToggle).
     if (window.SteelForge?.initTensionRodDesign) {
       window.SteelForge.initTensionRodDesign(panelRoot ?? document);
-    }
-    const tr =
-      compRoot?.classList?.contains?.('sf-comp--tensionRod') ? compRoot : compRoot?.querySelector?.('.sf-comp--tensionRod');
-    const nav = tr?.querySelector?.('.sf-comp__modeNav');
-    if (nav && tr && !tr.dataset.sfRodModeSync) {
-      tr.dataset.sfRodModeSync = '1';
-      nav.addEventListener('click', () => {
-        requestAnimationFrame(() => {
-          const active = tr.querySelector('.sf-comp__mode.is-active');
-          const m = active?.getAttribute('data-comp-mode-pane');
-          if (m === 'analysis') window.SteelForge?.__tensionRodRecomputeAnalysis?.();
-          if (m === 'design') window.SteelForge?.__tensionRodRecomputeDesign?.();
-        });
-      });
     }
   };
 

@@ -11,6 +11,14 @@
   <div class="sf-comp__mode is-active" data-comp-mode-pane="analysis" role="tabpanel" aria-label="Analysis bending">
     <div class="sf-comp__card sf-bendAna" role="region" aria-label="Analysis bending workspace">
       <div class="sf-comp__star" aria-hidden="true">★</div>
+
+      <input type="radio" id="sfBendAnaDefNo" name="sfBendAnaDefMode" checked hidden />
+      <input type="radio" id="sfBendAnaDefYes" name="sfBendAnaDefMode" hidden />
+      <div class="sf-bendDes__subNav sf-bendAna__subNav" role="tablist" aria-label="Analysis deflection mode">
+        <label class="sf-bendDes__subBtn" for="sfBendAnaDefNo">WITHOUT DEFLECTION</label>
+        <label class="sf-bendDes__subBtn" for="sfBendAnaDefYes">WITH DEFLECTION</label>
+      </div>
+
       <main class="sf-bendAna__contentGrid">
         <section class="sf-bendAna__panel sf-bendAna__panelLeft">
           <div class="sf-bendAna__panelTitle">ANALYSIS METHOD</div>
@@ -118,6 +126,43 @@
               </div>
             </div>
           </div>
+
+          <div class="sf-bendAna__deflBlock">
+            <div class="sf-bendAna__card sf-bendAna__deflCard">
+              <div class="sf-bendAna__cardTitle">DEFLECTION</div>
+              <p class="sf-bendAna__deflHint">Simple beam, uniform service load w; uses I<sub>x</sub> from the selected W-shape.</p>
+              <div class="sf-bendAna__propertyRow">
+                <span>SPAN L</span>
+                <span><input id="sfBendAnaSpanFt" class="sf-bendAna__inp sf-bendAna__inp--inline" type="text" inputmode="decimal" autocomplete="off" aria-label="Span length ft" /> <span class="sf-bendAna__unit">ft</span></span>
+              </div>
+              <div class="sf-bendAna__propertyRow">
+                <span>SERVICE w (DL+LL)</span>
+                <span><input id="sfBendAnaWsvc" class="sf-bendAna__inp sf-bendAna__inp--inline" type="text" inputmode="decimal" autocomplete="off" aria-label="Service uniform load klf" /> <span class="sf-bendAna__unit">kips/ft</span></span>
+              </div>
+              <div class="sf-bendAna__fieldGroup">
+                <label for="sfBendAnaDeflLim">DEFLECTION LIMITATION</label>
+                <div class="sf-bendAna__selectBox sf-bendAna__selectBox--flush">
+                  <select id="sfBendAnaDeflLim" class="sf-bendAna__selectNative" aria-label="Deflection limit span over n"></select>
+                </div>
+              </div>
+              <div class="sf-bendAna__propertyRow">
+                <span>I<sub>x</sub> (shape)</span>
+                <span><strong id="sfBendAnaIxDisp">—</strong> <span class="sf-bendAna__unit">in⁴</span></span>
+              </div>
+              <div class="sf-bendAna__propertyRow">
+                <span>Δ<sub>allow</sub></span>
+                <span id="sfBendAnaDeltaAllow">—</span>
+              </div>
+              <div class="sf-bendAna__propertyRow">
+                <span>Δ<sub>max</sub></span>
+                <span id="sfBendAnaDeltaMax">—</span>
+              </div>
+              <div class="sf-bendAna__compactVerdict" style="margin-top: 10px;">
+                <div class="sf-bendAna__verdictLabel">REMARKS</div>
+                <div class="sf-bendAna__verdictPill" id="sfBendAnaDeflRm">—</div>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </div>
@@ -151,7 +196,7 @@
 
             <div class="sf-bendNoDef__card sf-bendNoDef__parametersCard">
               <div class="sf-bendNoDef__cardTitle">PARAMETERS:</div>
-              <div class="sf-bendNoDef__formRow"><span>STEEL TYPE</span><input id="sfBendDesSteelN" class="sf-bendNoDef__fieldPill" value="A700 GR 36" /></div>
+              <div class="sf-bendNoDef__formRow"><span>STEEL TYPE</span><select id="sfBendDesSteelN" class="sf-bendNoDef__fieldPill sf-bendNoDef__fieldPill--select" aria-label="Steel grade"></select></div>
               <div class="sf-bendNoDef__formRow"><span>F<sub>y</sub></span><div class="sf-bendNoDef__fieldPill" id="sfBendDesFyDispN">—</div></div>
               <div class="sf-bendNoDef__formRow"><span>DEAD LOAD (DL)</span><input id="sfBendDesDlN" class="sf-bendNoDef__fieldPill" value="0.2" /></div>
               <div class="sf-bendNoDef__formRow"><span>LIVE LOAD (LL)</span><input id="sfBendDesLlN" class="sf-bendNoDef__fieldPill" value="0.8" /></div>
@@ -160,10 +205,8 @@
                 <span>BEAM TYPE</span>
                 <select id="sfBendDesBeamN" class="sf-bendNoDef__fieldPill sf-bendNoDef__fieldPill--select" aria-label="Beam type"></select>
               </div>
-              <div class="sf-bendNoDef__formRow">
-                <span>DEFLECTION LIMITATION</span>
-                <select id="sfBendDesDeflLim" class="sf-bendNoDef__fieldPill sf-bendNoDef__fieldPill--select" aria-label="Deflection limit"></select>
-              </div>
+              <!-- Deflection L/n applies only to WITH DEFLECTION branch; keep peer select for sync with sfBendDesDeflLimY -->
+              <select id="sfBendDesDeflLim" hidden aria-hidden="true" tabindex="-1"></select>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendNoDef__loadCard">
@@ -176,14 +219,15 @@
               <div class="sf-bendNoDef__tableRow"><span>DL+LL</span><span class="sf-bendNoDef__subtext" id="sfBendDesN_dlll">-</span><span>kips/ft</span></div>
               <div class="sf-bendNoDef__tableRow"><span>W<sub>b</sub></span><span class="sf-bendNoDef__subtext" id="sfBendDesN_Wa">-</span><span>kips/ft</span></div>
               <div class="sf-bendNoDef__tableRow"><span>ALLOWABLE MOMENT (M<sub>a</sub>)</span><span class="sf-bendNoDef__subtext" id="sfBendDesMaN">-</span><span>kips·ft</span></div>
-              <div class="sf-bendNoDef__finalNote">ASSUMING COMPACTION FOR Z<sub>c</sub> = <span id="sfBendDesN_ZxReq">212.6703704</span> in³</div>
+              <div class="sf-bendNoDef__finalNote">Z<sub>x,req</sub> (LRFD, compact) = <span id="sfBendDesN_ZxReq">—</span> in³</div>
+              <div class="sf-bendNoDef__finalNote">Z<sub>x,req</sub> (ASD, compact) = <span id="sfBendDesN_ZxReqAsd">—</span> in³</div>
             </div>
           </section>
 
           <section class="sf-bendNoDef__panel sf-bendNoDef__centerPanel">
             <div class="sf-bendNoDef__card sf-bendNoDef__wideCard">
               <div class="sf-bendNoDef__cardTitle">BEAM LOAD</div>
-              <div class="sf-bendNoDef__formRow"><span>BEAM TYPE</span><div class="sf-bendNoDef__fieldPill">CONTINUOUS BEAM [2 EQUAL SPANS] - Uni</div></div>
+              <div class="sf-bendNoDef__formRow"><span>BEAM TYPE</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesBeamLblN">—</div></div>
               <div class="sf-bendNoDef__loadRow"><span>ULTIMATE MOMENT (M<sub>u</sub>) =</span><div class="sf-bendNoDef__inlinePill" id="sfBendDesMomentFormulaN">WL²/8</div></div>
               <div class="sf-bendNoDef__loadRow"><span>MAX DEFLECTION (Δ<sub>max</sub>) =</span><div class="sf-bendNoDef__inlinePill" id="sfBendDesDeflFormulaN">5WL⁴/384EI</div></div>
               <div class="sf-bendNoDef__loadRow sf-bendNoDef__loadRow--reverse"><span>ALLOWABLE MOMENT OF INERTIA I<sub>c</sub> =</span><div class="sf-bendNoDef__highlightPill" id="sfBendDesIxReqChip">4647.02586 in³</div></div>
@@ -195,9 +239,14 @@
               <div class="sf-bendNoDef__formRow"><span>PLASTIC MODULUS Z<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesZxY">224 in³</div></div>
               <div class="sf-bendNoDef__formRow"><span>WEIGHT w<sub>e</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1W">84</div></div>
               <div class="sf-bendNoDef__formRow"><span>SECTION MODULUS S<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1Sx">195 in³</div></div>
-              <div class="sf-bendNoDef__formRow"><span>MOMENT OF INERTIA I<sub>x</sub></span><div class="sf-bendNoDef__highlightPill">2370 in³</div></div>
-              <div class="sf-bendNoDef__formRow"><span>λ<sub>rf</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1Lf">6.17</div></div>
-              <div class="sf-bendNoDef__remarkPill sf-bendNoDef__remarkPill--unsafe" id="sfBendDesAss1Rm">UNSAFE</div>
+              <div class="sf-bendNoDef__formRow"><span>MOMENT OF INERTIA I<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1Ix">—</div><span class="sf-bendNoDef__unitHint">in⁴</span></div>
+              <div class="sf-bendNoDef__formRow"><span>λ<sub>f</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1Lf">6.17</div></div>
+              <div class="sf-bendNoDef__remarkPill sf-bendNoDef__remarkPill--unsafe" id="sfBendDesAss1Rm">—</div>
+              <div class="sf-bendNoDef__panelHeading sf-bendNoDef__panelHeading--sub">ASD (strength pick)</div>
+              <div class="sf-bendNoDef__formRow"><span>STEEL SECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesAss1SecAsd">—</div></div>
+              <div class="sf-bendNoDef__formRow"><span>Z<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1ZxAsd">—</div><span class="sf-bendNoDef__unitHint">in³</span></div>
+              <div class="sf-bendNoDef__formRow"><span>I<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1IxAsd">—</div><span class="sf-bendNoDef__unitHint">in⁴</span></div>
+              <div class="sf-bendNoDef__remarkPill sf-bendNoDef__remarkPill--safe" id="sfBendDesAss1RmAsd">—</div>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendNoDef__sectionCard">
@@ -230,13 +279,31 @@
 
             <div class="sf-bendNoDef__card sf-bendNoDef__deflectionCard">
               <div class="sf-bendNoDef__cardTitle">DEFLECTION</div>
-              <div class="sf-bendNoDef__formRow"><span>ALLOWABLE DEFLECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesAllowDefl">0.101851852</div></div>
-              <div class="sf-bendNoDef__formRow"><span>MAX DEFLECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesDeflY">0.101851852</div></div>
+              <div class="sf-bendNoDef__formRow"><span>ALLOWABLE DEFLECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesAllowDefl">—</div></div>
+              <div class="sf-bendNoDef__formRow"><span>MAX DEFL. (LRFD section)</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesDeflYLrfd">—</div></div>
+              <div class="sf-bendNoDef__formRow"><span>MAX DEFL. (ASD section)</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesDeflYAsd">—</div></div>
+              <div class="sf-bendNoDef__tableRow"><span>REMARKS (LRFD sect.)</span><span class="sf-bendNoDef__remarkPill" id="sfBendDesDeflRmLrfd">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>REMARKS (ASD sect.)</span><span class="sf-bendNoDef__remarkPill" id="sfBendDesDeflRmAsd">—</span></div>
+              <div class="sf-bendNoDef__formRow sf-bendNoDef__hiddenLegacy"><span>MAX DEFLECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesDeflY">—</div></div>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendNoDef__bendingCard">
               <div class="sf-bendNoDef__cardTitle">BENDING CAPACITY</div>
-              <div class="sf-bendNoDef__resultPill sf-bendNoDef__resultPill--orange"><span id="sfBendDesCapSym">M<sub>u</sub></span> = <span id="sfBendDesCapVal">1020.6</span> kips-ft</div>
+              <div class="sf-bendNoDef__bendPair">
+                <div class="sf-bendNoDef__bendCol">
+                  <div class="sf-bendNoDef__bendHdr">LRFD</div>
+                  <div class="sf-bendNoDef__bendLine"><span>M<sub>u</sub></span><span id="sfBendDesCapLrfdDem">—</span><span class="sf-bendNoDef__unitHint">kips·ft</span></div>
+                  <div class="sf-bendNoDef__bendLine"><span>φM<sub>n</sub></span><span id="sfBendDesCapLrfdCap">—</span><span class="sf-bendNoDef__unitHint">kips·ft</span></div>
+                  <div class="sf-bendNoDef__remarkPill" id="sfBendDesCapLrfdRm">—</div>
+                </div>
+                <div class="sf-bendNoDef__bendCol">
+                  <div class="sf-bendNoDef__bendHdr">ASD</div>
+                  <div class="sf-bendNoDef__bendLine"><span>M<sub>a</sub></span><span id="sfBendDesCapAsdDem">—</span><span class="sf-bendNoDef__unitHint">kips·ft</span></div>
+                  <div class="sf-bendNoDef__bendLine"><span>M<sub>n</sub>/Ω</span><span id="sfBendDesCapAsdCap">—</span><span class="sf-bendNoDef__unitHint">kips·ft</span></div>
+                  <div class="sf-bendNoDef__remarkPill" id="sfBendDesCapAsdRm">—</div>
+                </div>
+              </div>
+              <div class="sf-bendNoDef__bendLegacy sf-bendNoDef__hiddenLegacy"><span id="sfBendDesCapSym">M<sub>u</sub></span> = <span id="sfBendDesCapVal">—</span> kips-ft</div>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendNoDef__finalSectionCard">
@@ -264,7 +331,7 @@
                 </div>
               </div>
               <div class="sf-bendNoDef__cardTitle">PARAMETERS:</div>
-              <div class="sf-bendNoDef__formRow"><span>STEEL TYPE =</span><input id="sfBendDesSteelY" class="sf-bendNoDef__fieldPill" value="A36" /></div>
+              <div class="sf-bendNoDef__formRow"><span>STEEL TYPE =</span><select id="sfBendDesSteelY" class="sf-bendNoDef__fieldPill sf-bendNoDef__fieldPill--select" aria-label="Steel grade with deflection"></select></div>
               <div class="sf-bendNoDef__formRow"><span>F<sub>y</sub> =</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesFyDispY">—</div></div>
               <div class="sf-bendNoDef__formRow"><span>DEAD LOAD (DL) =</span><input id="sfBendDesDlY" class="sf-bendNoDef__fieldPill" value="0.2" /></div>
               <div class="sf-bendNoDef__formRow"><span>LIVE LOAD (LL) =</span><input id="sfBendDesLlY" class="sf-bendNoDef__fieldPill" value="0.8" /></div>
@@ -289,7 +356,8 @@
               <div class="sf-bendNoDef__tableRow"><span>DL+LL =</span><span class="sf-bendNoDef__subtext" id="sfBendDesY_dlll">-</span><span>kips/ft</span></div>
               <div class="sf-bendNoDef__tableRow"><span>W<sub>b</sub> =</span><span class="sf-bendNoDef__subtext" id="sfBendDesY_Wa">-</span><span>kips/ft</span></div>
               <div class="sf-bendNoDef__tableRow"><span>ALLOWABLE MOMENT (M<sub>a</sub>) =</span><span class="sf-bendNoDef__subtext" id="sfBendDesMaY">-</span><span>kips·ft</span></div>
-              <div class="sf-bendNoDef__finalNote">ASSUMING COMPACTION FOR Z<sub>c</sub> = <span id="sfBendDesY_ZxReq">212.6703704</span> in³</div>
+              <div class="sf-bendNoDef__finalNote">Z<sub>x,req</sub> (LRFD, compact) = <span id="sfBendDesY_ZxReq">—</span> in³</div>
+              <div class="sf-bendNoDef__finalNote">Z<sub>x,req</sub> (ASD, compact) = <span id="sfBendDesY_ZxReqAsd">—</span> in³</div>
             </div>
           </section>
 
@@ -343,12 +411,30 @@
             <div class="sf-bendNoDef__card">
               <div class="sf-bendNoDef__cardTitle">DEFLECTION</div>
               <div class="sf-bendNoDef__tableRow"><span>ALLOWABLE DEFLECTION</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflAllow">—</span></div>
-              <div class="sf-bendNoDef__tableRow"><span>MAX DEFLECTION</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflDeltaMax">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>MAX DEFL. (LRFD sect.)</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflDeltaLrfd">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>MAX DEFL. (ASD sect.)</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflDeltaAsd">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>REMARKS (LRFD)</span><span class="sf-bendNoDef__remarkPill" id="sfBendDesDeflStaRmLrfd">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>REMARKS (ASD)</span><span class="sf-bendNoDef__remarkPill" id="sfBendDesDeflStaRmAsd">—</span></div>
+              <div class="sf-bendNoDef__tableRow sf-bendNoDef__hiddenLegacy"><span>MAX DEFLECTION</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflDeltaMax">—</span></div>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendNoDef__bendingCard">
               <div class="sf-bendNoDef__cardTitle">BENDING CAPACITY</div>
-              <div class="sf-bendNoDef__resultPill sf-bendNoDef__resultPill--orange"><span id="sfBendDesDeflCapSym">M<sub>u</sub></span> = <span id="sfBendDesDeflCapVal">—</span> kips-ft</div>
+              <div class="sf-bendNoDef__bendPair">
+                <div class="sf-bendNoDef__bendCol">
+                  <div class="sf-bendNoDef__bendHdr">LRFD</div>
+                  <div class="sf-bendNoDef__bendLine"><span>M<sub>u</sub></span><span id="sfBendDesDeflCapLrfdDem">—</span><span class="sf-bendNoDef__unitHint">kips·ft</span></div>
+                  <div class="sf-bendNoDef__bendLine"><span>φM<sub>n</sub></span><span id="sfBendDesDeflCapLrfdCap">—</span><span class="sf-bendNoDef__unitHint">kips·ft</span></div>
+                  <div class="sf-bendNoDef__remarkPill" id="sfBendDesDeflCapLrfdRm">—</div>
+                </div>
+                <div class="sf-bendNoDef__bendCol">
+                  <div class="sf-bendNoDef__bendHdr">ASD</div>
+                  <div class="sf-bendNoDef__bendLine"><span>M<sub>a</sub></span><span id="sfBendDesDeflCapAsdDem">—</span><span class="sf-bendNoDef__unitHint">kips·ft</span></div>
+                  <div class="sf-bendNoDef__bendLine"><span>M<sub>n</sub>/Ω</span><span id="sfBendDesDeflCapAsdCap">—</span><span class="sf-bendNoDef__unitHint">kips·ft</span></div>
+                  <div class="sf-bendNoDef__remarkPill" id="sfBendDesDeflCapAsdRm">—</div>
+                </div>
+              </div>
+              <div class="sf-bendNoDef__bendLegacy sf-bendNoDef__hiddenLegacy"><span id="sfBendDesDeflCapSym">M<sub>u</sub></span> = <span id="sfBendDesDeflCapVal">—</span> kips-ft</div>
             </div>
 
             <div class="sf-bendNoDef__card">
