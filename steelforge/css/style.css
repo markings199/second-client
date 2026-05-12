@@ -666,10 +666,10 @@ body::before {
   --sf-grade-table-cell-pad-x: 8px;
 
   /* Manual sizing knobs: right-top panel control widths */
-  --sf-grade-top-select-w: 240px; /* ASTM Designation dropdown width */
-  --sf-grade-mini-select-w: 84%; /* Fy dropdown width */
-  --sf-grade-blue-answer-w: 84%; /* blue answer pill width */
-  --sf-grade-selected-label-w: 96px; /* width of Designation/Fy/Fu label column */
+  --sf-grade-top-select-w: 198px; /* ASTM Designation dropdown width */
+  --sf-grade-mini-select-w: 72%; /* Fy dropdown width */
+  --sf-grade-blue-answer-w: 72%; /* blue answer pill width */
+  --sf-grade-selected-label-w: 84px; /* width of Designation/Fy/Fu label column */
   --sf-grade-selected-gap: 12px; /* gap between label and yellow pill */
 
   /* Manual text sizing knobs: "What is ASTM?" card */
@@ -683,8 +683,8 @@ body::before {
   --sf-grade-right-bottom-h: var(--sf-hub-grade-right-bottom);
 
   /* Manual sizing knobs: column widths (controls the overall size of the 3 boxes) */
-  --sf-grade-left-w: 1.15fr; /* left white box width */
-  --sf-grade-right-w: 1fr; /* right column width (top+bottom boxes) */
+  --sf-grade-left-w: 1.42fr; /* left white box width (wider table) */
+  --sf-grade-right-w: 0.68fr; /* right column: controls + ASTM info (narrower) */
 
   /* Manual positioning knobs (move the whole gray box) */
   --sf-grade-offset-x: 0px; /* +right / -left */
@@ -920,7 +920,7 @@ body::before {
 
 /* Right-top panel: match the reference layout (full-width controls) */
 .sf-grade__panel--select .sf-grade__row {
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: minmax(132px, 168px) minmax(0, 1fr);
   align-items: center;
 }
 
@@ -7939,7 +7939,7 @@ input.sf-secprops__val:focus {
   --des-steeltype-select-h: 18px;  /* STEEL TYPE dropdown height */
   --des-steeltype-row-gap: 8px;    /* STEEL TYPE label/dropdown gap */
   --des-condition-box-w: calc(100% - var(--des-condition-box-offset-x) - 166px);    /* CONDITION CHECKING box width */
-  --des-condition-box-min-h: 246px;/* CONDITION CHECKING box height */
+  --des-condition-box-min-h: 198px;/* CONDITION CHECKING box height (content-fit; was 246px) */
   --des-condition-box-offset-x: 392px; /* CONDITION CHECKING move left/right */
   --des-condition-box-offset-y: 16px;   /* CONDITION CHECKING move up/down */
   --des-condition-manual-x: 0px;   /* CONDITION CHECKING manual nudge: +right / -left */
@@ -7948,10 +7948,12 @@ input.sf-secprops__val:focus {
   --des-ultimate-box-min-h: 25px;  /* ULTIMATE SHEAR box height */
   --des-ultimate-box-offset-x: 392px; /* ULTIMATE SHEAR move left/right */
   --des-ultimate-box-shift-x: 0px; /* extra manual right/left shift */
-  --des-ultimate-box-offset-y: 102px;  /* legacy (absolute layout); grid mode ignores */
+  --des-ultimate-box-offset-y: 28px;  /* gap below CONDITION CHECKING → ULTIMATE SHEAR */
   --des-ultimate-manual-width: 100%; /* full width of grid cell */
   --des-ultimate-manual-x: 0px;
   --des-ultimate-manual-y: 0px;
+  /* Grid layout only: pull ULTIMATE SHEAR toward CONDITION CHECKING (beam/load grid unchanged) */
+  --des-ultimate-nudge-y: -43px;
   --des-shape-panel-w: 110px;      /* right shape panel width */
   --des-shape-card-w: 100%;        /* each inner photo card width */
   --des-shape-panel-gap-x: 10px;   /* gap from condition box */
@@ -8430,10 +8432,10 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLeft {
   display: grid;
-  grid-template-columns: 1fr 98px;
+  grid-template-columns: minmax(0, 1fr) minmax(104px, 118px);
   grid-template-rows: auto 1fr;
-  column-gap: 8px;
-  row-gap: 6px;
+  column-gap: 10px;
+  row-gap: 8px;
   align-items: stretch;
 }
 
@@ -8463,23 +8465,30 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionPillCol {
   display: grid;
-  grid-template-rows: repeat(3, minmax(20px, 1fr));
-  row-gap: 6px;
-  align-content: stretch;
-  padding: 0;
+  grid-template-rows: repeat(3, minmax(28px, auto));
+  row-gap: 8px;
+  align-content: start;
+  padding: 2px 0 0;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionPill {
-  height: 20px;
+  min-height: 28px;
+  height: auto;
+  padding: 4px 8px;
+  box-sizing: border-box;
   border-radius: 999px;
   background: rgba(142, 172, 203, 0.9);
   border: 1px solid rgba(105, 100, 90, 0.14);
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
   font-size: 0.78rem;
   color: rgba(255,255,255,0.96);
+  text-align: center;
+  line-height: 1.15;
+  width: 100%;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRight {
@@ -8489,10 +8498,10 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRow {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: minmax(44px, auto) minmax(72px, 1fr) auto;
   grid-template-rows: auto auto;
-  column-gap: 8px;
-  row-gap: 3px;
+  column-gap: 10px;
+  row-gap: 4px;
   align-items: center;
 }
 
@@ -8522,6 +8531,13 @@ input.sf-secprops__val:focus {
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRow .sf-shearDes__conditionPill {
   grid-column: 2;
   grid-row: 2;
+  min-height: 28px;
+  min-width: 72px;
+  padding: 4px 10px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRow--vn .sf-shearDes__conditionPill {
@@ -8741,8 +8757,9 @@ input.sf-secprops__val:focus {
   grid-area: ultimate;
   min-height: 0;
   padding: 10px 12px;
-  margin-top: 0;
-  align-self: stretch;
+  /* Pull ULTIMATE SHEAR up toward CONDITION CHECKING only (does not move beam/load grid) */
+  margin-top: var(--des-ultimate-nudge-y, -43px);
+  align-self: start;
   justify-self: stretch;
   width: 100%;
   max-width: 100%;
@@ -8795,7 +8812,7 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
   grid-area: shape;
-  align-self: stretch;
+  align-self: start;
   padding: 6px;
   border-width: 3px;
   grid-template-rows: 1fr 1fr;
@@ -9713,10 +9730,11 @@ input.sf-secprops__val:focus {
   grid-area: ultimate !important;
   min-height: 0 !important;
   padding: 10px 12px !important;
+  margin-top: var(--des-ultimate-nudge-y, -43px) !important;
   width: 100% !important;
   max-width: 100% !important;
   justify-self: stretch !important;
-  align-self: stretch !important;
+  align-self: start !important;
   transform: none !important;
   z-index: 6 !important;
 }
@@ -9767,11 +9785,11 @@ input.sf-secprops__val:focus {
 
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
   grid-area: shape !important;
-  align-self: stretch !important;
+  align-self: start !important;
   padding: 6px !important;
   border-width: 3px !important;
   grid-template-rows: 1fr 1fr !important;
-  transform: translateY(-45px) !important;
+  transform: translateY(-62px) !important;
 }
 
 /* Design uses same gray-card height as analysis (shared value above) */

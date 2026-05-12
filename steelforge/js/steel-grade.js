@@ -7,8 +7,8 @@
  * strengths stay in sync with the material table embedded in steel-db.js.
  */
 (() => {
-  /** Default matches the hub UI reference (A572 Gr. 42). */
-  const DEFAULT_GRADE_ID = 'a572_42';
+  /** Default matches common W-shape design practice (ASTM REF 2). */
+  const DEFAULT_GRADE_ID = 'a992';
 
   function sortedGrades() {
     const grades = window.SteelForgeStructuralSteelGrades ?? [];

@@ -315,6 +315,47 @@
   border: 1px solid rgba(19, 78, 138, 0.22);
 }
 
+.sf-compAnaDash .cad-compactLimits {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 10px;
+}
+
+.sf-compAnaDash .cad-compactLimitRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+}
+
+.sf-compAnaDash .cad-compactLimitLab {
+  font-weight: 800;
+  color: var(--cad-accent);
+  flex: 0 0 auto;
+}
+
+.sf-compAnaDash .cad-compactLimitNums {
+  font-weight: 600;
+  color: var(--cad-ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.sf-compAnaDash .cad-compactLimitNums #sfCompDashLpF,
+.sf-compAnaDash .cad-compactLimitNums #sfCompDashLrF,
+.sf-compAnaDash .cad-compactLimitNums #sfCompDashLpW,
+.sf-compAnaDash .cad-compactLimitNums #sfCompDashLrW {
+  color: var(--cad-accent);
+  font-weight: 800;
+}
+
 .sf-compAnaDash .cad-middleCol {
   margin-top: 10px;
   min-width: 0;

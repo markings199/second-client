@@ -520,6 +520,12 @@
       return `${fmt(deltaIn / 12, 9)} ft (${fmt(deltaIn, 4)} in)`;
     }
 
+    /** Plain feet (no unit suffix) to match Excel-style numeric cells. */
+    function formatDeflectionWorkbookFt(deltaIn) {
+      if (!Number.isFinite(deltaIn)) return '—';
+      return fmt(deltaIn / 12, 9);
+    }
+
     function copySpan(toEl, fromEl) {
       if (toEl && fromEl) toEl.textContent = fromEl.textContent;
     }
@@ -857,15 +863,9 @@
         const ixReqDisp = requiredIx(dlll_val, L, E, deltaLimIn, bcDesign.deflectionK);
         if (Number.isFinite(ixReqDisp) && ixReqDisp > 0) I_min = ixReqDisp;
         setOutSpan(els.ixChip, Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
-        setOutSpan(els.allowDefl, formatDeflectionDual(deltaLimIn));
+        setOutSpan(els.allowDefl, formatDeflectionWorkbookFt(deltaLimIn));
       } else {
         setOutSpan(els.ixChip, '—');
-        setOutSpan(els.allowDefl, '—');
-        setOutSpan(els.deflY, '—');
-        setOutSpan(els.deflYLrfd, '—');
-        setOutSpan(els.deflYAsd, '—');
-        setRemarkSafe(els.deflRmLrfd, null);
-        setRemarkSafe(els.deflRmAsd, null);
       }
 
       if (wRows.length === 0) {
@@ -875,7 +875,22 @@
         if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
           const ixReqDisp = requiredIx(dlll_val, L, E, deltaLimIn, bcDesign.deflectionK);
           setOutSpan(els.ixChip, Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
-          setOutSpan(els.allowDefl, formatDeflectionDual(deltaLimIn));
+          setOutSpan(els.allowDefl, formatDeflectionWorkbookFt(deltaLimIn));
+        } else if (!deflOn && Number.isFinite(L) && L > 0) {
+          const denomAdv =
+            els.deflLim?.value ||
+            els.deflLimY?.value ||
+            String(preferredWorkbookDeflectionDenom());
+          const limAdv = allowableDeflectionInches(L, denomAdv);
+          setOutSpan(
+            els.allowDefl,
+            Number.isFinite(limAdv) && limAdv > 0 ? formatDeflectionWorkbookFt(limAdv) : '—',
+          );
+          setOutSpan(els.deflYLrfd, '—');
+          setOutSpan(els.deflYAsd, '—');
+          setOutSpan(els.deflY, '—');
+          setRemarkSafe(els.deflRmLrfd, null);
+          setRemarkSafe(els.deflRmAsd, null);
         }
         mirrorDeflPanels(ins.beam);
         return;
@@ -911,7 +926,6 @@
           setOutSpan(els.ass1.ix, fmt(lrfdR.picked.Ix, 1));
           setOutSpan(els.ass1.lf, fmt(p.lamF, 6));
           const capL = designStrengthKipFt(Fy, E, p.row, true);
-          const detailL = `Demand ${fmt(lrfdR.Mu_tot, 3)} kips·ft; φMₙ ${fmt(capL, 3)} kips·ft.`;
           const WsvcL = dl + ll + lrfdR.w_self;
           let ok = capL != null && capL >= lrfdR.Mu_tot;
           if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
@@ -921,13 +935,10 @@
               Number.isFinite(dMax) && Number.isFinite(deltaLimIn) ? dMax <= deltaLimIn + 1e-9 : false;
             ok = ok && ixOk && delOk;
           }
-          setOutSpan(els.ass1.rm, `${detailL} — ${ok ? 'SAFE' : 'UNSAFE'}`);
-          els.ass1.rm.classList.toggle('sf-bendNoDef__remarkPill--safe', ok);
-          els.ass1.rm.classList.toggle('sf-bendNoDef__remarkPill--unsafe', !ok);
+          setRemarkSafe(els.ass1.rm, ok);
         } else {
           ['sec', 'zx', 'w', 'sx', 'ix', 'lf'].forEach((k) => setOutSpan(els.ass1[k], '—'));
-          setOutSpan(els.ass1.rm, '—');
-          els.ass1.rm.classList.remove('sf-bendNoDef__remarkPill--safe', 'sf-bendNoDef__remarkPill--unsafe');
+          setRemarkSafe(els.ass1.rm, null);
         }
 
         if (asdR.picked) {
@@ -972,9 +983,18 @@
         setRemarkSafe(els.capAsdRm, null);
         setRemarkSafe(els.deflRmLrfd, null);
         setRemarkSafe(els.deflRmAsd, null);
-        if (deflOn) {
-          ['ixSec', 'ixZx', 'ixSx', 'ixI', 'ixLf', 'ixW'].forEach((k) => setOutSpan(els[k], '—'));
+        if (!deflOn && Number.isFinite(L) && L > 0) {
+          const denomAdv =
+            els.deflLim?.value ||
+            els.deflLimY?.value ||
+            String(preferredWorkbookDeflectionDenom());
+          const limAdv = allowableDeflectionInches(L, denomAdv);
+          setOutSpan(
+            els.allowDefl,
+            Number.isFinite(limAdv) && limAdv > 0 ? formatDeflectionWorkbookFt(limAdv) : '—',
+          );
         }
+        ['ixSec', 'ixZx', 'ixSx', 'ixI', 'ixLf', 'ixW'].forEach((k) => setOutSpan(els[k], '—'));
         mirrorDeflPanels(ins.beam);
         return;
       }
@@ -1030,7 +1050,7 @@
         if (lrfdR.picked) {
           const Wl = dl + ll + lrfdR.w_self;
           const dL = deltaInches(Wl, L, E, lrfdR.picked.Ix, bcDesign.deflectionK);
-          setOutSpan(els.deflYLrfd, Number.isFinite(dL) ? fmt(dL, 9) : '—');
+          setOutSpan(els.deflYLrfd, Number.isFinite(dL) ? formatDeflectionWorkbookFt(dL) : '—');
           const ok =
             Number.isFinite(dL) &&
             dL <= deltaLimIn + 1e-9 &&
@@ -1043,7 +1063,7 @@
         if (asdR.picked) {
           const Wa = dl + ll + asdR.w_self;
           const dA = deltaInches(Wa, L, E, asdR.picked.Ix, bcDesign.deflectionK);
-          setOutSpan(els.deflYAsd, Number.isFinite(dA) ? fmt(dA, 9) : '—');
+          setOutSpan(els.deflYAsd, Number.isFinite(dA) ? formatDeflectionWorkbookFt(dA) : '—');
           const ok =
             Number.isFinite(dA) &&
             dA <= deltaLimIn + 1e-9 &&
@@ -1062,14 +1082,58 @@
         );
       }
 
-      if (deflOn && ixPick) {
-        const ip = shapeProps(ixPick, Fy, E);
-        setOutSpan(els.ixSec, ixPick.lab);
+      if (!deflOn && Number.isFinite(L) && L > 0) {
+        const denomAdv =
+          els.deflLim?.value ||
+          els.deflLimY?.value ||
+          String(preferredWorkbookDeflectionDenom());
+        const limAdv = allowableDeflectionInches(L, denomAdv);
+        const kAdv = bcDesign.deflectionK ?? 5 / 384;
+        if (Number.isFinite(limAdv) && limAdv > 0) {
+          setOutSpan(els.allowDefl, formatDeflectionWorkbookFt(limAdv));
+        } else {
+          setOutSpan(els.allowDefl, '—');
+        }
+        if (lrfdR.picked && Number.isFinite(limAdv) && limAdv > 0) {
+          const Wl = dl + ll + lrfdR.w_self;
+          const dL = deltaInches(Wl, L, E, lrfdR.picked.Ix, kAdv);
+          setOutSpan(els.deflYLrfd, Number.isFinite(dL) ? formatDeflectionWorkbookFt(dL) : '—');
+          setRemarkSafe(els.deflRmLrfd, Number.isFinite(dL) ? dL <= limAdv + 1e-9 : null);
+        } else {
+          setOutSpan(els.deflYLrfd, '—');
+          setRemarkSafe(els.deflRmLrfd, null);
+        }
+        if (asdR.picked && Number.isFinite(limAdv) && limAdv > 0) {
+          const Wa = dl + ll + asdR.w_self;
+          const dA = deltaInches(Wa, L, E, asdR.picked.Ix, kAdv);
+          setOutSpan(els.deflYAsd, Number.isFinite(dA) ? formatDeflectionWorkbookFt(dA) : '—');
+          setRemarkSafe(els.deflRmAsd, Number.isFinite(dA) ? dA <= limAdv + 1e-9 : null);
+        } else {
+          setOutSpan(els.deflYAsd, '—');
+          setRemarkSafe(els.deflRmAsd, null);
+        }
+        const dLegacy =
+          lrfdR.picked &&
+          deltaInches(dl + ll + lrfdR.w_self, L, E, lrfdR.picked.Ix, kAdv);
+        setOutSpan(els.deflY, Number.isFinite(dLegacy) ? formatDeflectionDual(dLegacy) : '—');
+      }
+
+      /**
+       * ASSUMED SECTION BY I_x:
+       * - WITH deflection: lightest shape meeting required I_x (may differ from Z_x strength pick).
+       * - WITHOUT deflection: no separate inertia-driven pick — show the governing strength section
+       *   so the panel stays populated (matches the final designed member).
+       */
+      const shapeForIxPanel = deflOn && ixPick ? ixPick : govPick || null;
+
+      if (shapeForIxPanel) {
+        const ip = shapeProps(shapeForIxPanel, Fy, E);
+        setOutSpan(els.ixSec, shapeForIxPanel.lab);
         setOutSpan(els.ixZx, fmt(ip.Zx, 3));
         setOutSpan(els.ixSx, fmt(ip.Sx, 3));
-        setOutSpan(els.ixI, fmt(ixPick.Ix, 1));
+        setOutSpan(els.ixI, fmt(shapeForIxPanel.Ix, 1));
         setOutSpan(els.ixLf, fmt(ip.lamF, 6));
-        setOutSpan(els.ixW, fmt(ixPick.wLb, 1));
+        setOutSpan(els.ixW, fmt(shapeForIxPanel.wLb, 1));
       } else {
         ['ixSec', 'ixZx', 'ixSx', 'ixI', 'ixLf', 'ixW'].forEach((k) => setOutSpan(els[k], '—'));
       }
@@ -1107,9 +1171,10 @@
     }
 
     function applyDefaults() {
-      const dDL = 0.15;
-      const dLL = 0.4;
-      const dL = 24;
+      /** Workbook “Bending design with deflection” demo: simple beam UDL, L/360. */
+      const dDL = 0.2;
+      const dLL = 0.8;
+      const dL = 35;
       if (els.dlN && String(els.dlN.value).trim() === '') els.dlN.value = String(dDL);
       if (els.llN && String(els.llN.value).trim() === '') els.llN.value = String(dLL);
       if (els.lN && String(els.lN.value).trim() === '') els.lN.value = String(dL);

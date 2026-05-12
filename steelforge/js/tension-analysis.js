@@ -247,7 +247,10 @@
       const Fu = parseNumLike(fuEl?.value);
 
       if (!case2Touched && Number.isFinite(xbar) && Number.isFinite(L) && L > 0) {
-        case2El.value = fmt(Math.max(0.6, 1 - xbar / L), 6);
+        const case1Blank = !String(case1El?.value || '').trim();
+        if (case1Blank) {
+          case2El.value = fmt(Math.max(0.6, 1 - xbar / L), 6);
+        }
       }
 
       const c1 = parseNumLike(case1El?.value);
@@ -417,7 +420,6 @@
       if (nEl && !String(nEl.value).trim()) nEl.value = '2';
       if (dhEl && !String(dhEl.value).trim()) dhEl.value = '3/4';
       if (case1El && !String(case1El.value).trim()) case1El.value = '1.0';
-      if (case8El && !String(case8El.value).trim()) case8El.value = '0.8';
       if (steelEl && !String(steelEl.value).trim()) steelEl.value = activeGrade?.label ?? 'A992';
       applySteelDefaults();
       setGeometryReadOnly(!isManualMode());

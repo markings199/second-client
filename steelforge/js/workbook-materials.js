@@ -106,16 +106,29 @@
     cont: 'fixed-pinned-u',
   };
 
-  /** Denominators n for allowable Δ = L/n with L as span length (same convention as workbook “L/360”). */
-  const DEFLECTION_DENOMS = [
-    100, 120, 140, 160, 180, 190, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480,
-    500, 520, 540, 560, 580, 600,
-  ];
+  /**
+   * ASTM Specification “deflection limitation” table: Δ = L/n with span L in ft (same as app bending).
+   * Includes L/100 … L/600 in steps of 20, plus named rows from the workbook (flat roofs L/180, floors L/360, etc.).
+   */
+  const DEFLECTION_DENOMS = (() => {
+    const out = [];
+    for (let n = 100; n <= 600; n += 20) out.push(n);
+    return out;
+  })();
+
+  function workbookDeflectionLabel(denom) {
+    const d = Number(denom);
+    if (d === 180) return 'L/180 — flat roofs';
+    if (d === 240) return 'L/240';
+    if (d === 360) return 'L/360 — floors';
+    if (d === 480) return 'L/480';
+    return `L/${d}`;
+  }
 
   /** Shear lag factor U cases from `reference/exel program EWIWIWI(S(ASTM)).csv`. */
   const SHEAR_LAG_CASES = [
     { caseKey: '1', description: 'Directly transmitted to fasteners', u: 1 },
-    { caseKey: '2', description: 'Some are transmitted to fasteners', u: 0.606 },
+    { caseKey: '2', description: 'Some are transmitted to fasteners (client workbook CASE 2)', u: 0.8 },
     { caseKey: '3', description: 'Transverse welds', u: 1 },
     { caseKey: '4', description: 'Load is transmitted by longitudinal welds', u: 0.4545 },
     { caseKey: '5', description: 'Round HSS', u: null },
@@ -138,7 +151,7 @@
 
   window.SteelForgeWorkbookDeflectionLimitPresets = DEFLECTION_DENOMS.map((denom) => ({
     denom,
-    label: `L/${denom}`,
+    label: workbookDeflectionLabel(denom),
     /** Allowable deflection (in) when span L is entered in ft: Δ = L(ft)·12/n */
     allowableDeltaInches(L_ft) {
       return Number.isFinite(L_ft) && L_ft > 0 ? (L_ft * 12) / denom : null;

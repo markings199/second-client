@@ -108,6 +108,11 @@
     return `${fmt(deltaIn / 12, 9)} ft (${fmt(deltaIn, 4)} in)`;
   }
 
+  function formatDeflectionWorkbookFt(deltaIn) {
+    if (!Number.isFinite(deltaIn)) return '—';
+    return fmt(deltaIn / 12, 9);
+  }
+
   function steelPropsFromGradeSelect(selectValue) {
     if (selectValue === 'custom') return null;
     const grades = window.SteelForgeStructuralSteelGrades ?? [];
@@ -401,7 +406,7 @@
       const denom = deflLimSel?.value;
       const dAllow = allowableDeflectionInches(L, denom);
 
-      if (deltaAllow) deltaAllow.textContent = formatDeflectionDual(dAllow);
+      if (deltaAllow) deltaAllow.textContent = formatDeflectionWorkbookFt(dAllow);
 
       if (!Number.isFinite(curIx) || curIx <= 0 || !Number.isFinite(W) || W <= 0 || !Number.isFinite(L) || L <= 0) {
         if (deltaMax) deltaMax.textContent = '—';
@@ -413,7 +418,7 @@
       const k = bc.deflectionK ?? 5 / 384;
       const dMax = deltaInches(W, L, E_DEFAULT, curIx, k);
 
-      if (deltaMax) deltaMax.textContent = formatDeflectionDual(dMax);
+      if (deltaMax) deltaMax.textContent = formatDeflectionWorkbookFt(dMax);
 
       if (deflRm) {
         const ok =

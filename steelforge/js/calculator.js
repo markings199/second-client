@@ -380,7 +380,7 @@
     const steelEl = input('sfCompAnaSteel');
     populateStructuralSteelGradeSelect(
       steelEl,
-      window.SteelForge?.activeStructuralSteelGrade?.id || 'a529_55',
+      window.SteelForge?.activeStructuralSteelGrade?.id || 'a992',
     );
 
     const E_DEFAULT = 29000;
@@ -443,7 +443,9 @@
           o.textContent = t;
           sel.appendChild(o);
         });
-        sel.value = axis === 'x' ? 'fixed-pinned' : 'pinned-pinned';
+        // Match client workbook: x-axis segments default fixed–pinned; y₁ fixed–pinned, y₂+ pinned–pinned.
+        sel.value =
+          axis === 'x' ? 'fixed-pinned' : i === 0 ? 'fixed-pinned' : 'pinned-pinned';
         const kSpan = document.createElement('span');
         kSpan.className = 'sf-compAnaCritical__input';
         const lSpan = document.createElement('span');
@@ -558,6 +560,16 @@
       if (lim && pillF) pillF.textContent = classify(lamF, lim.flange, 'flange');
       if (lim && pillW) pillW.textContent = classify(lamW, lim.web, 'web');
 
+      const dashLim = (id, v) => {
+        const el = pane.querySelector(`#${id}`);
+        if (!el) return;
+        el.textContent = lim && Number.isFinite(v) ? fmt(v, 8) : '—';
+      };
+      dashLim('sfCompDashLpF', lim?.flange?.lp);
+      dashLim('sfCompDashLrF', lim?.flange?.lr);
+      dashLim('sfCompDashLpW', lim?.web?.lp);
+      dashLim('sfCompDashLrW', lim?.web?.lr);
+
       const xs = [1, 2, 3, 4, 5, 6].map((i) => parseNum(input(`sfCompAnaX${i}`)?.value) ?? 0);
       const ys = [1, 2, 3, 4, 5, 6].map((i) => parseNum(input(`sfCompAnaY${i}`)?.value) ?? 0);
       let gov = null;
@@ -584,7 +596,14 @@
               o.textContent = t;
               sel.appendChild(o);
             });
-            sel.value = prev && connK[prev] ? prev : axis === 'x' ? 'fixed-pinned' : 'pinned-pinned';
+            sel.value =
+              prev && connK[prev]
+                ? prev
+                : axis === 'x'
+                  ? 'fixed-pinned'
+                  : i === 0
+                    ? 'fixed-pinned'
+                    : 'pinned-pinned';
           }
           const K = sel ? connK[sel.value] ?? 1 : 1;
           const Lin = Number.isFinite(Lft) ? Lft * 12 : null;
@@ -1114,8 +1133,13 @@
     const initCompressionDesignConnDefaults = () => {
       pane.querySelectorAll('select.sf-compDes__connSelect[data-sf-k-for]').forEach((sel) => {
         if (!sel.value || !SF_COMP_DES_CONN_K[sel.value]) {
-          const yAxis = /^sfCompDesConnY\d$/i.test(sel.id);
-          sel.value = yAxis ? 'pinned-pinned' : 'fixed-pinned';
+          const ym = sel.id.match(/^sfCompDesConnY(\d)$/i);
+          if (ym) {
+            const j = Number(ym[1]);
+            sel.value = j === 1 ? 'fixed-pinned' : 'pinned-pinned';
+          } else {
+            sel.value = 'fixed-pinned';
+          }
         }
         applyConnKFromSelect(sel);
       });
@@ -1499,10 +1523,10 @@
     return v.toFixed(digits);
   }
 
-  /** Match typical spreadsheet display for limiting slenderness values */
+  /** Limiting slenderness (λ, 2.24√(E/Fy), etc.) — compact display for UI tables */
   function fmtShearLimit(v) {
     if (!Number.isFinite(v)) return '—';
-    return v.toFixed(8);
+    return v.toFixed(3).replace(/\.?0+$/, '');
   }
 
   /**
@@ -1912,7 +1936,7 @@
             : `Enter ${isASD ? 'Va' : 'Vu'} (demand).`;
         } else {
           const ok = VuDemand <= cap;
-          remarksEl.textContent = `${ok ? 'SAFE' : 'NOT SAFE'} · ${webCls || 'Shear check'}`;
+          remarksEl.textContent = `${ok ? 'SAFE' : 'UNSAFE'} · ${webCls || 'Shear check'}`;
         }
       }
 
@@ -2136,12 +2160,13 @@
         designShapeImgs[1].style.opacity = isLRFD ? '0.35' : '1';
       }
 
-      const beamKind = String(input('sfShearDesBeamType')?.value || 'cantilever').toLowerCase();
+      const beamKind = String(input('sfShearDesBeamType')?.value || 'simple').toLowerCase();
       const isCantilever = beamKind === 'cantilever';
       const momentFac = isCantilever ? 1 / 3 : 1 / 8;
       const shearFac = isCantilever ? 1 : 0.5;
       const beamMomentFormulaHtml = isCantilever ? 'WL²/3' : 'WL²/8';
-      const beamDeflFormulaHtml = isCantilever ? 'WL³/5EI' : '5WL<sup>4</sup>/384EI';
+      /** Workbook-style cantilever UDL tip deflection (see shear design reference). */
+      const beamDeflFormulaHtml = isCantilever ? 'WL<sup>4</sup>/5EI' : '5WL<sup>4</sup>/384EI';
 
       const setText = (id, value) => {
         const el = out(id);
@@ -2275,8 +2300,14 @@
         cv = Vn = phiVn = Vallow = null;
       }
 
-      /** λ<sub>w</sub> for the governing shear section (lightest that satisfies Z<sub>x</sub> and shear) — matches V<sub>n</sub>, C<sub>v</sub> block. */
-      const lambdaWebDisplay = shearCondShapeResult?.lambda ?? null;
+      /** Web slenderness for the Z<sub>x</sub>-assumed shape (must match plastic modulus / depth / t<sub>w</sub> in the same card). */
+      const lambdaWebAssumed =
+        assumedShape &&
+        (Number.isFinite(assumedShape.h) && Number.isFinite(assumedShape.tw) && assumedShape.tw > 0
+          ? assumedShape.h / assumedShape.tw
+          : Number.isFinite(assumedShape.lambdaW)
+            ? assumedShape.lambdaW
+            : null);
 
       setText('sfShearDesWult', fmtNum(wTop, 2));
       setText('sfShearDesWu', fmtNum(wComb, 2));
@@ -2288,7 +2319,7 @@
       setText('sfShearDesPlasticMod', assumedShape?.zx == null ? '—' : fmtNum(assumedShape.zx, 2));
       setText('sfShearDesTw', assumedShape?.tw == null ? '—' : fmtNum(assumedShape.tw, 3));
       setText('sfShearDesDepth', assumedShape?.d == null ? '—' : fmtNum(assumedShape.d, 2));
-      setText('sfShearDesLambdaWeb', lambdaWebDisplay == null ? '—' : fmtNum(lambdaWebDisplay, 2));
+      setText('sfShearDesLambdaWeb', lambdaWebAssumed == null ? '—' : fmtNum(lambdaWebAssumed, 2));
 
       setText('sfShearDesLambdaVal', fmtShearLimit(lim224));
       setText('sfShearDesLambdaP', fmtShearLimit(lambdaPglob));
@@ -2316,7 +2347,7 @@
       if (isSafe == null) {
         setText('sfShearDesRemarks', '—');
       } else {
-        setText('sfShearDesRemarks', isSafe ? 'SAFE' : 'NOT SAFE');
+        setText('sfShearDesRemarks', isSafe ? 'SAFE' : 'UNSAFE');
       }
 
       if (shearDebugEnabled()) {
