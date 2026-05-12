@@ -324,9 +324,9 @@
   font-size: 12px;
   font-weight: 800;
   margin: 0 0 10px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--cad-section-title);
+  color: var(--cad-accent);
 }
 
 .sf-compAnaDash .cad-tableScroll {
@@ -336,20 +336,23 @@
 }
 
 /*
-  Critical slenderness table — classic grid (reference layout):
-  tan rows, horizontal rules, first column left / others centered — not full “pill” cells.
+  Critical slenderness table — aligned with SteelForge blue/cream (section titles + shear accents).
 */
 .sf-compAnaDash .cad-stiffTable {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
   margin-bottom: 10px;
-  background: #d4c7bc;
+  background: rgba(248, 244, 234, 0.65);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(19, 78, 138, 0.14);
   table-layout: fixed;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .sf-compAnaDash .cad-stiffTable thead {
-  background: #6b7280;
+  background: linear-gradient(180deg, #1a5fa8 0%, var(--cad-accent) 55%, #0f3d6e 100%);
   color: #fff;
 }
 
@@ -358,7 +361,7 @@
   text-align: center;
   font-weight: 800;
   border: none;
-  border-bottom: 2px solid #5a6370;
+  border-bottom: 2px solid rgba(15, 61, 110, 0.45);
   font-size: 10px;
   letter-spacing: 0.04em;
   vertical-align: middle;
@@ -399,10 +402,14 @@
   padding: 8px 8px;
   vertical-align: middle;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-  background: #d4c7bc;
-  color: #4b5563;
+  border-bottom: 1px solid rgba(19, 78, 138, 0.1);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--cad-ink);
   word-break: break-word;
+}
+
+.sf-compAnaDash .cad-stiffTable tbody tr:nth-child(even) td {
+  background: rgba(248, 244, 234, 0.55);
 }
 
 .sf-compAnaDash .cad-stiffTable tbody tr:last-child td {
@@ -429,10 +436,11 @@
   font-size: 10px;
   font-weight: 600;
   line-height: 1.3;
-  border-radius: 6px;
-  border: 1px solid rgba(148, 163, 184, 0.55);
-  background: rgba(255, 255, 255, 0.92);
+  border-radius: 8px;
+  border: 1px solid rgba(19, 78, 138, 0.2);
+  background: rgba(255, 255, 255, 0.98);
   color: var(--cad-ink);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 /* Plain numeric cells (no pill chrome) */
@@ -441,7 +449,7 @@
   font-weight: 700;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
-  color: #4b5563;
+  color: var(--cad-ink);
   background: transparent;
   border: none;
   padding: 0;
@@ -468,7 +476,7 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   font-size: 11px;
-  color: #4b5563;
+  color: var(--cad-ink);
   background: transparent;
   border: none;
   padding: 0;
@@ -481,16 +489,17 @@
   max-width: 120px;
   height: 6px;
   margin: 0 auto;
-  background: rgba(148, 163, 184, 0.35);
+  background: rgba(19, 78, 138, 0.12);
   border-radius: 4px;
   overflow: hidden;
+  border: 1px solid rgba(19, 78, 138, 0.1);
 }
 
 .sf-compAnaDash .cad-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
-  border-radius: 4px;
+  background: linear-gradient(90deg, #8eb0ce 0%, #4a7eb5 100%);
+  border-radius: 3px;
   transition: width 0.2s ease;
 }
 
@@ -539,7 +548,7 @@
   padding: 0;
   margin: 0;
   background: transparent;
-  color: #4b5563;
+  color: var(--cad-ink);
   font-weight: 700;
   justify-content: unset;
   align-items: unset;
@@ -557,14 +566,16 @@
 }
 
 .sf-compAnaDash .cad-calcNote {
-  background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
-  color: #78350f;
+  background: linear-gradient(180deg, #e8f0fa 0%, #d4e4f2 100%);
+  color: #0f3d6e;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 11px;
   font-weight: 800;
   text-align: center;
-  border: 1px solid rgba(251, 191, 36, 0.35);
+  border: 1px solid rgba(19, 78, 138, 0.22);
+  box-shadow: 0 1px 3px rgba(19, 78, 138, 0.08);
+  letter-spacing: 0.02em;
 }
 
 .sf-compAnaDash .cad-capacityBox {
