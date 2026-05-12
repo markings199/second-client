@@ -2,6 +2,18 @@
 
 Single-page **steel design workspace** for structural coursework: tension, compression, bending, shear, tension rod, steel grades, and section properties. Built as static HTML/CSS/JS under `steelforge/`.
 
+## Source repository
+
+Canonical GitHub project: [github.com/markings199/second-client](https://github.com/markings199/second-client)
+
+```bash
+git clone https://github.com/markings199/second-client.git
+```
+
+Your machine’s folder name (for example `Civil Engineering Department`) does not need to match the repo name. What ties your copy to GitHub is the Git remote `origin`; this workspace should use:
+
+`https://github.com/markings199/second-client.git`
+
 ## Run locally
 
 From this folder:

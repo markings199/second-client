@@ -7948,10 +7948,10 @@ input.sf-secprops__val:focus {
   --des-ultimate-box-min-h: 25px;  /* ULTIMATE SHEAR box height */
   --des-ultimate-box-offset-x: 392px; /* ULTIMATE SHEAR move left/right */
   --des-ultimate-box-shift-x: 0px; /* extra manual right/left shift */
-  --des-ultimate-box-offset-y: 102px;  /* ULTIMATE SHEAR moved 50px lower again */
-  --des-ultimate-manual-width: 68%; /* ULTIMATE SHEAR manual width (use % or px) */
-  --des-ultimate-manual-x: 0px; /* ULTIMATE SHEAR manual nudge: +right / -left */
-  --des-ultimate-manual-y: -30px; /* ULTIMATE SHEAR moved 20px down again */
+  --des-ultimate-box-offset-y: 102px;  /* legacy (absolute layout); grid mode ignores */
+  --des-ultimate-manual-width: 100%; /* full width of grid cell */
+  --des-ultimate-manual-x: 0px;
+  --des-ultimate-manual-y: 0px;
   --des-shape-panel-w: 110px;      /* right shape panel width */
   --des-shape-card-w: 100%;        /* each inner photo card width */
   --des-shape-panel-gap-x: 10px;   /* gap from condition box */
@@ -8740,9 +8740,13 @@ input.sf-secprops__val:focus {
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox {
   grid-area: ultimate;
   min-height: 0;
-  padding: 8px 12px 8px;
-  margin-top: 50px;
-  align-self: end;
+  padding: 10px 12px;
+  margin-top: 0;
+  align-self: stretch;
+  justify-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  transform: none;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTitle,
@@ -9708,12 +9712,12 @@ input.sf-secprops__val:focus {
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox {
   grid-area: ultimate !important;
   min-height: 0 !important;
-  padding: 6px 10px 6px !important;
-  width: min(100%, var(--des-ultimate-manual-width)) !important;
-  max-width: min(100%, var(--des-ultimate-manual-width)) !important;
-  justify-self: start !important;
-  align-self: start !important;
-  transform: translate(var(--des-ultimate-manual-x), var(--des-ultimate-manual-y)) !important;
+  padding: 10px 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  justify-self: stretch !important;
+  align-self: stretch !important;
+  transform: none !important;
   z-index: 6 !important;
 }
 
@@ -9786,9 +9790,9 @@ input.sf-secprops__val:focus {
   --des-light-right-shift-x: -14px !important;
   --des-light-right-manual-x: -15px !important;
   --des-light-right-manual-y: 0px !important;
-  --des-ultimate-manual-width: 68% !important;
+  --des-ultimate-manual-width: 100% !important;
   --des-ultimate-manual-x: 0px !important;
-  --des-ultimate-manual-y: -95px !important;
+  --des-ultimate-manual-y: 0px !important;
   --des-condition-manual-x: 0px !important;
   --des-condition-manual-y: -28px !important;
 }

@@ -3,6 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <script>
+    /* Resolve ./assets and fetched page fragments against the app directory (index.html), including /steelforge/ on Vercel. */
+    (function () {
+      if (location.protocol === 'file:' || location.protocol === 'blob:') return;
+      var path = location.pathname || '/';
+      var dir;
+      if (path === '/' || path === '') dir = '/';
+      else if (path.endsWith('/')) dir = path;
+      else {
+        var i = path.lastIndexOf('/');
+        var last = i >= 0 ? path.slice(i + 1) : '';
+        if (last.indexOf('.') !== -1) dir = path.slice(0, i + 1) || '/';
+        else dir = path + '/';
+      }
+      var b = document.createElement('base');
+      b.href = dir;
+      document.head.insertBefore(b, document.head.children[1] || null);
+    })();
+  </script>
   <title>SteelForge | Compact Hub Line</title>
 
   <!-- Fonts: vintage + technical (clean & readable) -->
