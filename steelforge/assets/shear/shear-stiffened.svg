@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160" role="img" aria-labelledby="sfStTitle sfStDesc">
+  <title id="sfStTitle">Wide-flange section  stiffened web (shear)</title>
+  <desc id="sfStDesc">Same schematic with vertical stiffener plates on the web for ASD visualization.</desc>
+  <defs>
+    <linearGradient id="steelAs" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b8d4ee"/>
+      <stop offset="55%" stop-color="#7eb0d8"/>
+      <stop offset="100%" stop-color="#4a84b8"/>
+    </linearGradient>
+    <linearGradient id="steelBs" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#6a9ec9"/>
+      <stop offset="100%" stop-color="#a8cce8"/>
+    </linearGradient>
+    <linearGradient id="stiff" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2f5f8a"/>
+      <stop offset="100%" stop-color="#5a8ab8"/>
+    </linearGradient>
+    <filter id="softs" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="0.6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="220" height="160" fill="#f8fafc"/>
+  <g filter="url(#softs)" transform="translate(24 18) rotate(-12 86 62)">
+    <path fill="url(#steelAs)" stroke="#3d6f9a" stroke-width="1.2"
+      d="M20 12 L172 12 L172 28 L118 28 L118 132 L172 132 L172 148 L20 148 L20 132 L74 132 L74 28 L20 28 Z"/>
+    <path fill="url(#steelBs)" opacity="0.85" d="M74 28 L118 28 L118 132 L74 132 Z"/>
+    <!-- Web stiffeners -->
+    <rect x="88" y="36" width="8" height="88" rx="1" fill="url(#stiff)" stroke="#1f4a6e" stroke-width="0.8"/>
+    <rect x="104" y="36" width="8" height="88" rx="1" fill="url(#stiff)" stroke="#1f4a6e" stroke-width="0.8"/>
+  </g>
+</svg>

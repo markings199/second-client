@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160" role="img" aria-labelledby="sfPlainTitle sfPlainDesc">
+  <title id="sfPlainTitle">Wide-flange section  unstiffened web (shear)</title>
+  <desc id="sfPlainDesc">Schematic I-shape used for LRFD shear visualization.</desc>
+  <defs>
+    <linearGradient id="steelA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b8d4ee"/>
+      <stop offset="55%" stop-color="#7eb0d8"/>
+      <stop offset="100%" stop-color="#4a84b8"/>
+    </linearGradient>
+    <linearGradient id="steelB" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#6a9ec9"/>
+      <stop offset="100%" stop-color="#a8cce8"/>
+    </linearGradient>
+    <filter id="soft" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="0.6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="220" height="160" fill="#f8fafc"/>
+  <!-- Isometric-style W elevation -->
+  <g filter="url(#soft)" transform="translate(24 18) rotate(-12 86 62)">
+    <path fill="url(#steelA)" stroke="#3d6f9a" stroke-width="1.2"
+      d="M20 12 L172 12 L172 28 L118 28 L118 132 L172 132 L172 148 L20 148 L20 132 L74 132 L74 28 L20 28 Z"/>
+    <path fill="url(#steelB)" opacity="0.85" d="M74 28 L118 28 L118 132 L74 132 Z"/>
+  </g>
+</svg>
