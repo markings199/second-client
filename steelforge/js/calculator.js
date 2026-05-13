@@ -1741,17 +1741,6 @@
       norm('sfShearAnaFu', 3, 0);
       norm('sfShearAnaAw', 4, 0);
       norm('sfShearAnaAs', 4, 0);
-      const vuEl = input('sfShearAnaVu');
-      if (vuEl) {
-        const vuStr = String(vuEl.value || '').trim();
-        const vuNum = parseNum(vuStr);
-        if (vuStr === '' || (Number.isFinite(vuNum) && vuNum === 0)) {
-          // Per client request: never display "0.000" in the demand box; leave it empty until typed.
-          if (vuStr !== '') vuEl.value = '';
-        } else if (Number.isFinite(vuNum) && vuNum > 0) {
-          vuEl.value = fmtNum(vuNum, 3);
-        }
-      }
     };
 
     const syncWebSpacingAndKv = () => {
@@ -1862,8 +1851,6 @@
       }
       const kv = num('sfShearAnaKv');
       const E = num('sfShearAnaE');
-      const demandField = input('sfShearAnaVu');
-      const VuDemand = parseNum(demandField?.value);
 
       const lim224 =
         Number.isFinite(fy) && fy > 0 && Number.isFinite(E) && E > 0
@@ -1895,10 +1882,6 @@
       const asdCap = Number.isFinite(Vn) && shearSt ? Vn / shearSt.omegaV : null;
 
       const isASD = (methodEl?.value || 'lrfd') === 'asd';
-      const demandLbl = out('sfShearAnaDemandLabel');
-      if (demandLbl) {
-        demandLbl.innerHTML = isASD ? 'V<sub>a</sub> =' : 'V<sub>u</sub> =';
-      }
       const capacityLRFD = phiVn;
       const capacityASD = asdCap;
 
@@ -1950,13 +1933,8 @@
           remarksEl.textContent = webCls
             ? `${webCls}. Enter Aw, h (or λ), E, Fy.`
             : 'Enter section geometry and material.';
-        } else if (!Number.isFinite(VuDemand)) {
-          remarksEl.textContent = webCls
-            ? `${webCls}. Enter ${isASD ? 'Va' : 'Vu'} (demand).`
-            : `Enter ${isASD ? 'Va' : 'Vu'} (demand).`;
         } else {
-          const ok = VuDemand <= cap;
-          remarksEl.textContent = `${ok ? 'SAFE' : 'UNSAFE'} · ${webCls || 'Shear check'}`;
+          remarksEl.textContent = webCls ? `${webCls}.` : 'Shear capacity computed.';
         }
       }
 
@@ -1976,13 +1954,10 @@
           Vn,
           phiVn,
           VnOverOmega: asdCap,
-          VuOrVaDemand: VuDemand,
           mode: isASD ? 'ASD' : 'LRFD',
         });
       }
     };
-
-    const demandField = input('sfShearAnaVu');
 
     pane.querySelectorAll('input, select').forEach((el) => {
       if (el === steelEl) return;
@@ -2022,18 +1997,12 @@
     applySteelGradeProps();
     const E0 = input('sfShearAnaE');
     const kv0 = input('sfShearAnaKv');
-    const vu0 = input('sfShearAnaVu');
     if (E0 && String(E0.value).trim() === '') E0.value = '29000';
     if (kv0 && String(kv0.value).trim() === '') kv0.value = '5';
     if (E0) E0.readOnly = true;
     if (kv0) {
       kv0.readOnly = true;
       kv0.setAttribute('aria-label', 'Web shear coefficient k_v');
-    }
-    if (vu0) {
-      // Client request: shear-analysis demand starts empty (no "0.000" autofill).
-      const vu0Num = parseNum(vu0.value);
-      if (Number.isFinite(vu0Num) && vu0Num === 0) vu0.value = '';
     }
     setManualGeometryMode(!(shapeSel?.value));
     syncWebSpacingAndKv();
