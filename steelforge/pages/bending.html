@@ -209,7 +209,7 @@
               <select id="sfBendDesDeflLim" hidden aria-hidden="true" tabindex="-1"></select>
             </div>
 
-            <div class="sf-bendNoDef__card sf-bendNoDef__loadCard">
+            <div class="sf-bendNoDef__card sf-bendNoDef__loadCard" id="sfBendNoDefLoadCard" aria-label="Factored and allowable loads">
               <div class="sf-bendNoDef__cardTitle">LOAD W/O BEAM WEIGHT</div>
               <div class="sf-bendNoDef__loadRow"><span>1.2DL + 1.6LL</span><div class="sf-bendNoDef__highlightPill" id="sfBendDesN_c12">—</div></div>
               <div class="sf-bendNoDef__loadRow"><span>1.4DL</span><div class="sf-bendNoDef__highlightPill" id="sfBendDesN_c14">—</div></div>
@@ -219,8 +219,8 @@
               <div class="sf-bendNoDef__tableRow"><span>DL+LL</span><span class="sf-bendNoDef__subtext" id="sfBendDesN_dlll">—</span><span>kips/ft</span></div>
               <div class="sf-bendNoDef__tableRow"><span>W<sub>b</sub></span><span class="sf-bendNoDef__subtext" id="sfBendDesN_Wa">—</span><span>kips/ft</span></div>
               <div class="sf-bendNoDef__tableRow"><span>ALLOWABLE MOMENT (M<sub>a</sub>)</span><span class="sf-bendNoDef__subtext" id="sfBendDesMaN">—</span><span>kips·ft</span></div>
-              <div class="sf-bendNoDef__finalNote">Z<sub>x,req</sub> (LRFD, compact) = <span id="sfBendDesN_ZxReq">—</span> in³</div>
-              <div class="sf-bendNoDef__finalNote">Z<sub>x,req</sub> (ASD, compact) = <span id="sfBendDesN_ZxReqAsd">—</span> in³</div>
+              <div class="sf-bendNoDef__finalNote sf-bendNoDef__finalNote--lrfd">Z<sub>x,req</sub> (LRFD, compact) = <span id="sfBendDesN_ZxReq">—</span> in³</div>
+              <div class="sf-bendNoDef__finalNote sf-bendNoDef__finalNote--asd">Z<sub>x,req</sub> (ASD, compact) = <span id="sfBendDesN_ZxReqAsd">—</span> in³</div>
             </div>
           </section>
 
@@ -230,7 +230,7 @@
               <div class="sf-bendNoDef__formRow"><span>BEAM TYPE</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesBeamLblN">—</div></div>
               <div class="sf-bendNoDef__loadRow"><span>ULTIMATE MOMENT (M<sub>u</sub>) =</span><div class="sf-bendNoDef__inlinePill" id="sfBendDesMomentFormulaN">WL²/8</div></div>
               <div class="sf-bendNoDef__loadRow"><span>MAX DEFLECTION (Δ<sub>max</sub>) =</span><div class="sf-bendNoDef__inlinePill" id="sfBendDesDeflFormulaN">5WL⁴/384EI</div></div>
-              <div class="sf-bendNoDef__loadRow sf-bendNoDef__loadRow--reverse"><span>ALLOWABLE MOMENT OF INERTIA I<sub>c</sub> =</span><div class="sf-bendNoDef__highlightPill" id="sfBendDesIxReqChip">—</div></div>
+              <div class="sf-bendNoDef__loadRow sf-bendNoDef__loadRow--reverse"><span>ALLOWABLE MOMENT OF INERTIA I<sub>c</sub> =</span><div class="sf-bendNoDef__highlightPill" id="sfBendDesIxReqChip" title="Minimum Ix (in⁴) for Δ = L(ft)/n using service W = DL+LL (klf) and δ = k·W·L⁴/(E·I); k from beam case (simple UDL: 5/384), E = 29 000 ksi.">—</div></div>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendNoDef__sectionCard">
@@ -269,22 +269,22 @@
               <div class="sf-bendNoDef__tableRow"><span>ALLOWABLE MOMENT M<sub>a</sub></span><span class="sf-bendNoDef__subtext" id="sfBendDesLwMa">—</span><span>kips·ft</span></div>
             </div>
 
+            <div class="sf-bendNoDef__card sf-bendNoDef__deflectionCard" id="sfBendNoDefDeflectionCard" aria-label="Serviceability deflection check">
+              <div class="sf-bendNoDef__cardTitle">DEFLECTION</div>
+              <div class="sf-bendNoDef__tableRow"><span>ALLOWABLE DEFLECTION</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesAllowDefl">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>MAX DEFL. (LRFD section)</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflYLrfd">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>MAX DEFL. (ASD section)</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflYAsd">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>REMARKS (LRFD sect.)</span><span class="sf-bendNoDef__remarkPill" id="sfBendDesDeflRmLrfd">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>REMARKS (ASD sect.)</span><span class="sf-bendNoDef__remarkPill" id="sfBendDesDeflRmAsd">—</span></div>
+              <div class="sf-bendNoDef__formRow sf-bendNoDef__hiddenLegacy"><span>MAX DEFLECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesDeflY">—</div></div>
+            </div>
+
             <div class="sf-bendNoDef__card sf-bendNoDef__compactnessCard">
               <div class="sf-bendNoDef__cardTitle">CHECK COMPACTNESS</div>
               <div class="sf-bendNoDef__compactRow"><span>λ<sub>pf</sub> =</span><div class="sf-bendNoDef__compactValue" id="sfBendDesLpf">—</div></div>
               <div class="sf-bendNoDef__compactRow"><span>λ<sub>rf</sub> =</span><div class="sf-bendNoDef__compactValue" id="sfBendDesLrf">—</div></div>
               <div class="sf-bendNoDef__compactVerdict"><span>VERDICT</span><div class="sf-bendNoDef__verdictPill" id="sfBendDesVerdict">—</div></div>
               <div class="sf-bendNoDef__nominalResult"><span>NOMINAL MOMENT STRENGTH M<sub>n</sub></span><div class="sf-bendNoDef__resultPill" id="sfBendDesMn">—</div></div>
-            </div>
-
-            <div class="sf-bendNoDef__card sf-bendNoDef__deflectionCard">
-              <div class="sf-bendNoDef__cardTitle">DEFLECTION</div>
-              <div class="sf-bendNoDef__formRow"><span>ALLOWABLE DEFLECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesAllowDefl">—</div></div>
-              <div class="sf-bendNoDef__formRow"><span>MAX DEFL. (LRFD section)</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesDeflYLrfd">—</div></div>
-              <div class="sf-bendNoDef__formRow"><span>MAX DEFL. (ASD section)</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesDeflYAsd">—</div></div>
-              <div class="sf-bendNoDef__tableRow"><span>REMARKS (LRFD sect.)</span><span class="sf-bendNoDef__remarkPill" id="sfBendDesDeflRmLrfd">—</span></div>
-              <div class="sf-bendNoDef__tableRow"><span>REMARKS (ASD sect.)</span><span class="sf-bendNoDef__remarkPill" id="sfBendDesDeflRmAsd">—</span></div>
-              <div class="sf-bendNoDef__formRow sf-bendNoDef__hiddenLegacy"><span>MAX DEFLECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesDeflY">—</div></div>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendNoDef__bendingCard">
@@ -367,7 +367,7 @@
               <div class="sf-bendNoDef__tableRow"><span>BEAM TYPE =</span><span class="sf-bendNoDef__fieldPill" id="sfBendDesDeflBeamLbl">—</span></div>
               <div class="sf-bendNoDef__tableRow"><span>ULTIMATE MOMENT (M<sub>u</sub>) =</span><span class="sf-bendNoDef__inlinePill" id="sfBendDesMomentFormulaY">WL²/8</span></div>
               <div class="sf-bendNoDef__tableRow"><span>ULTIMATE DEFLECTION (Δ<sub>max</sub>) =</span><span class="sf-bendNoDef__inlinePill" id="sfBendDesDeflFormulaY">5WL⁴/384EI</span></div>
-              <div class="sf-bendNoDef__tableRow"><span>ALLOWABLE MOMENT OF INERTIA I<sub>c</sub> =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesIxReqChipDefl">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>ALLOWABLE MOMENT OF INERTIA I<sub>c</sub> =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesIxReqChipDefl" title="Minimum Ix (in⁴) for Δ = L(ft)/n using service W = DL+LL (klf) and δ = k·W·L⁴/(E·I); k from beam case (simple UDL: 5/384), E = 29 000 ksi.">—</span></div>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendWithDef__assumed1">

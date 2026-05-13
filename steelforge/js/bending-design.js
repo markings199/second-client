@@ -473,10 +473,41 @@
 
     if (!methodEl || !steelN || !steelY) return;
 
+    const loadCardNoDef = $('sfBendNoDefLoadCard');
+
     let wRows = [];
 
     function isDeflOn() {
       return deflYes && deflYes.checked;
+    }
+
+    /** Keep N/Y input pairs identical so hidden branch values never drift from the active deflection mode. */
+    function syncBendingParameterPeers() {
+      const defl = isDeflOn();
+      const copyVal = (from, to) => {
+        if (!from || !to) return;
+        if (String(from.value) !== String(to.value)) to.value = from.value;
+      };
+      if (defl) {
+        copyVal(els.lY, els.lN);
+        copyVal(els.dlY, els.dlN);
+        copyVal(els.llY, els.llN);
+        copyVal(els.beamY, els.beamN);
+        if (steelY && steelN) copyVal(steelY, steelN);
+        if (els.deflLimY && els.deflLim) copyVal(els.deflLimY, els.deflLim);
+      } else {
+        copyVal(els.lN, els.lY);
+        copyVal(els.dlN, els.dlY);
+        copyVal(els.llN, els.llY);
+        copyVal(els.beamN, els.beamY);
+        if (steelN && steelY) copyVal(steelN, steelY);
+        if (els.deflLim && els.deflLimY) copyVal(els.deflLim, els.deflLimY);
+      }
+    }
+
+    function setMomentInertiaReqChip(text) {
+      setOutSpan(els.ixChip, text);
+      if (els.defl?.ixChip) setOutSpan(els.defl.ixChip, text);
     }
 
     function activeInputs() {
@@ -721,6 +752,7 @@
     }
 
     function recompute() {
+      syncBendingParameterPeers();
       normalizeInputs();
       const method = String(methodEl.value || 'lrfd').toLowerCase();
       const isLRFD = method === 'lrfd';
@@ -772,6 +804,11 @@
       const L = ins.L;
 
       const deflOn = isDeflOn();
+      if (pane) pane.dataset.sfBendDesMethod = isLRFD ? 'lrfd' : 'asd';
+      if (loadCardNoDef) {
+        if (!deflOn) loadCardNoDef.dataset.sfBendDesMethod = isLRFD ? 'lrfd' : 'asd';
+        else delete loadCardNoDef.dataset.sfBendDesMethod;
+      }
       if (els.deflLim && els.deflLimY && els.deflLim.value !== els.deflLimY.value) {
         if (deflOn) els.deflLim.value = els.deflLimY.value;
         else els.deflLimY.value = els.deflLim.value;
@@ -790,6 +827,15 @@
         Fy <= 0;
 
       const clearDesignOutputs = () => {
+        const methodClear = String(methodEl?.value || 'lrfd').toLowerCase();
+        const isLRFDClear = methodClear === 'lrfd';
+        if (pane) {
+          pane.dataset.sfBendDesMethod = isLRFDClear ? 'lrfd' : 'asd';
+        }
+        if (loadCardNoDef) {
+          if (!deflOn) loadCardNoDef.dataset.sfBendDesMethod = isLRFDClear ? 'lrfd' : 'asd';
+          else delete loadCardNoDef.dataset.sfBendDesMethod;
+        }
         if (els.beamLblN) els.beamLblN.textContent = '—';
         [
           ...Object.values(els.lw),
@@ -858,6 +904,26 @@
       const Mu_val = Wu_val * L * L * KMOM;
       const Ma_req_val = Wa_val * L * L * KMOM;
 
+      const denomIxPanel =
+        els.deflLim?.value ||
+        els.deflLimY?.value ||
+        String(preferredWorkbookDeflectionDenom());
+      const deltaIxPanelIn =
+        !deflOn && Number.isFinite(L) && L > 0
+          ? allowableDeflectionInches(L, denomIxPanel)
+          : null;
+      let I_ix_panel_min = 0;
+      if (
+        !deflOn &&
+        Number.isFinite(deltaIxPanelIn) &&
+        deltaIxPanelIn > 0 &&
+        Number.isFinite(dlll_val) &&
+        dlll_val >= 0
+      ) {
+        const ixR = requiredIx(dlll_val, L, E, deltaIxPanelIn, bcDesign.deflectionK);
+        if (Number.isFinite(ixR) && ixR > 0) I_ix_panel_min = ixR;
+      }
+
       const demandStrength = isLRFD ? Mu_val : Ma_req_val;
       if (els.capVal) els.capVal.textContent = fmt(demandStrength, 3);
 
@@ -870,10 +936,13 @@
       if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
         const ixReqDisp = requiredIx(dlll_val, L, E, deltaLimIn, bcDesign.deflectionK);
         if (Number.isFinite(ixReqDisp) && ixReqDisp > 0) I_min = ixReqDisp;
-        setOutSpan(els.ixChip, Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
+        setMomentInertiaReqChip(Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
         setOutSpan(els.allowDefl, formatDeflectionWorkbookFt(deltaLimIn));
       } else {
-        setOutSpan(els.ixChip, '—');
+        setOutSpan(
+          els.ixChip,
+          Number.isFinite(I_ix_panel_min) && I_ix_panel_min > 0 ? fmt(I_ix_panel_min, 3) : '—',
+        );
       }
 
       if (wRows.length === 0) {
@@ -882,7 +951,7 @@
            clearDesignOutputs() wipes them; restore so WITH DEFLECTION card is not stuck on “—” while CSV loads or if fetch fails. */
         if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
           const ixReqDisp = requiredIx(dlll_val, L, E, deltaLimIn, bcDesign.deflectionK);
-          setOutSpan(els.ixChip, Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
+          setMomentInertiaReqChip(Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
           setOutSpan(els.allowDefl, formatDeflectionWorkbookFt(deltaLimIn));
         } else if (!deflOn && Number.isFinite(L) && L > 0) {
           const denomAdv =
@@ -916,8 +985,12 @@
 
       const lrfdR = pickBeamSelfWeightShape(true, sorted, I_min, dl, ll, L, KMOM, Fy, E);
       const asdR = pickBeamSelfWeightShape(false, sorted, I_min, dl, ll, L, KMOM, Fy, E);
-      const ixPick =
+      const ixPickDefl =
         deflOn && Number.isFinite(I_min) && I_min > 0 ? pickLightestMeetingIx(I_min, sorted) : null;
+      const ixPickNoDef =
+        !deflOn && Number.isFinite(I_ix_panel_min) && I_ix_panel_min > 0
+          ? pickLightestMeetingIx(I_ix_panel_min, sorted)
+          : null;
 
       setOutSpan(els.lw.Wu, fmt(lrfdR.Wu_tot, 4));
       setOutSpan(els.lw.Mu, fmt(lrfdR.Mu_tot, 3));
@@ -1129,10 +1202,10 @@
       /**
        * ASSUMED SECTION BY I_x:
        * - WITH deflection: lightest shape meeting required I_x (may differ from Z_x strength pick).
-       * - WITHOUT deflection: no separate inertia-driven pick — show the governing strength section
-       *   so the panel stays populated (matches the final designed member).
+       * - WITHOUT deflection: same inertia-driven pick using workbook Δ limit and service DL+LL
+       *   (strength iteration still omits I_min when deflection design is off).
        */
-      const shapeForIxPanel = deflOn && ixPick ? ixPick : govPick || null;
+      const shapeForIxPanel = ixPickDefl || ixPickNoDef || govPick || null;
 
       if (shapeForIxPanel) {
         const ip = shapeProps(shapeForIxPanel, Fy, E);
@@ -1154,11 +1227,18 @@
         el.addEventListener('input', recompute);
         el.addEventListener('change', recompute);
       });
-      [methodEl, methodDefl].filter(Boolean).forEach((el) => {
-        el.addEventListener('change', () => {
-          syncMethodPeers(el);
+      function scheduleMethodRecompute(source) {
+        syncMethodPeers(source);
+        if (scheduleMethodRecompute._queued) return;
+        scheduleMethodRecompute._queued = true;
+        queueMicrotask(() => {
+          scheduleMethodRecompute._queued = false;
           recompute();
         });
+      }
+      [methodEl, methodDefl].filter(Boolean).forEach((el) => {
+        el.addEventListener('change', () => scheduleMethodRecompute(el));
+        el.addEventListener('input', () => scheduleMethodRecompute(el));
       });
       /** Sync paired steel controls before bubble handlers so Fy / load rows stay aligned. */
       function syncSteelPeersFrom(source) {

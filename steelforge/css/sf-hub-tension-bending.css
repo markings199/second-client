@@ -7396,11 +7396,15 @@
 .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLpfLim,
 .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLrfLim {
   min-width: 52px !important;
-  min-height: 12px !important;
+  min-height: 22px !important;
   border-radius: 999px !important;
-  font-size: 0 !important;
-  color: transparent !important;
-  overflow: hidden !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.76rem !important;
+  font-weight: 800 !important;
+  color: #132433 !important;
+  overflow: visible !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__mnLbl {
@@ -7540,12 +7544,17 @@
 .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLpfLim,
 .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active #sfBendAnaLrfLim {
   min-width: 90px !important;
-  min-height: 10px !important;
+  min-height: 22px !important;
   border-radius: 999px !important;
   background: #9bb3c9 !important;
-  font-size: 0 !important;
-  color: transparent !important;
-  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.76rem !important;
+  font-weight: 800 !important;
+  color: #0f1f2f !important;
+  padding: 4px 10px !important;
+  overflow: visible !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictPill,
@@ -7786,10 +7795,18 @@
   width: 100% !important;
   min-width: 0 !important;
   max-width: none !important;
-  min-height: 22px !important;
+  min-height: 26px !important;
   border-radius: 999px !important;
   background: #85a8c9 !important;
   justify-self: stretch !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  color: #0f1f2f !important;
+  padding: 4px 10px !important;
+  overflow: visible !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictBox {

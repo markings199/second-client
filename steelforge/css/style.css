@@ -10846,6 +10846,35 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   color: #7b6e5f;
 }
 
+/* Bending (no deflection): emphasize LRFD vs ASD load-line pills to match active design method */
+.sf-comp.sf-comp--bending #sfBendNoDefLoadCard[data-sf-bend-des-method="asd"] .sf-bendNoDef__loadRow .sf-bendNoDef__highlightPill {
+  background: #e7dfd5;
+  color: var(--text);
+  border: 1px solid rgba(53, 47, 39, 0.08);
+}
+
+.sf-comp.sf-comp--bending #sfBendNoDefLoadCard[data-sf-bend-des-method="asd"] .sf-bendNoDef__tableRow .sf-bendNoDef__subtext {
+  background: #b2afaa;
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 16px;
+  min-width: 130px;
+  justify-content: center;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  box-sizing: border-box;
+}
+
+.sf-comp.sf-comp--bending .sf-comp__mode[data-comp-mode-pane="design"][data-sf-bend-des-method="asd"] .sf-bendNoDef__finalNote--lrfd {
+  opacity: 0.48;
+}
+
+.sf-comp.sf-comp--bending .sf-comp__mode[data-comp-mode-pane="design"][data-sf-bend-des-method="lrfd"] .sf-bendNoDef__finalNote--asd {
+  opacity: 0.48;
+}
+
 .sf-comp.sf-comp--bending .sf-bendNoDef__finalNote {
   margin-top: 18px;
   font-size: 0.8rem;
