@@ -1,8 +1,14 @@
 /**
  * Spot-check: block shear chain matches `reference/exel program EWIWIWI(TENSION).csv`
  * sample (Agv = 5.625 in², Anv = 3.984375 in², Ant ≈ 2.39 in², Fy = 36 ksi, Fu = 58 ksi).
- * Run: node scripts/sf-tension-parity.mjs
+ * Run: node scripts/sf-tension-parity.mjs (from repo root: `node steelforge/scripts/sf-tension-parity.mjs`).
  */
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const repoSf = path.join(__dirname, '..');
 const HOLE = 1 / 8;
 const bolt = 0.75;
 const dh = bolt + HOLE;
@@ -85,4 +91,16 @@ const u8b = 2 >= 4 ? 0.8 : 0.6;
 const okU8 = u8a === 0.8 && u8b === 0.6;
 console.log(okU2 && okU8 ? 'OK — shear lag Case 2 / Case 8 auto rules' : 'FAIL — shear lag U');
 
-process.exit(ok && okNet && okHoleRule && okU2 && okU8 ? 0 : 1);
+/** Discrete CASE → U for tension Design must match S(ASTM).csv and `workbook-materials.js`. */
+const sAstPath = path.join(repoSf, 'reference', 'exel program EWIWIWI(S(ASTM)).csv');
+const sAst = fs.readFileSync(sAstPath, 'utf8');
+const wmPath = path.join(repoSf, 'js', 'workbook-materials.js');
+const wm = fs.readFileSync(wmPath, 'utf8');
+const okSastmCsv =
+  sAst.includes(',2,Some are transmitted to fasteners,0.75') &&
+  sAst.includes(',4,Load is transmitted by longhitudinal welds,0.5625');
+const okWmDiscrete =
+  /caseKey:\s*'2'[\s\S]*?u:\s*0\.75\b/.test(wm) && /caseKey:\s*'4'[\s\S]*?u:\s*0\.5625\b/.test(wm);
+console.log(okSastmCsv && okWmDiscrete ? 'OK — S(ASTM) discrete U vs workbook-materials' : 'FAIL — S(ASTM) / workbook shear-lag U drift');
+
+process.exit(ok && okNet && okHoleRule && okU2 && okU8 && okSastmCsv && okWmDiscrete ? 0 : 1);

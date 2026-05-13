@@ -125,12 +125,12 @@
     return `L/${d}`;
   }
 
-  /** Shear lag factor U cases from `reference/exel program EWIWIWI(S(ASTM)).csv`. */
+  /** Shear lag factor U cases from `reference/exel program EWIWIWI(S(ASTM)).csv` (discrete table; tension Design mode). */
   const SHEAR_LAG_CASES = [
     { caseKey: '1', description: 'Directly transmitted to fasteners', u: 1 },
-    { caseKey: '2', description: 'Some are transmitted to fasteners (client workbook CASE 2)', u: 0.8 },
+    { caseKey: '2', description: 'Some are transmitted to fasteners', u: 0.75 },
     { caseKey: '3', description: 'Transverse welds', u: 1 },
-    { caseKey: '4', description: 'Load is transmitted by longitudinal welds', u: 0.4545 },
+    { caseKey: '4', description: 'Load is transmitted by longitudinal welds', u: 0.5625 },
     { caseKey: '5', description: 'Round HSS', u: null },
     { caseKey: '6a', description: 'Rectangular HSS (single)', u: null },
     { caseKey: '6b', description: 'Rectangular HSS (two side)', u: null },
