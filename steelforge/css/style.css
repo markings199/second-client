@@ -163,7 +163,7 @@ body::before {
 }
 
 
-/* ========== HEADER (SteelForge hero) ========== */
+/* ========== HEADER (university + app title) ========== */
 .steelforge-header {
   background:
     radial-gradient(1200px 420px at 50% 0%, rgba(255,255,255,0.25), rgba(255,255,255,0) 55%),
@@ -300,6 +300,19 @@ body::before {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.sf-app-name {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.78rem, 1.6vw, 0.95rem);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+  margin-top: 4px;
+  max-width: min(520px, 92vw);
+  line-height: 1.35;
 }
 
 .sf-center {
@@ -6330,6 +6343,12 @@ input.sf-secprops__val:focus {
   white-space: nowrap;
 }
 
+.sf-secprops__dykBody {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
 .sf-secprops__dykText {
   margin: 0;
   color: #4f4a42;
@@ -6337,6 +6356,20 @@ input.sf-secprops__val:focus {
   line-height: 1.2;
   font-style: normal;
   font-weight: 700;
+}
+
+.sf-secprops__dykAttr {
+  font-style: italic;
+  font-weight: 600;
+  color: #5c554c;
+}
+
+.sf-secprops__dykNote {
+  margin: 0;
+  color: #5f5a52;
+  font-size: calc(var(--sf-secprops-dyk-text-size) * 0.92);
+  line-height: 1.25;
+  font-weight: 600;
 }
 
 .sf-secprops__dots {

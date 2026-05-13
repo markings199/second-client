@@ -85,9 +85,9 @@
 
 .sf-comp--overview .hero-section h1 {
   margin: 0;
-  font-size: clamp(2.8rem, 4vw, 4.8rem);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.75rem, 3.2vw, 3.25rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
   color: #212b3e;
 }
 
@@ -110,6 +110,58 @@
   border-radius: 50%;
   background: #bbc8d8;
   opacity: 0.7;
+}
+
+/* ASTM + DYK info cards */
+.sf-comp--overview .info-section {
+  display: grid;
+  gap: 20px;
+}
+
+.sf-comp--overview .info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+
+.sf-comp--overview .info-card {
+  border-radius: 28px;
+  background: linear-gradient(180deg, #fdfcfa 0%, #f0ebe2 100%);
+  border: 1px solid rgba(97, 116, 151, 0.14);
+  box-shadow: 0 14px 36px rgba(34, 44, 64, 0.07);
+  padding: 26px 26px 24px;
+  min-width: 0;
+}
+
+.sf-comp--overview .info-card__title {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #1a4d84;
+  text-transform: none;
+}
+
+.sf-comp--overview .info-card__body {
+  color: #495670;
+  font-size: 0.96rem;
+  line-height: 1.75;
+}
+
+.sf-comp--overview .info-card__body p {
+  margin: 0 0 12px;
+}
+
+.sf-comp--overview .info-card__body p:last-child {
+  margin-bottom: 0;
+}
+
+.sf-comp--overview .info-card__attr {
+  margin-top: 14px;
+  font-style: italic;
+  color: #5a6785;
+  font-size: 0.92rem;
 }
 
 .sf-comp--overview .calculator-section {

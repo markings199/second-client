@@ -1,6 +1,6 @@
-# second-client — SteelForge
+# second-client — Steel Analysis & Design Calculator
 
-Single-page **steel design workspace** for structural coursework: tension, compression, bending, shear, tension rod, steel grades, and section properties. Built as static HTML/CSS/JS under `steelforge/`.
+Single-page **Steel Analysis & Design Calculator** (structural steel workspace) for coursework: tension, compression, bending, shear, tension rod, steel grades, and section properties. Built as static HTML/CSS/JS under `steelforge/`.
 
 ## Source repository
 

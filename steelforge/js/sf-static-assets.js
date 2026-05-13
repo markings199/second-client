@@ -114,7 +114,7 @@
           img.dataset.sfAssetFailed = '1';
           var was = img.getAttribute('src');
           if (global.console && console.warn) {
-            console.warn('[SteelForge] Missing image asset:', was);
+            console.warn('[Steel Analysis & Design Calculator] Missing image asset:', was);
           }
           if (!img.getAttribute('alt')) img.setAttribute('alt', 'Image unavailable');
           img.removeEventListener('error', onImgErr);
