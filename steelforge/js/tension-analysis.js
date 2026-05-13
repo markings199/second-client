@@ -51,8 +51,12 @@
     return Number.isFinite(n) ? n : null;
   }
 
-  /** Match workbook `reference/exel program EWIWIWI(TENSION).csv`: BOLT d<sub>b</sub> → d<sub>h</sub> = d<sub>b</sub> + 1/8 in; HOLE uses given value as d<sub>h</sub>. */
-  const HOLE_OVERSIZE_IN = 1 / 8;
+  /**
+   * Workbook / client: BOLT → d<sub>h</sub> = d<sub>b</sub> + 1/8 in.
+   * HOLE (punch / listed hole dia.) → add 1/16 in to final d<sub>h</sub> (not “as-is”).
+   */
+  const BOLT_TO_HOLE_ADD_IN = 1 / 8;
+  const HOLE_PUNCH_ADD_IN = 1 / 16;
   const PHI_LRFD_BLOCK = 0.75;
   const OMEGA_ASD_BLOCK = 2.0;
 
@@ -63,14 +67,14 @@
 
   function holeDiameterFromBoltDia(boltDiaIn) {
     if (!Number.isFinite(boltDiaIn) || boltDiaIn <= 0) return null;
-    return boltDiaIn + HOLE_OVERSIZE_IN;
+    return boltDiaIn + BOLT_TO_HOLE_ADD_IN;
   }
 
   /** @param {'bolt'|'hole'|string} kind */
   function effectiveHoleDiameterInches(kind, givenInches) {
     if (!Number.isFinite(givenInches) || givenInches <= 0) return null;
     const k = String(kind || 'bolt').toLowerCase();
-    if (k === 'hole') return givenInches;
+    if (k === 'hole') return givenInches + HOLE_PUNCH_ADD_IN;
     return holeDiameterFromBoltDia(givenInches);
   }
 
@@ -159,11 +163,45 @@
     }
     aiscEl.setAttribute('list', dataListId);
 
+    const CSV_TYPES = new Set(['L', '2L', 'W', 'WT', 'HP', 'C', 'MC', 'S', 'ST', 'MT']);
+
+    function shapeTypeSet(shapeVal) {
+      const v = String(shapeVal || 'l').toLowerCase();
+      if (v === 'l') return new Set(['L']);
+      if (v === '2l') return new Set(['2L']);
+      if (v === 'w') return new Set(['W', 'WT', 'HP']);
+      if (v === 'c') return new Set(['C', 'MC', 'S', 'ST', 'MT']);
+      return new Set();
+    }
+
+    function shapeThicknessFamily(shapeVal) {
+      const v = String(shapeVal || 'l').toLowerCase();
+      if (v === 'l' || v === '2l') return 'angle';
+      if (v === 'w' || v === 'c') return 'wide';
+      return 'manual';
+    }
+
+    let allSteelRows = [];
     let angleRows = [];
     let case2Touched = false;
+    let case8Touched = false;
     let stagSumTouched = false;
 
     const isManualMode = () => String(shapeEl.value || '').toLowerCase() === 'manual';
+
+    function refreshShapeCatalog() {
+      const want = shapeTypeSet(shapeEl.value);
+      angleRows =
+        want.size === 0
+          ? []
+          : allSteelRows.filter((r) => want.has(String(r[COL.type] || '').trim()));
+      dl.innerHTML = '';
+      angleRows.forEach((r) => {
+        const opt = document.createElement('option');
+        opt.value = String(r[COL.label] || '').trim();
+        dl.appendChild(opt);
+      });
+    }
 
     function setGeometryReadOnly(isReadOnly) {
       [tEl, agEl, xbarEl].forEach((x) => {
@@ -174,18 +212,29 @@
     function applyAiscRowByLabel(label) {
       const hit = angleRows.find((r) => String(r[COL.label] || '').trim().toUpperCase() === String(label || '').trim().toUpperCase());
       if (!hit) return false;
-      const tVal =
-        parseNumLike(hit[COL.tPrimary]) ??
-        parseNumLike(hit[COL.tFallbackA]) ??
-        parseNumLike(hit[COL.tFallbackB]) ??
-        null;
+      const fam = shapeThicknessFamily(shapeEl.value);
+      let tVal = null;
+      let xbarVal = null;
+      if (fam === 'angle') {
+        tVal =
+          parseNumLike(hit[COL.tPrimary]) ??
+          parseNumLike(hit[COL.tFallbackA]) ??
+          parseNumLike(hit[COL.tFallbackB]) ??
+          null;
+        xbarVal = parseNumLike(hit[COL.xbar]);
+      } else if (fam === 'wide') {
+        tVal = parseNumLike(hit[14]) ?? parseNumLike(hit[8]) ?? null;
+        xbarVal = parseNumLike(hit[38]) ?? parseNumLike(hit[32]) ?? null;
+      } else {
+        return false;
+      }
       const agVal = parseNumLike(hit[COL.Ag]);
-      const xbarVal = parseNumLike(hit[COL.xbar]);
       if (tEl) tEl.value = toNumInput(tVal);
       if (agEl) agEl.value = toNumInput(agVal);
       if (xbarEl) xbarEl.value = toNumInput(xbarVal);
       aiscEl.value = String(hit[COL.label] || '').trim();
       case2Touched = false;
+      case8Touched = false;
       stagSumTouched = false;
       return true;
     }
@@ -227,6 +276,10 @@
         const v = parseNumLike(case1El.value);
         if (Number.isFinite(v)) case1El.value = fmt(v, 3);
       }
+      if (case2El) {
+        const v2 = parseNumLike(case2El.value);
+        if (Number.isFinite(v2)) case2El.value = fmt(v2, 6);
+      }
       if (case8El) {
         const v = parseNumLike(case8El.value);
         if (Number.isFinite(v)) case8El.value = fmt(v, 3);
@@ -256,9 +309,15 @@
       const Fu = parseNumLike(fuEl?.value);
 
       if (!case2Touched && Number.isFinite(xbar) && Number.isFinite(L) && L > 0) {
-        const case1Blank = !String(case1El?.value || '').trim();
-        if (case1Blank) {
-          case2El.value = fmt(Math.max(0.6, 1 - xbar / L), 6);
+        const uCase2 = Math.max(0.6, 1 - xbar / L);
+        case2El.value = fmt(uCase2, 6);
+      }
+
+      if (!case8Touched && nEl && case8El) {
+        const nv = parseNumLike(nEl.value);
+        if (Number.isFinite(nv) && nv >= 0) {
+          const u8 = nv >= 4 ? 0.8 : 0.6;
+          case8El.value = fmt(u8, 3);
         }
       }
 
@@ -441,6 +500,7 @@
       applySteelDefaults();
       setGeometryReadOnly(!isManualMode());
       case2Touched = false;
+      case8Touched = false;
       stagSumTouched = false;
       const blkNS = el('sfTenAnaBlkNShear');
       const blkLS = el('sfTenAnaBlkLshear');
@@ -452,9 +512,17 @@
       if (blkUbsEl && !String(blkUbsEl.value).trim()) blkUbsEl.value = '1';
     }
 
-    function defaultAngleRow() {
-      const preferredLabels = ['L4X4X1/2', 'L3-1/2X3-1/2X3/8'];
-      for (const p of preferredLabels) {
+    function defaultCatalogRow() {
+      const v = String(shapeEl.value || 'l').toLowerCase();
+      const prefs =
+        v === 'w'
+          ? ['W12X40', 'W12X35', 'W16X26']
+          : v === 'c'
+            ? ['C10X30', 'MC10X8', 'S12X35']
+            : v === '2l'
+              ? ['2L4X4X5/8', '2L4X4X3/4', '2L3X3X1/4']
+              : ['L4X4X1/2', 'L3-1/2X3-1/2X3/8'];
+      for (const p of prefs) {
         const hit = angleRows.find(
           (r) => String(r[COL.label] || '').trim().toUpperCase() === p.toUpperCase(),
         );
@@ -484,14 +552,19 @@
         const manual = isManualMode();
         setGeometryReadOnly(!manual);
         case2Touched = false;
+        case8Touched = false;
         stagSumTouched = false;
+        refreshShapeCatalog();
         if (!manual && angleRows.length) {
-          applyAiscRowByLabel(aiscEl.value) || applyAiscRowByLabel(angleRows[0][COL.label]);
+          applyAiscRowByLabel(aiscEl.value) || applyAiscRowByLabel(String(angleRows[0][COL.label] || '').trim());
         }
         recompute();
       });
       case2El?.addEventListener('input', () => {
         case2Touched = String(case2El.value || '').trim() !== '';
+      });
+      case8El?.addEventListener('input', () => {
+        case8Touched = String(case8El.value || '').trim() !== '';
       });
       sumEl?.addEventListener('input', () => {
         stagSumTouched = String(sumEl.value || '').trim() !== '';
@@ -519,24 +592,18 @@
       })
       .then((txt) => {
         const lines = txt.split(/\r?\n/);
-        angleRows = lines
+        allSteelRows = lines
           .slice(4)
           .map(parseCsvLine)
           .filter((r) => {
             const typ = String(r[COL.type] || '').trim();
             const lbl = String(r[COL.label] || '').trim();
-            return (typ === 'L' || typ === '2L') && !!lbl;
+            return !!lbl && CSV_TYPES.has(typ);
           });
 
-        dl.innerHTML = '';
-        angleRows.forEach((r) => {
-          const opt = document.createElement('option');
-          opt.value = String(r[COL.label] || '').trim();
-          dl.appendChild(opt);
-        });
-
+        refreshShapeCatalog();
         setDefaults();
-        const dflt = defaultAngleRow();
+        const dflt = defaultCatalogRow();
         if (dflt) applyAiscRowByLabel(dflt[COL.label]);
         wire();
         attachAnalysisGradeListener();

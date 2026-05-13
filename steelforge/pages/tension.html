@@ -31,6 +31,9 @@
                 <td>
                   <select class="sf-tensionAnalysisLayout__sel" id="sfTenAnaShape" aria-label="Shape">
                     <option value="l" selected>L-SHAPE</option>
+                    <option value="2l">DOUBLE ANGLE (2L)</option>
+                    <option value="w">W / WT / HP</option>
+                    <option value="c">CHANNEL / S / MC / ST / MT</option>
                     <option value="manual">MANUAL</option>
                   </select>
                 </td>
@@ -92,11 +95,11 @@
                   <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaCase1" inputmode="decimal" autocomplete="off" /></td>
                 </tr>
                 <tr>
-                  <th>CASE 2</th>
+                  <th title="U₂ = max(0.6, 1 − x̄/L) from length and x̄ when not edited; override by typing.">CASE 2</th>
                   <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaCase2" inputmode="decimal" autocomplete="off" /></td>
                 </tr>
                 <tr>
-                  <th>CASE 8</th>
+                  <th title="U₈ = 0.80 if n ≥ 4 bolts, else 0.60 (L / 2L Case 8a / 8b); override by typing.">CASE 8</th>
                   <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaCase8" inputmode="decimal" autocomplete="off" /></td>
                 </tr>
                 <tr>

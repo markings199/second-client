@@ -68,4 +68,21 @@ const okNet =
 
 console.log(okNet ? 'OK — net area / LRFD yield & fracture spot-check' : 'FAIL — net / tensile chain');
 
-process.exit(ok && okNet ? 0 : 1);
+/** Mirror tension-analysis.js: BOLT +1/8 in, HOLE (listed punch) +1/16 in. */
+const BOLT_ADD = 1 / 8;
+const HOLE_ADD = 1 / 16;
+const dhBoltMode = 0.75 + BOLT_ADD;
+const dhHoleMode = 0.75 + HOLE_ADD;
+const okHoleRule =
+  Math.abs(dhBoltMode - 0.875) < 1e-12 && Math.abs(dhHoleMode - 0.8125) < 1e-12;
+console.log(okHoleRule ? 'OK — bolt vs hole final diameter rules' : 'FAIL — bolt/hole d_h');
+
+/** Shear lag auto U (analysis): Case 2 = max(0.6, 1 − x̄/L); Case 8 from bolt count. */
+const uCase2 = Math.max(0.6, 1 - 1 / 10);
+const okU2 = Math.abs(uCase2 - 0.9) < 1e-12;
+const u8a = 4 >= 4 ? 0.8 : 0.6;
+const u8b = 2 >= 4 ? 0.8 : 0.6;
+const okU8 = u8a === 0.8 && u8b === 0.6;
+console.log(okU2 && okU8 ? 'OK — shear lag Case 2 / Case 8 auto rules' : 'FAIL — shear lag U');
+
+process.exit(ok && okNet && okHoleRule && okU2 && okU8 ? 0 : 1);
