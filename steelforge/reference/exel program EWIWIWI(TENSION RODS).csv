@@ -1,0 +1,33 @@
+,DESIGN OF TENSION MEMBERS,,,,,,,,,,,,,,
+,PARAMETERS,,,,,,,,,,,,,Rod Diameter,
+,Dead Load,DL,3,kips,,,,,,,,,,3?4,0.75
+,Live Load,LL,6,kips,,,,,,,,,,7?8,0.875
+,Steel Grade,A36,,,,,,,,,,,,1,1
+,Yield Stress,Fy,36,ksi,,,,,,,,,,1¼,1.25
+,Tensile Stress,Fu,58,ksi,,,,,,,,,,1½,1.5
+,,,,,,,,,,,,,,1¾,1.75
+,FIND,,,,,,,,,,,,,2,2
+,LOAD AND RESISTANCE FACTOR DESIGN (LRFD),,,,,,,,,,,,,2½,2.5
+,Tu = 1.2DL + 1.6LL,Tu,13.2,kips,,,,,,,,,,,
+,Tu = 1.4DL,Tu,4.2,kips,,,,,,,,,,,
+,Governing Ultimate Tensile Force,Tu =,13.2,kips,,,,,,,,,,,
+,FIND,,,,,,,,,,,,,,
+,ALLOWABLE STRESS DESIGN (ASD),,,,,,,,,,,,,,
+,Ta = DL + LL,Ta =,9,kips,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,GET DIAMETER,,,,,,,,,,,,,,
+,LOAD AND RESISTANCE FACTOR DESIGN (LRFD),,,,,,,,,,,,,,
+,Tu = 0.75²(Fu)(Ab),d =,0.717739363,,,,,,,,,,,,
+,Diameter of Bar,d =,3?4,in,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,GET DIAMETER,,,,,,,,,,,,,,
+,ALLOWABLE STRESS DESIGN (ASD),,,,,,,,,,,,,,
+,Ta = [0.75(Fu)(Ab)]/2,d =,0.725849669,,,,,,,,,,,,
+,Diameter of Bar,d =,3?4,in,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,

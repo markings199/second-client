@@ -2,9 +2,9 @@
 ,,,,,,"Shear Lag Factor, U",,
 ASTM DESIGNATION,"Yield Stress, Fy","Tensile Stress, Fu",,BOLT db,,Cases,Description of Element,U
 A36,36,58,,HOLE dh,,1,Diretcly transmitted to fasteners,1
-A53 Gr. B,35,60,,,,2,Some are transmitted to fasteners,0.606
+A53 Gr. B,35,60,,,,2,Some are transmitted to fasteners,0.75
 A500 Gr. B1,42,58,,,,3,Transverse welds,1
-A500 Gr. B2,46,58,,,,4,Load is transmitted by longhitudinal welds,0.4545
+A500 Gr. B2,46,58,,,,4,Load is transmitted by longhitudinal welds,0.5625
 A500 Gr. C1,46,62,,,,5,Round HSS,N/A
 A500 Gr. C2,50,62,,,,6a,Rectangular HSS (single),N/A
 A501 Gr. A,36,58,,,,6b,Rectangular HSS (two side),N/A
