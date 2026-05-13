@@ -51,7 +51,7 @@
     return Number.isFinite(n) ? n : null;
   }
 
-  /** Match workbook / typical fabricated holes: d<sub>h</sub> = d<sub>b</sub> + 1/8 in (see `reference/exel program EWIWIWI(TENSION) (1).csv`). */
+  /** Match workbook `reference/exel program EWIWIWI(TENSION).csv`: BOLT d<sub>b</sub> → d<sub>h</sub> = d<sub>b</sub> + 1/8 in; HOLE uses given value as d<sub>h</sub>. */
   const HOLE_OVERSIZE_IN = 1 / 8;
   const PHI_LRFD_BLOCK = 0.75;
   const OMEGA_ASD_BLOCK = 2.0;
@@ -64,6 +64,14 @@
   function holeDiameterFromBoltDia(boltDiaIn) {
     if (!Number.isFinite(boltDiaIn) || boltDiaIn <= 0) return null;
     return boltDiaIn + HOLE_OVERSIZE_IN;
+  }
+
+  /** @param {'bolt'|'hole'|string} kind */
+  function effectiveHoleDiameterInches(kind, givenInches) {
+    if (!Number.isFinite(givenInches) || givenInches <= 0) return null;
+    const k = String(kind || 'bolt').toLowerCase();
+    if (k === 'hole') return givenInches;
+    return holeDiameterFromBoltDia(givenInches);
   }
 
   function toNumInput(v, fallback = '') {
@@ -120,6 +128,7 @@
     const case8El = el('sfTenAnaCase8');
     const uGovEl = el('sfTenAnaUgovern');
     const nEl = el('sfTenAnaNBolts');
+    const boltKindEl = el('sfTenAnaBoltKind');
     const dhEl = el('sfTenAnaDh');
     const ahEl = el('sfTenAnaAh');
     const anNsEl = el('sfTenAnaAnNs');
@@ -259,10 +268,18 @@
       const U = minPositive([c1, c2, c8]);
       uGovEl.textContent = fmt(U, 3);
 
-      const boltDia = parseNumLike(dhEl?.value);
-      const dhHole = holeDiameterFromBoltDia(boltDia);
+      const givenDia = parseNumLike(dhEl?.value);
+      const boltKind = String(boltKindEl?.value || 'bolt').toLowerCase();
+      const dhHole = effectiveHoleDiameterInches(boltKind, givenDia);
       const Ah =
-        Number.isFinite(n) && Number.isFinite(dhHole) && Number.isFinite(t) ? n * dhHole * t : null;
+        Number.isFinite(n) &&
+        n > 0 &&
+        Number.isFinite(dhHole) &&
+        dhHole > 0 &&
+        Number.isFinite(t) &&
+        t > 0
+          ? n * dhHole * t
+          : null;
       ahEl.textContent = fmt(Ah, 4);
 
       const dfDispEl = el('sfTenAnaDfDisp');
@@ -272,7 +289,7 @@
 
       const blkBoltAlias = el('sfTenAnaBlkBoltAlias');
       if (blkBoltAlias) {
-        blkBoltAlias.textContent = Number.isFinite(boltDia) ? fmt(boltDia, 4) : '—';
+        blkBoltAlias.textContent = Number.isFinite(givenDia) ? fmt(givenDia, 4) : '—';
       }
       const blkDhDisp = el('sfTenAnaBlkDhDisp');
       if (blkDhDisp) {
@@ -549,6 +566,7 @@
     const uEl = el('sfTenDesU');
     const rEl = el('sfTenDesR');
     const nEl = el('sfTenDesN');
+    const boltKindEl = el('sfTenDesBoltKind');
     const dhEl = el('sfTenDesDh');
     const dfEl = el('sfTenDesDf');
 
@@ -746,8 +764,9 @@
       if (outFracAssAg) outFracAssAg.textContent = fmt(agFromFrac, 3);
       if (outGovAg) outGovAg.textContent = fmt(govAg, 3);
 
-      const dh = parseNumLike(dhEl?.value);
-      const df = holeDiameterFromBoltDia(dh);
+      const boltKind = String(boltKindEl?.value || 'bolt').toLowerCase();
+      const nominalDia = parseNumLike(dhEl?.value);
+      const df = effectiveHoleDiameterInches(boltKind, nominalDia);
       if (dfEl) dfEl.textContent = fmt(df, 4);
 
       renderTable(govAg);

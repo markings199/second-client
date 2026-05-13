@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const p = path.join(__dirname, '..', 'reference', 'exel program EWIWIWI(TENSION) (1).csv');
+const p = path.join(__dirname, '..', 'reference', 'exel program EWIWIWI(TENSION).csv');
 const txt = fs.readFileSync(p, 'utf8');
 const lines = txt.split(/\r?\n/);
 

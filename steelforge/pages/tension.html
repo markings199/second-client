@@ -117,8 +117,9 @@
                   <th>GIVEN DIAMETER</th>
                   <td>
                     <div class="sf-tensionAnalysisLayout__inlineCluster" role="group" aria-label="Bolt nominal diameter">
-                      <select class="sf-tensionAnalysisLayout__sel sf-tensionAnalysisLayout__sel--boltKind" id="sfTenAnaBoltKind" aria-label="Bolt type">
+                      <select class="sf-tensionAnalysisLayout__sel sf-tensionAnalysisLayout__sel--boltKind" id="sfTenAnaBoltKind" aria-label="Given diameter is bolt or hole">
                         <option value="bolt" selected>BOLT</option>
+                        <option value="hole">HOLE</option>
                       </select>
                       <input
                         class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--boltDh"
@@ -428,8 +429,9 @@
                     <th>GIVEN DIAMETER</th>
                     <td>
                       <div class="sf-tensionDesignLayout__boltCluster" role="group" aria-label="Bolt nominal diameter">
-                        <select id="sfTenDesBoltKind" class="sf-tensionDesignLayout__sel" aria-label="Bolt type">
+                        <select id="sfTenDesBoltKind" class="sf-tensionDesignLayout__sel" aria-label="Given diameter is bolt or hole">
                           <option value="bolt" selected>BOLT</option>
+                          <option value="hole">HOLE</option>
                         </select>
                         <input class="sf-tensionDesignLayout__inp sf-tensionDesignLayout__inp--dh" id="sfTenDesDh" inputmode="decimal" autocomplete="off" placeholder="7/8" />
                         <span class="sf-tensionDesignLayout__unitSuffix">in</span>

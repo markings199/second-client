@@ -1,5 +1,5 @@
 /**
- * Spot-check: block shear chain matches `reference/exel program EWIWIWI(TENSION) (1).csv`
+ * Spot-check: block shear chain matches `reference/exel program EWIWIWI(TENSION).csv`
  * sample (Agv = 5.625 in², Anv = 3.984375 in², Ant ≈ 2.39 in², Fy = 36 ksi, Fu = 58 ksi).
  * Run: node scripts/sf-tension-parity.mjs
  */
