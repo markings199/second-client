@@ -230,7 +230,8 @@
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__paramsBox .sf-shear__row--select .sf-shear__select {
-  max-width: 14rem;
+  max-width: min(20rem, 100%);
+  width: auto;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__paramsBox .sf-shear__row--fy .sf-shear__input {
@@ -311,8 +312,8 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__shapePanel,
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-photos-card {
   display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  grid-template-rows: none !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto auto !important;
   gap: 14px !important;
   background: #f7f5ef !important;
   border-radius: 24px !important;
@@ -342,18 +343,6 @@
   object-fit: contain;
   border-radius: 14px;
   background: #fff;
-}
-
-@media (min-width: 1121px) {
-  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__shapePanel .sf-shearDes__shapeCard:first-child,
-  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-photos-card .sf-shearDes-photo-box:first-child {
-    border-right: none !important;
-  }
-
-  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__shapePanel .sf-shearDes__shapeCard:last-child,
-  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-photos-card .sf-shearDes-photo-box:last-child {
-    border-left: none !important;
-  }
 }
 
 /* Lightest highlight card */
