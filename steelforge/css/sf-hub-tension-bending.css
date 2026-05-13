@@ -7403,7 +7403,9 @@
   justify-content: center !important;
   font-size: 0.76rem !important;
   font-weight: 800 !important;
-  color: #132433 !important;
+  color: #1f2937 !important;
+  background: #d6d0c4 !important;
+  border: 1px solid #bfb8aa !important;
   overflow: visible !important;
 }
 
@@ -7546,13 +7548,14 @@
   min-width: 90px !important;
   min-height: 22px !important;
   border-radius: 999px !important;
-  background: #9bb3c9 !important;
+  background: #d6d0c4 !important;
+  border: 1px solid #bfb8aa !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   font-size: 0.76rem !important;
   font-weight: 800 !important;
-  color: #0f1f2f !important;
+  color: #1f2937 !important;
   padding: 4px 10px !important;
   overflow: visible !important;
 }
@@ -7797,16 +7800,23 @@
   max-width: none !important;
   min-height: 26px !important;
   border-radius: 999px !important;
-  background: #85a8c9 !important;
+  background: #d6d0c4 !important;
+  border: 1px solid #bfb8aa !important;
   justify-self: stretch !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   font-size: 0.78rem !important;
   font-weight: 800 !important;
-  color: #0f1f2f !important;
+  color: #1f2937 !important;
   padding: 4px 10px !important;
   overflow: visible !important;
+}
+
+/* Single pill: inner span carries the chip; outer shell stays flush (no grey-on-grey ring). */
+.content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-bendAna__compactItem .sf-bendAna__compactValue {
+  background: transparent !important;
+  padding: 0 !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--bending > .sf-comp__mode[data-comp-mode-pane='analysis'].is-active .sf-tbRef__verdictBox {
