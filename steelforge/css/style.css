@@ -8364,9 +8364,9 @@ input.sf-secprops__val:focus {
   border-radius: 18px;
   border: 1px solid rgba(105, 100, 90, 0.18);
   background: rgba(248, 244, 234, 0.94);
-  padding: 12px 12px 10px;
+  padding: 12px 14px 10px 12px;
   z-index: 2;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTitle {
@@ -8392,7 +8392,7 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTri {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) 86px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.92fr) 74px minmax(0, 1.45fr);
   gap: 8px 10px;
   margin-top: 8px;
   align-items: stretch;
@@ -8426,10 +8426,11 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionHdr {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px 10px;
   margin-bottom: 2px;
+  min-width: 0;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionHdrLabel {
@@ -8439,6 +8440,17 @@ input.sf-secprops__val:focus {
   color: rgba(42, 70, 140, 0.92);
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.25;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionHdrDemand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  min-width: 0;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionHdrExpr {
@@ -8446,6 +8458,24 @@ input.sf-secprops__val:focus {
   font-weight: 900;
   font-size: 0.82rem;
   color: rgba(62, 55, 49, 0.82);
+  flex: 0 0 auto;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionHdrPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  min-width: 64px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.78rem;
+  background: rgba(142, 172, 203, 0.92);
+  color: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(105, 100, 90, 0.14);
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionFactors {
@@ -8481,8 +8511,8 @@ input.sf-secprops__val:focus {
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionFormula img {
   display: block;
   width: auto;
-  max-width: min(240px, 100%);
-  max-height: 140px;
+  max-width: min(200px, 100%);
+  max-height: 128px;
   height: auto;
   object-fit: contain;
   object-position: center center;
@@ -8537,7 +8567,9 @@ input.sf-secprops__val:focus {
   font-size: 0.78rem;
   color: rgba(62, 55, 49, 0.82);
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.25;
+  overflow-wrap: break-word;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionExpr {
@@ -8870,7 +8902,7 @@ input.sf-secprops__val:focus {
   grid-template-rows: auto auto;
   column-gap: var(--des-load-grid-gap-x);
   row-gap: var(--des-load-grid-gap-y);
-  justify-content: end;
+  justify-content: start;
   align-items: start;
   min-height: 0;
   align-content: start;
@@ -8930,7 +8962,10 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadRow--wide .sf-shearDes__loadLabel {
-  text-align: right;
+  text-align: left;
+  justify-self: start;
+  white-space: normal;
+  line-height: 1.2;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadRow--zx {
@@ -9741,7 +9776,7 @@ input.sf-secprops__val:focus {
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox {
-  padding: 12px 12px 10px !important;
+  padding: 12px 14px 10px 12px !important;
   transform: none !important;
 }
 

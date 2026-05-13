@@ -2263,6 +2263,7 @@
           'sfShearDesOmega',
           'sfShearDesVn',
           'sfShearDesUltimateVal',
+          'sfShearDesUltHdrVal',
           // New SHEAR CAPACITY card (top-right):
           'sfShearDesCapCv',
           'sfShearDesCapVn',
@@ -2426,6 +2427,7 @@
       const demandShear = V;
 
       setText('sfShearDesUltimateVal', Number.isFinite(demandShear) ? fmtNum(demandShear, 3) : '—');
+      setText('sfShearDesUltHdrVal', Number.isFinite(demandShear) ? fmtNum(demandShear, 3) : '—');
       if (isSafe == null) {
         setText('sfShearDesRemarks', '—');
       } else {
