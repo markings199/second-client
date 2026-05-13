@@ -6400,7 +6400,7 @@ input.sf-secprops__val:focus {
 /* Manual page padding for SHEAR (this limits max gray-card width) */
 .content-panel.comp-panel > .sf-comp.sf-comp--shear {
   /* Match SECTION PROPS outer spacing behavior */
-  --sf-shear-side-pad: 10px; /* decrease to allow wider gray box */
+  --sf-shear-side-pad: 6px; /* use horizontal space for shear workspace */
   padding: 10px var(--sf-shear-side-pad) 14px;
 }
 
@@ -7875,145 +7875,101 @@ input.sf-secprops__val:focus {
   color: rgba(62, 55, 49, 0.85);
 }
 
-/* ===== DESIGN SHEAR starter box (top-left only) ===== */
+/* ===== DESIGN SHEAR (three-column layout) ===== */
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__start {
-  /* ===== SIZE CONTROLS (edit these only) ===== */
-  --des-box-w: 286px;          /* outer white box width */
-  --des-box-pad: 5px;          /* outer white box inner padding */
-  --des-box-min-h: 166px;      /* outer white box minimum height */
-  --des-top-gap: 10px;         /* top row spacing */
-  --des-steel-box-w: 390px;    /* assumed section box width */
-  --des-steel-box-offset-x: 24px; /* assumed section move left/right */
-  --des-steel-box-offset-y: 8px; /* assumed section move up/down */
-  --des-steel-box-min-h: 166px;/* assumed section box min height */
-  --des-steel-box-pad-x: 10px; /* assumed section horizontal padding */
-  --des-steel-box-pad-y: 8px;  /* assumed section vertical padding */
-  --des-steel-title-size: 0.9rem; /* assumed section title size */
-  --des-light-box-w: 292px;    /* lightest section box width */
-  --des-light-box-min-h: 88px; /* lightest section box height */
-  --des-light-box-offset-x: 22px; /* lightest section move left/right */
-  --des-light-box-offset-y: 30px; /* lightest section vertical offset */
-  --des-light-manual-x: 20px; /* LIGHTEST table manual move: +right / -left */
-  --des-light-left-manual-x: 30px; /* left table manual move: +right / -left */
-  --des-light-left-manual-y: 0px; /* left table manual move: +down / -up */
-  --des-light-right-w: 192px;  /* lightest right panel width */
-  --des-light-right-shift-x: -14px; /* move right panel left/right (negative = closer to label) */
-  --des-light-right-manual-x: -15px; /* right table manual move: +right / -left */
-  --des-light-right-manual-y: 0px; /* right table manual move: +down / -up */
-  --des-light-left-w: 132px;   /* lightest left label panel width */
-  --des-light-left-h: 126px;   /* lightest left label panel height only */
-  --des-light-eq-size: 1.35rem;/* lightest '=' size */
-  --des-light-label-size: 0.86rem; /* lightest left text size */
-  --des-light-value-size: 1.4rem; /* lightest right value size */
-  --des-inner-min-h: 96px;    /* inner parameters box minimum height */
-  --des-input-h: 16px;         /* input/select box height */
-  --des-param-label-w: 122px;  /* PARAMETERS label column width (DL/LL/LENGTH alignment) */
-  --des-fy-label-w: 34px;      /* Fy row label width */
-  --des-param-input-w: 78px;   /* PARAMETERS answer field width */
-  --des-load-param-input-w: 78px; /* DL/LL/LENGTH answer field width */
-  --des-param-unit-w: 48px;    /* PARAMETERS unit column width */
-  --des-load-param-offset-x: 0px; /* DL/LL block move left/right */
-  --des-title-size: 0.72rem;   /* PARAMETERS title size */
-  --des-label-size: 0.62rem;   /* row label size */
-  --des-fy-label-nudge: 0px;     /* Fy label: extra push toward right */
-  --des-field-size: 0.72rem;   /* input/select text size */
-  --des-base-row-w: calc(var(--des-box-w) + var(--des-steel-box-w) + var(--des-top-gap)); /* width of first two top boxes */
-  --des-beam-box-w: 370px;      /* BEAM LOAD box width */
-  --des-beam-box-min-h: 92px; /* BEAM LOAD box minimum height */
-  --des-beam-box-max-w: 100%;  /* BEAM LOAD box max width */
-  --des-beam-box-offset-y: 10px;  /* BEAM LOAD move up/down */
-  --des-beam-box-offset-x: -2px;  /* BEAM LOAD move left/right */
-  --des-beam-box-pad-y: 10px;  /* BEAM LOAD box vertical padding */
-  --des-beam-box-pad-x: 8px;   /* BEAM LOAD box horizontal padding */
-  --des-beam-title-top: -9px;  /* BEAM LOAD title vertical position */
-  --des-beam-title-left: 8px;  /* BEAM LOAD title horizontal position */
-  --des-beam-title-h: 18px;    /* BEAM LOAD title height */
-  --des-beam-title-pad-x: 10px;/* BEAM LOAD title horizontal padding */
-  --des-beam-title-size: 0.88rem;   /* BEAM LOAD title size */
-  --des-load-title-size: 0.80rem;   /* LOAD W/O BEAM WEIGHT title size */
-  --des-beam-label-size: 0.68rem;   /* BEAM LOAD label text size */
-  --des-beam-field-size: 0.68rem;   /* BEAM LOAD field text size */
-  --des-beam-select-size: 0.54rem;  /* BEAM TYPE select text size */
-  --des-beam-label-col: 190px;      /* BEAM LOAD label column width */
-  --des-beam-row-gap: 8px;          /* BEAM LOAD label/value gap */
-  --des-beam-row-space: 8px;        /* BEAM LOAD row spacing */
-  --des-beam-pill-h: 20px;          /* BEAM LOAD pill/select height */
-  --des-beam-pill-pad-x: 8px;       /* BEAM LOAD pill horizontal padding */
-  --des-beam-field-w: 98px;         /* BEAM LOAD right field width */
-  --des-beam-select-w: 240px;       /* BEAM TYPE select width */
-  --des-load-box-w: 330px;          /* LOAD W/O BEAM WEIGHT box width */
-  --des-load-box-min-h: 130px;     /* LOAD W/O BEAM WEIGHT minimum height */
-  --des-load-box-offset-y: 18px;   /* LOAD box move down amount */
-  --des-load-box-pad-y: 12px;      /* LOAD box vertical padding */
-  --des-load-box-pad-x: 10px;      /* LOAD box horizontal padding */
-  --des-load-title-top: -11px;     /* LOAD title vertical position */
-  --des-load-title-left: 10px;     /* LOAD title horizontal position */
-  --des-load-title-h: 20px;        /* LOAD title height */
-  --des-load-title-pad-x: 8px;     /* LOAD title horizontal padding */
-  --des-load-title-letter: 0.4px;  /* LOAD title letter spacing */
-  --des-load-grid-top-mt: 6px;     /* LOAD grid top margin */
-  --des-load-row-gap: 6px;         /* LOAD default row gap */
-  --des-load-grid-gap-x: 8px;      /* LOAD grid column gap */
-  --des-load-grid-gap-y: 2px;      /* LOAD grid row gap */
-  --des-load-top-label-w: 88px;    /* top-left label width */
-  --des-load-top-wu-label-w: 34px; /* Wu label width */
-  --des-load-top-inner-gap: 4px;   /* top row item gap */
-  --des-load-pill-h: 17px;         /* LOAD result pill height */
-  --des-load-pill-w: 56px;         /* LOAD small pill width */
-  --des-load-wide-pill-w: 68px;    /* LOAD wide pill width */
-  --des-load-wide-label-w: 174px;  /* LOAD wide label width */
-  --des-load-wide-gap: 5px;        /* LOAD wide row gap */
-  --des-load-wide-offset-x: 0px;   /* LOAD wide rows move left/right */
-  --des-load-zx-pill-w: 104px;     /* LOAD Zx row pill width */
-  --des-load-label-size: 0.56rem;  /* LOAD label text size */
-  --des-load-pill-size: 0.58rem;   /* LOAD pill text size */
-  --des-load-unit-size: 0.56rem;   /* LOAD unit text size */
-  --des-steeltype-label-w: 86px;   /* STEEL TYPE label column width */
-  --des-steeltype-select-w: 90px; /* STEEL TYPE dropdown width */
-  --des-steeltype-select-h: 18px;  /* STEEL TYPE dropdown height */
-  --des-steeltype-row-gap: 8px;    /* STEEL TYPE label/dropdown gap */
-  --des-condition-box-w: calc(100% - var(--des-condition-box-offset-x) - 166px);    /* CONDITION CHECKING box width */
-  --des-condition-box-min-h: 198px;/* CONDITION CHECKING box height (content-fit; was 246px) */
-  --des-condition-box-offset-x: 392px; /* CONDITION CHECKING move left/right */
-  --des-condition-box-offset-y: 16px;   /* CONDITION CHECKING move up/down */
-  --des-condition-manual-x: 0px;   /* CONDITION CHECKING manual nudge: +right / -left */
-  --des-condition-manual-y: -28px; /* CONDITION CHECKING manual nudge: -up / +down */
-  --des-ultimate-box-w: calc(100% - var(--des-ultimate-box-offset-x) - 166px);     /* ULTIMATE SHEAR box width */
-  --des-ultimate-box-min-h: 25px;  /* ULTIMATE SHEAR box height */
-  --des-ultimate-box-offset-x: 392px; /* ULTIMATE SHEAR move left/right */
-  --des-ultimate-box-shift-x: 0px; /* extra manual right/left shift */
-  --des-ultimate-box-offset-y: 28px;  /* gap below CONDITION CHECKING → ULTIMATE SHEAR */
-  --des-ultimate-manual-width: 100%; /* full width of grid cell */
-  --des-ultimate-manual-x: 0px;
-  --des-ultimate-manual-y: 0px;
-  /* Grid layout only: pull ULTIMATE SHEAR toward CONDITION CHECKING (beam/load grid unchanged) */
-  --des-ultimate-nudge-y: -43px;
-  --des-shape-panel-w: 110px;      /* right shape panel width */
-  --des-shape-card-w: 100%;        /* each inner photo card width */
-  --des-shape-panel-gap-x: 10px;   /* gap from condition box */
-  --des-shape-panel-offset-x: 0px; /* move shape panel right/left */
-  --des-shape-panel-gap-y: 8px;   /* gap between shape cards */
-  --des-shape-panel-card-h: 120px; /* each shape card height */
-  --des-shape-img-zoom-top: 1;  /* top image zoom (1 = normal) */
-  --des-shape-img-zoom-bottom: 1;  /* bottom image zoom (1 = normal) */
+  --des-inner-min-h: 0;
+  --des-input-h: 16px;
+  --des-param-label-w: 118px;
+  --des-fy-label-w: 34px;
+  --des-param-input-w: 78px;
+  --des-load-param-input-w: 78px;
+  --des-param-unit-w: 48px;
+  --des-load-param-offset-x: 0px;
+  --des-title-size: 0.72rem;
+  --des-label-size: 0.62rem;
+  --des-fy-label-nudge: 0px;
+  --des-field-size: 0.72rem;
+  --des-steel-box-pad-x: 10px;
+  --des-steel-box-pad-y: 8px;
+  --des-steel-title-size: 0.88rem;
+  --des-beam-box-min-h: 0;
+  --des-beam-box-pad-y: 8px;
+  --des-beam-box-pad-x: 8px;
+  --des-beam-title-top: -9px;
+  --des-beam-title-left: 8px;
+  --des-beam-title-h: 18px;
+  --des-beam-title-pad-x: 10px;
+  --des-beam-title-size: 0.86rem;
+  --des-load-title-size: 0.78rem;
+  --des-beam-label-size: 0.66rem;
+  --des-beam-field-size: 0.66rem;
+  --des-beam-select-size: 0.52rem;
+  --des-beam-label-col: minmax(0, 1fr);
+  --des-beam-row-gap: 6px;
+  --des-beam-row-space: 5px;
+  --des-beam-pill-h: 20px;
+  --des-beam-pill-pad-x: 8px;
+  --des-beam-field-w: minmax(96px, 1fr);
+  --des-beam-select-w: minmax(0, 1fr);
+  --des-load-box-min-h: 0;
+  --des-load-box-pad-y: 10px;
+  --des-load-box-pad-x: 10px;
+  --des-load-title-top: -10px;
+  --des-load-title-left: 10px;
+  --des-load-title-h: 20px;
+  --des-load-title-pad-x: 8px;
+  --des-load-title-letter: 0.35px;
+  --des-load-grid-top-mt: 4px;
+  --des-load-row-gap: 4px;
+  --des-load-grid-gap-x: 10px;
+  --des-load-grid-gap-y: 3px;
+  --des-load-top-label-w: minmax(72px, max-content);
+  --des-load-top-wu-label-w: 34px;
+  --des-load-top-inner-gap: 4px;
+  --des-load-pill-h: 17px;
+  --des-load-pill-w: 56px;
+  --des-load-wide-pill-w: 72px;
+  --des-load-wide-label-w: minmax(0, 1fr);
+  --des-load-wide-gap: 6px;
+  --des-load-wide-offset-x: 0px;
+  --des-load-zx-pill-w: minmax(72px, 1fr);
+  --des-load-label-size: 0.56rem;
+  --des-load-pill-size: 0.58rem;
+  --des-load-unit-size: 0.56rem;
+  --des-steeltype-label-w: 86px;
+  --des-steeltype-select-w: 92px;
+  --des-steeltype-select-h: 18px;
+  --des-steeltype-row-gap: 6px;
+  --des-shape-img-zoom-top: 1;
+  --des-shape-img-zoom-bottom: 1;
 
-  padding: 8px 16px;
+  padding: 8px 12px 10px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__layout {
   display: grid;
-  gap: 8px;
+  grid-template-columns: minmax(248px, 0.92fr) minmax(320px, 1.28fr) minmax(216px, 300px);
+  gap: 14px 16px;
   width: 100%;
   max-width: none;
-  position: relative;
+  align-items: stretch;
 }
 
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__topRow {
-  display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.3fr) minmax(280px, 1fr);
-  gap: var(--des-top-gap);
-  align-items: start;
-  width: 100%;
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__column--right {
+  gap: 12px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__column--right .sf-shearDes__shapePanel {
+  flex: 1 1 auto;
+  min-height: 200px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__miniCard {
@@ -8022,7 +7978,7 @@ input.sf-secprops__val:focus {
   background: rgba(248, 246, 239, 0.98);
   border: 1px solid rgba(176, 168, 150, 0.30);
   padding: 6px 7px 7px;
-  min-height: var(--des-box-min-h);
+  min-height: 0;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__methodBar {
@@ -8110,13 +8066,13 @@ input.sf-secprops__val:focus {
   text-transform: uppercase;
   text-align: center;
   padding-left: 0;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shear__row {
   grid-template-columns: 1fr var(--des-param-input-w) auto;
-  gap: 6px;
-  margin-bottom: 3px;
+  gap: 5px;
+  margin-bottom: 1px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shear__row--select {
@@ -8128,7 +8084,7 @@ input.sf-secprops__val:focus {
   grid-template-columns: var(--des-fy-label-w) var(--des-param-input-w) var(--des-param-unit-w);
   justify-content: center;
   width: fit-content;
-  margin: 0 auto 4px;
+  margin: 0 auto 2px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__paramsBox .sf-shear__row--fy .sf-shear__input {
@@ -8142,7 +8098,7 @@ input.sf-secprops__val:focus {
   column-gap: 5px;
   justify-content: center;
   width: fit-content;
-  margin: 0 auto 2px;
+  margin: 0 auto 1px;
   transform: translateX(var(--des-load-param-offset-x));
 }
 
@@ -8164,7 +8120,7 @@ input.sf-secprops__val:focus {
   justify-content: center;
   column-gap: var(--des-steeltype-row-gap);
   width: fit-content;
-  margin: 0 auto 3px;
+  margin: 0 auto 2px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__paramsBox .sf-shear__row--select .sf-shear__label {
@@ -8218,13 +8174,13 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__steelBox {
-  margin-top: var(--des-steel-box-offset-y);
-  margin-left: var(--des-steel-box-offset-x);
+  margin: 0;
+  width: 100%;
   border-radius: 16px;
   background: rgba(248, 244, 234, 0.94);
   border: 1px solid rgba(105, 100, 90, 0.20);
   padding: var(--des-steel-box-pad-y) var(--des-steel-box-pad-x) calc(var(--des-steel-box-pad-y) - 1px);
-  min-height: var(--des-steel-box-min-h);
+  min-height: 0;
   position: relative;
 }
 
@@ -8249,7 +8205,7 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__steelTop {
   display: grid;
-  grid-template-columns: auto 128px;
+  grid-template-columns: auto minmax(100px, 1fr);
   align-items: center;
   gap: 10px;
   margin: 9px 0 8px;
@@ -8275,6 +8231,8 @@ input.sf-secprops__val:focus {
   font-weight: 900;
   font-size: 0.72rem;
   color: rgba(62, 55, 49, 0.86);
+  min-width: 0;
+  width: 100%;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__steelGrid {
@@ -8344,68 +8302,36 @@ input.sf-secprops__val:focus {
   opacity: 0.5;
 }
 
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestBox {
-  margin-left: var(--des-light-box-offset-x);
-  margin-top: var(--des-light-box-offset-y);
-  width: var(--des-light-box-w);
-  max-width: 100%;
-  min-height: var(--des-light-box-min-h);
-  position: relative;
-  transform: translateX(var(--des-light-manual-x));
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestStack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
 }
 
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestLabel {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: var(--des-light-left-w);
-  height: var(--des-light-left-h);
-  box-sizing: border-box;
-  border-radius: 18px;
-  background: #e6e1d6;
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestHead {
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
   color: rgba(42, 70, 140, 0.95);
-  font-family: 'Inter', sans-serif;
-  font-weight: 900;
-  font-size: var(--des-light-label-size);
   text-transform: uppercase;
-  line-height: 1.18;
+  line-height: 1.2;
+  padding: 0 4px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestCard {
+  border-radius: 18px;
+  background: rgba(248, 244, 234, 0.96);
+  border: 1px solid rgba(105, 100, 90, 0.18);
+  padding: 14px 12px 16px;
   display: flex;
   align-items: center;
-  padding: 0 16px 0 18px;
-  transform: translate(var(--des-light-left-manual-x), calc(-50% + var(--des-light-left-manual-y)));
-  z-index: 2;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestEq {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  color: rgba(62, 55, 49, 0.86);
-  font-family: 'Inter', sans-serif;
-  font-weight: 900;
-  font-size: var(--des-light-eq-size);
-  line-height: 1;
-  display: block;
-  padding: 0;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestValue {
-  position: absolute;
-  right: calc(var(--des-light-right-shift-x) - var(--des-light-right-manual-x));
-  top: var(--des-light-right-manual-y);
-  width: var(--des-light-right-w);
-  height: var(--des-light-box-min-h);
-  border-radius: 20px;
-  background: #f0f0f0;
+  justify-content: center;
+  min-height: 72px;
   box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-left: 72px;
-  padding-right: 24px;
-  z-index: 1;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestPill {
@@ -8414,10 +8340,10 @@ input.sf-secprops__val:focus {
   color: #000;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: var(--des-light-value-size);
-  height: 42px;
-  min-width: 128px;
-  padding: 0 22px;
+  font-size: 1.35rem;
+  height: 44px;
+  min-width: 132px;
+  padding: 0 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -8425,59 +8351,112 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox {
-  position: absolute;
-  left: var(--des-condition-box-offset-x);
-  top: calc(var(--des-box-min-h) + var(--des-top-gap) + var(--des-condition-box-offset-y));
-  width: var(--des-condition-box-w);
-  max-width: calc(100% - var(--des-condition-box-offset-x) - 150px);
-  min-height: var(--des-condition-box-min-h);
+  position: relative;
+  left: auto;
+  top: auto;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
   border-radius: 18px;
   border: 1px solid rgba(105, 100, 90, 0.18);
   background: rgba(248, 244, 234, 0.94);
-  padding: 12px 14px 10px;
+  padding: 12px 12px 10px;
   z-index: 2;
   overflow: hidden;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTitle {
-  position: absolute;
-  top: -10px;
-  left: 14px;
-  height: 22px;
+  position: static;
+  top: auto;
+  left: auto;
+  height: auto;
+  min-height: 20px;
   border-radius: 999px;
-  padding: 0 12px;
+  padding: 0 10px;
+  margin: 0 0 6px;
   background: rgba(248, 244, 234, 0.98);
   border: 1px solid rgba(105, 100, 90, 0.14);
   display: inline-flex;
   align-items: center;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.9rem;
+  font-size: 0.84rem;
+  line-height: 1.2;
   color: rgba(42, 70, 140, 0.95);
   text-transform: uppercase;
 }
 
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionGrid {
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTri {
   display: grid;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1.25fr) 86px minmax(0, 1fr);
+  gap: 8px 10px;
   margin-top: 8px;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLeft {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(104px, 118px);
-  grid-template-rows: auto 1fr;
-  column-gap: 10px;
-  row-gap: 8px;
   align-items: stretch;
 }
 
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSubTitle {
-  grid-column: 1 / -1;
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--formula {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--limits {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--limits .sf-shearDes__conditionPillCol {
+  padding-top: 22px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--factors {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionHdr {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  margin-bottom: 2px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionHdrLabel {
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.9rem;
+  font-size: 0.68rem;
+  color: rgba(42, 70, 140, 0.92);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionHdrExpr {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.82rem;
+  color: rgba(62, 55, 49, 0.82);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionFactors {
+  display: grid;
+  gap: 5px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLeft {
+  display: none;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSubTitle {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.82rem;
   color: rgba(62, 55, 49, 0.84);
   text-transform: uppercase;
 }
@@ -8487,7 +8466,8 @@ input.sf-secprops__val:focus {
   border-radius: 10px;
   overflow: hidden;
   background: #fff;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 120px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionFormula img {
@@ -8518,7 +8498,7 @@ input.sf-secprops__val:focus {
   justify-content: center;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: rgba(255,255,255,0.96);
   text-align: center;
   line-height: 1.15;
@@ -8526,16 +8506,15 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRight {
-  display: grid;
-  gap: 6px;
+  display: none;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRow {
   display: grid;
   grid-template-columns: minmax(44px, auto) minmax(72px, 1fr) auto;
   grid-template-rows: auto auto;
-  column-gap: 10px;
-  row-gap: 4px;
+  column-gap: 8px;
+  row-gap: 3px;
   align-items: center;
 }
 
@@ -8591,15 +8570,12 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox {
-  position: absolute;
-  left: calc(var(--des-ultimate-box-offset-x) + var(--des-ultimate-box-shift-x));
-  top: calc(
-    var(--des-box-min-h) + var(--des-top-gap) + var(--des-condition-box-min-h) +
-    var(--des-condition-box-offset-y) + var(--des-ultimate-box-offset-y)
-  );
-  width: var(--des-ultimate-box-w);
-  max-width: calc(100% - var(--des-ultimate-box-offset-x) - 150px);
-  min-height: var(--des-ultimate-box-min-h);
+  position: relative;
+  left: auto;
+  top: auto;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
   border-radius: 18px;
   border: 1px solid rgba(105, 100, 90, 0.18);
   background: rgba(248, 244, 234, 0.94);
@@ -8608,36 +8584,38 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateTitle {
-  position: absolute;
-  top: -10px;
-  left: 14px;
-  height: 22px;
+  position: static;
+  top: auto;
+  left: auto;
+  height: auto;
   border-radius: 999px;
-  padding: 0 12px;
+  padding: 0 10px;
+  margin: 0 0 6px;
   background: rgba(248, 244, 234, 0.98);
   border: 1px solid rgba(105, 100, 90, 0.14);
   display: inline-flex;
   align-items: center;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.9rem;
+  font-size: 0.84rem;
   color: rgba(42, 70, 140, 0.95);
   text-transform: uppercase;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
-  margin-top: 8px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  margin-top: 0;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-start;
+  gap: 10px 16px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow {
   display: grid;
-  grid-template-columns: auto 110px auto;
+  grid-template-columns: auto minmax(86px, 120px) auto;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateExpr,
@@ -8686,19 +8664,20 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
-  position: absolute;
+  position: relative;
   left: auto;
-  right: 8px;
-  top: calc(var(--des-box-min-h) + var(--des-top-gap) + var(--des-condition-box-offset-y));
-  width: var(--des-shape-panel-w);
+  right: auto;
+  top: auto;
+  width: 100%;
   border-radius: 14px;
-  border: 4px solid rgba(216, 228, 238, 0.95);
+  border: 3px solid rgba(216, 228, 238, 0.95);
   background: rgba(248, 244, 234, 0.36);
   padding: 8px;
   display: grid;
-  grid-template-rows: var(--des-shape-panel-card-h) var(--des-shape-panel-card-h);
-  gap: var(--des-shape-panel-gap-y);
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
   z-index: 2;
+  box-sizing: border-box;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapeCard {
@@ -8730,133 +8709,11 @@ input.sf-secprops__val:focus {
   transform-origin: center;
 }
 
-/* Design Shear strict layout normalization (no overlap) */
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__layout {
-  display: grid;
-  grid-template-columns: minmax(250px, 0.95fr) minmax(360px, 1.2fr) 112px;
-  grid-template-areas:
-    "top top top"
-    "beam condition shape"
-    "load condition shape"
-    "load ultimate ultimate";
-  gap: 10px;
-  width: 100%;
-  max-width: none;
-  align-items: start;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__topRow {
-  grid-area: top;
-  grid-template-columns: minmax(260px, 1fr) minmax(330px, 1.1fr) minmax(250px, 0.95fr);
-  width: 100%;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__miniCard,
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__steelBox,
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestBox,
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox,
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox {
-  width: 100%;
-  max-width: 100%;
-  margin-left: 0;
-}
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox {
-  grid-area: beam;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox {
-  grid-area: load;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox,
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox,
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
-  position: static;
-  left: auto;
-  top: auto;
-  right: auto;
+  margin: 0;
   width: 100%;
   max-width: 100%;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox {
-  grid-area: condition;
-  min-height: 0;
-  overflow: hidden;
-  padding: 10px 12px 8px;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox {
-  grid-area: ultimate;
-  min-height: 0;
-  padding: 10px 12px;
-  /* Pull ULTIMATE SHEAR up toward CONDITION CHECKING only (does not move beam/load grid) */
-  margin-top: var(--des-ultimate-nudge-y, -43px);
-  align-self: start;
-  justify-self: stretch;
-  width: 100%;
-  max-width: 100%;
-  transform: none;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTitle,
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateTitle {
-  position: static;
-  top: auto;
-  left: auto;
-  display: inline-flex;
-  margin: 0 0 6px;
-  height: 20px;
-  padding: 0 10px;
-  font-size: 0.82rem;
-  line-height: 1;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionGrid,
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
-  margin-top: 0;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow {
-  grid-template-columns: auto minmax(86px, 110px) auto;
-  gap: 6px;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow--remarks {
-  align-self: center;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSubTitle {
-  font-size: 0.78rem;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionPill {
-  font-size: 0.72rem;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
-  min-height: 0;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
-  grid-area: shape;
-  align-self: start;
-  padding: 6px;
-  border-width: 3px;
-  grid-template-rows: 1fr 1fr;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox {
-  margin-top: var(--des-beam-box-offset-y);
-  margin-left: var(--des-beam-box-offset-x);
-  width: var(--des-beam-box-w);
-  max-width: var(--des-beam-box-max-w);
   border: 1px solid rgba(105, 100, 90, 0.20);
   border-radius: 12px;
   background: rgba(248, 244, 234, 0.94);
@@ -8959,14 +8816,21 @@ input.sf-secprops__val:focus {
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox {
-  width: var(--des-load-box-w);
-  margin-top: var(--des-load-box-offset-y);
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   border: 1px solid rgba(105, 100, 90, 0.20);
   border-radius: 16px;
   background: rgba(248, 244, 234, 0.94);
   padding: var(--des-load-box-pad-y) var(--des-load-box-pad-x) calc(var(--des-load-box-pad-y) - 2px);
   min-height: var(--des-load-box-min-h);
   position: relative;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__bwLoadBox {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadTitle {
@@ -8997,8 +8861,8 @@ input.sf-secprops__val:focus {
   row-gap: var(--des-load-grid-gap-y);
   justify-content: start;
   align-items: start;
-  min-height: calc(var(--des-load-box-min-h) - 32px);
-  align-content: space-between;
+  min-height: 0;
+  align-content: start;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadRow {
@@ -9044,10 +8908,12 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadRow--wide {
   grid-column: 1 / -1;
-  grid-template-columns: var(--des-load-wide-label-w) var(--des-load-wide-pill-w) auto;
+  grid-template-columns: minmax(0, 1fr) var(--des-load-wide-pill-w) auto;
   gap: var(--des-load-wide-gap);
-  justify-content: start;
-  justify-self: start;
+  justify-content: stretch;
+  justify-self: stretch;
+  width: 100%;
+  max-width: 100%;
   transform: translateX(var(--des-load-wide-offset-x));
 }
 
@@ -9092,7 +8958,135 @@ input.sf-secprops__val:focus {
   white-space: nowrap;
 }
 
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capBox {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(105, 100, 90, 0.20);
+  background: rgba(248, 244, 234, 0.96);
+  padding: 10px 10px 8px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capTitle {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.78rem;
+  letter-spacing: 0.4px;
+  color: rgba(42, 70, 140, 0.95);
+  text-transform: uppercase;
+  text-align: center;
+  margin: 0 0 8px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capBody {
+  display: grid;
+  gap: 6px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capRow {
+  display: grid;
+  grid-template-columns: auto minmax(64px, 96px) max-content;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  row-gap: 3px;
+  align-items: center;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capLabel {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.66rem;
+  color: rgba(62, 55, 49, 0.82);
+  text-transform: uppercase;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capExpr {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: end;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.82rem;
+  color: rgba(62, 55, 49, 0.82);
+  white-space: nowrap;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capPill {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(142, 172, 203, 0.92);
+  border: 1px solid rgba(105, 100, 90, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.96);
+  box-sizing: border-box;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capUnit {
+  grid-column: 3;
+  grid-row: 2;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.68rem;
+  color: rgba(62, 55, 49, 0.78);
+  white-space: nowrap;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capPill--accent {
+  background: rgba(246, 214, 106, 0.95);
+  color: rgba(62, 55, 49, 0.92);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capRow--remarks {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capRemLabel {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.78rem;
+  color: rgba(62, 55, 49, 0.82);
+}
+
 /* Responsive fallback */
+@media (max-width: 1180px) {
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__column--right .sf-shearDes__shapePanel {
+    min-height: 180px;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTri {
+    grid-template-columns: 1fr;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--limits .sf-shearDes__conditionPillCol {
+    padding-top: 0;
+  }
+}
+
 @media (max-width: 1100px) {
   .sf-comp--shear .sf-shear__cols {
     grid-template-columns: 1fr;
@@ -9703,150 +9697,73 @@ input.sf-secprops__val:focus {
 }
 
 
-/* ===== FINAL LOCK: Design Shear no-overlap layout ===== */
+/* ===== FINAL LOCK: Design Shear (three-column layout) ===== */
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__layout {
   display: grid !important;
-  grid-template-columns: minmax(250px, 0.95fr) minmax(360px, 1.2fr) 112px !important;
-  grid-template-areas:
-    "top top top"
-    "beam condition shape"
-    "load condition shape"
-    "load ultimate ultimate" !important;
-  gap: 10px !important;
+  grid-template-columns: minmax(248px, 0.92fr) minmax(320px, 1.28fr) minmax(216px, 300px) !important;
+  gap: 14px 16px !important;
   width: 100% !important;
   max-width: none !important;
-  align-items: start !important;
+  align-items: stretch !important;
 }
 
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__topRow {
-  grid-area: top !important;
-  display: grid !important;
-  grid-template-columns: minmax(260px, 1fr) minmax(330px, 1.1fr) minmax(250px, 0.95fr) !important;
-  width: 100% !important;
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__column {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__miniCard,
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__steelBox,
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__lightestBox,
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox,
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox {
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__capBox,
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
   width: 100% !important;
   max-width: 100% !important;
   margin-left: 0 !important;
 }
 
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamBox { grid-area: beam !important; }
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox { grid-area: load !important; }
-
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox,
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox,
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
-  position: static !important;
-  left: auto !important;
-  top: auto !important;
-  right: auto !important;
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionBox {
-  grid-area: condition !important;
-  min-height: 0 !important;
-  overflow: hidden !important;
-  padding: 10px 12px 8px !important;
-  align-self: start !important;
-  justify-self: stretch !important;
-  transform: translate(var(--des-condition-manual-x), var(--des-condition-manual-y)) !important;
-  z-index: 6 !important;
+  padding: 12px 12px 10px !important;
+  transform: none !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateBox {
-  grid-area: ultimate !important;
-  min-height: 0 !important;
-  padding: 10px 12px !important;
-  margin-top: var(--des-ultimate-nudge-y, -43px) !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  justify-self: stretch !important;
-  align-self: start !important;
+  margin-top: 0 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
   transform: none !important;
-  z-index: 6 !important;
+  grid-template-rows: 1fr 1fr !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTitle,
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateTitle {
-  position: static !important;
-  top: auto !important;
-  left: auto !important;
-  display: inline-flex !important;
-  margin: 0 0 6px !important;
-  height: 20px !important;
-  padding: 0 10px !important;
-  font-size: 0.82rem !important;
+  height: auto !important;
+  min-height: 20px !important;
 }
 
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionGrid,
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
   margin-top: 0 !important;
 }
 
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
-  gap: 8px !important;
-}
-
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow {
-  grid-template-columns: auto 96px auto !important;
-  gap: 5px !important;
-}
-
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateExpr,
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRemarksLabel {
-  font-size: 0.8rem !important;
-}
-
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateUnit {
-  font-size: 0.78rem !important;
-}
-
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimatePill {
-  height: 20px !important;
-  font-size: 0.8rem !important;
-}
-
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow--remarks {
-  grid-template-columns: auto 96px !important;
-}
-
-.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__shapePanel {
-  grid-area: shape !important;
-  align-self: start !important;
-  padding: 6px !important;
-  border-width: 3px !important;
-  grid-template-rows: 1fr 1fr !important;
-  transform: translateY(-62px) !important;
+  grid-template-columns: auto minmax(86px, 120px) auto !important;
+  gap: 6px !important;
 }
 
 /* Design uses same gray-card height as analysis (shared value above) */
 
 
-/* ===== LOCKED DESIGN SHEAR LAYOUT (fixed values) ===== */
+/* ===== LOCKED DESIGN SHEAR (optional tuning; keep minimal) ===== */
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__start {
-  --des-light-box-w: 292px !important;
-  --des-light-box-min-h: 88px !important;
-  --des-light-box-offset-x: 22px !important;
-  --des-light-box-offset-y: 30px !important;
-  --des-light-manual-x: 20px !important;
-  --des-light-left-manual-x: 30px !important;
-  --des-light-left-manual-y: 0px !important;
-  --des-light-right-w: 192px !important;
-  --des-light-right-shift-x: -14px !important;
-  --des-light-right-manual-x: -15px !important;
-  --des-light-right-manual-y: 0px !important;
-  --des-ultimate-manual-width: 100% !important;
-  --des-ultimate-manual-x: 0px !important;
-  --des-ultimate-manual-y: 0px !important;
   --des-condition-manual-x: 0px !important;
-  --des-condition-manual-y: -28px !important;
+  --des-condition-manual-y: 0px !important;
 }
 
 /* Disable page scroll when SHEAR tab is active (analysis/design) */

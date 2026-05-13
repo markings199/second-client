@@ -198,23 +198,25 @@
     <div class="sf-comp__card" role="region" aria-label="Shear design calculator">
       <div class="sf-comp__star" aria-hidden="true">★</div>
       <div class="sf-shearDes__start">
-        <div class="sf-shearDes__layout">
-          <div class="sf-shearDes__topRow">
-            <section class="sf-shearDes__miniCard" aria-label="Design shear starter panel">
-              <div class="sf-shearDes__methodBar">
-                <div class="sf-shearDes__methodLabel">DESIGN METHOD</div>
-                <div class="sf-shearDes__methodWrap">
-                  <select class="sf-shearDes__methodSelect" id="sfShearDesMethod" aria-label="Design method">
-                    <option value="lrfd" selected>LRFD</option>
-                    <option value="asd">ASD</option>
-                  </select>
-                  <span class="sf-shearDes__methodCaret" aria-hidden="true">▾</span>
-                </div>
-              </div>
+        <div class="sf-shearDes-shell">
+          <header class="sf-shearDes-hero-tab">DESIGN SHEAR</header>
+          <div class="sf-shearDes__layout">
+          <div class="sf-shearDes__column sf-shearDes__column--left">
+            <section class="sf-shearDes-card sf-shearDes-card--small" aria-label="Design method">
+              <div class="sf-shearDes-cardTitle">DESIGN METHOD</div>
+              <label class="sf-shearDes-method-pill">
+                <span class="sf-shearDes-vh">Design method</span>
+                <select class="sf-shearDes-method-select" id="sfShearDesMethod" aria-label="Design method">
+                  <option value="lrfd" selected>LRFD</option>
+                  <option value="asd">ASD</option>
+                </select>
+                <span class="sf-shearDes-method-arrow" aria-hidden="true">▼</span>
+              </label>
+            </section>
 
+            <section class="sf-shearDes-card" aria-label="Design shear parameters">
+              <div class="sf-shearDes-cardTitle">PARAMETERS</div>
               <div class="sf-shearDes__paramsBox">
-                <div class="sf-shearDes__paramsTitle">PARAMETERS:</div>
-
                 <div class="sf-shear__row sf-shear__row--select">
                   <span class="sf-shear__label">STEEL TYPE =</span>
                   <select class="sf-shear__select" id="sfShearDesSteelType" aria-label="Steel grade (ASTM)"></select>
@@ -253,8 +255,68 @@
               </div>
             </section>
 
-            <section class="sf-shearDes__steelBox" aria-label="Assumed section by Zx">
-              <div class="sf-shearDes__steelTitle">ASSUMED SECTION BY Z<sub>x</sub></div>
+            <section class="sf-shearDes-card sf-shearDes__beamBox" aria-label="Beam load">
+              <div class="sf-shearDes-cardTitle sf-shearDes__beamTitle">BEAM LOAD</div>
+
+              <div class="sf-shearDes__beamRow sf-shearDes__beamRow--select">
+                <span class="sf-shearDes__beamLabel">BEAM TYPE =</span>
+                <select class="sf-shearDes__beamSelect" id="sfShearDesBeamType" aria-label="Beam type">
+                  <option value="simple" selected>SIMPLE BEAM - Uniformly distributed load</option>
+                  <option value="cantilever">CANTILEVER - Uniformly distributed load</option>
+                </select>
+              </div>
+
+              <div class="sf-shearDes__beamRow">
+                <span class="sf-shearDes__beamLabel" id="sfShearDesBeamMomentLabel">ULTIMATE MOMENT (M<sub>u</sub>) =</span>
+                <div class="sf-shearDes__beamPill sf-shearDes__beamPill--formula" id="sfShearDesBeamMomentFormula">WL²/8</div>
+              </div>
+
+              <div class="sf-shearDes__beamRow">
+                <span class="sf-shearDes__beamLabel" id="sfShearDesBeamDeflLabel">ULTIMATE DEFLECTION (Δ<sub>Max</sub>)=</span>
+                <div class="sf-shearDes__beamPill sf-shearDes__beamPill--formula" id="sfShearDesBeamDeflFormula">5WL<sup>4</sup>/384EI</div>
+              </div>
+            </section>
+
+            <section class="sf-shearDes-card sf-shearDes__loadBox" aria-label="Load without beam weight">
+              <div class="sf-shearDes-cardTitle sf-shearDes__loadTitle">LOAD W/O BEAM WEIGHT</div>
+              <div class="sf-shearDes__loadGrid">
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--leftTop">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesLoadTopLabel">1.2DL + 1.6LL =</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesWult">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesLoadTopUnit">kips/ft</span>
+                </div>
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wu">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesWuLabel">W<sub>u</sub> =</span>
+                  <span class="sf-shearDes__loadPill sf-shearDes__loadPill--accent" id="sfShearDesWu">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesWuUnit">kips/ft</span>
+                </div>
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--leftBottom" id="sfShearDesLoadBottomRow">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesLoadBottomLabel">1.4DL =</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesW14">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesLoadBottomUnit">kips/ft</span>
+                </div>
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wide">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesMomentLabel">ALLOWABLE MOMENT (M<sub>a</sub>) =</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesMu">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesMomentUnit">kip-ft</span>
+                </div>
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wide">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesShearLabel">ALLOWABLE SHEAR (V<sub>a</sub>) =</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesVu">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesShearUnit">kips</span>
+                </div>
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wide sf-shearDes__loadRow--zx">
+                  <span class="sf-shearDes__loadLabel">ASSUMING COMPACTION FOR Z<sub>x</sub> =</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesZx">—</span>
+                  <span class="sf-shearDes__loadUnit">in<sup>3</sup></span>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="sf-shearDes__column sf-shearDes__column--center">
+            <section class="sf-shearDes-card sf-shearDes__steelBox" aria-label="Assumed section by Zx">
+              <div class="sf-shearDes-cardTitle sf-shearDes__steelTitle">ASSUMED SECTION BY Z<sub>x</sub></div>
 
               <div class="sf-shearDes__steelTop">
                 <span class="sf-shearDes__steelTopLabel">STEEL SECTION =</span>
@@ -289,147 +351,151 @@
               </div>
             </section>
 
-            <section class="sf-shearDes__lightestBox" aria-label="Lightest W-section to use">
-              <div class="sf-shearDes__lightestLabel">LIGHTEST W-SECTION TO USE</div>
-              <div class="sf-shearDes__lightestEq">=</div>
-              <div class="sf-shearDes__lightestValue">
-                <span class="sf-shearDes__lightestPill" id="sfShearDesLightest">—</span>
+            <section class="sf-shearDes-card sf-shearDes__loadBox sf-shearDes__bwLoadBox" aria-label="Load with beam weight">
+              <div class="sf-shearDes-cardTitle sf-shearDes__loadTitle sf-shearDes__bwLoadTitle">LOAD WITH BEAM WEIGHT</div>
+              <div class="sf-shearDes__loadGrid">
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--leftTop">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesBwLoadTopLabel">1.2DL + 1.6LL =</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesBwWult">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesBwLoadTopUnit">kips/ft</span>
+                </div>
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wu">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesBwWuLabel">W<sub>u</sub> =</span>
+                  <span class="sf-shearDes__loadPill sf-shearDes__loadPill--accent" id="sfShearDesBwWu">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesBwWuUnit">kips/ft</span>
+                </div>
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--leftBottom" id="sfShearDesBwLoadBottomRow">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesBwLoadBottomLabel">1.4DL =</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesBwW14">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesBwLoadBottomUnit">kips/ft</span>
+                </div>
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wide">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesBwMomentLabel">ALLOWABLE MOMENT (M<sub>a</sub>) =</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesBwMu">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesBwMomentUnit">kip-ft</span>
+                </div>
+                <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wide">
+                  <span class="sf-shearDes__loadLabel" id="sfShearDesBwShearLabel">ALLOWABLE SHEAR (V<sub>a</sub>) =</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesBwVu">—</span>
+                  <span class="sf-shearDes__loadUnit" id="sfShearDesBwShearUnit">kips</span>
+                </div>
               </div>
             </section>
 
+            <section class="sf-shearDes-card sf-shearDes__conditionBox" aria-label="Condition checking">
+              <div class="sf-shearDes-cardTitle sf-shearDes__conditionTitle">CONDITION CHECKING</div>
+
+              <div class="sf-shearDes__conditionTri">
+                <div class="sf-shearDes__conditionSeg sf-shearDes__conditionSeg--formula">
+                  <div class="sf-shearDes__conditionSubTitle">LIMITING SLENDERNESS</div>
+                  <div class="sf-shearDes__conditionFormula">
+                    <img src="./assets/shear/limiting-slenderness-clear.png" alt="Limiting slenderness equations" />
+                  </div>
+                </div>
+                <div class="sf-shearDes__conditionSeg sf-shearDes__conditionSeg--limits">
+                  <div class="sf-shearDes__conditionPillCol" aria-hidden="false">
+                    <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaVal">—</span>
+                    <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaP">—</span>
+                    <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaR">—</span>
+                  </div>
+                </div>
+                <div class="sf-shearDes__conditionSeg sf-shearDes__conditionSeg--factors">
+                  <div class="sf-shearDes__conditionHdr">
+                    <span class="sf-shearDes__conditionHdrLabel" id="sfShearDesUltLabel"></span>
+                    <span class="sf-shearDes__conditionHdrExpr" id="sfShearDesUltExpr"></span>
+                  </div>
+                  <div class="sf-shearDes__conditionFactors">
+                    <div class="sf-shearDes__conditionRow">
+                      <span class="sf-shearDes__conditionLabel">WEB SHEAR STRENGTH COEFFICIENT</span>
+                      <span class="sf-shearDes__conditionExpr">C<sub>v</sub> =</span>
+                      <span class="sf-shearDes__conditionPill" id="sfShearDesCv">—</span>
+                    </div>
+                    <div class="sf-shearDes__conditionRow">
+                      <span class="sf-shearDes__conditionLabel">RESISTANCE FACTOR</span>
+                      <span class="sf-shearDes__conditionExpr">Φ<sub>v</sub> =</span>
+                      <span class="sf-shearDes__conditionPill" id="sfShearDesPhi">—</span>
+                    </div>
+                    <div class="sf-shearDes__conditionRow">
+                      <span class="sf-shearDes__conditionLabel">SAFETY FACTOR</span>
+                      <span class="sf-shearDes__conditionExpr">Ω<sub>v</sub> =</span>
+                      <span class="sf-shearDes__conditionPill" id="sfShearDesOmega">—</span>
+                    </div>
+                    <div class="sf-shearDes__conditionRow sf-shearDes__conditionRow--vn">
+                      <span class="sf-shearDes__conditionLabel">NOMINAL SHEAR STRENGTH</span>
+                      <span class="sf-shearDes__conditionExpr">V<sub>n</sub> =</span>
+                      <span class="sf-shearDes__conditionPill sf-shearDes__conditionPill--accent" id="sfShearDesVn">—</span>
+                      <span class="sf-shearDes__conditionUnit">kips</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="sf-shearDes-card sf-shearDes__ultimateBox" aria-label="Ultimate shear summary">
+              <div class="sf-shearDes-cardTitle sf-shearDes__ultimateTitle" id="sfShearDesUltimateTitle">ULTIMATE SHEAR</div>
+              <div class="sf-shearDes__ultimateGrid">
+                <div class="sf-shearDes__ultimateRow">
+                  <span class="sf-shearDes__ultimateExpr" id="sfShearDesUltimateExpr">V<sub>u</sub> =</span>
+                  <span class="sf-shearDes__ultimatePill" id="sfShearDesUltimateVal">—</span>
+                  <span class="sf-shearDes__ultimateUnit">kips</span>
+                </div>
+              </div>
+            </section>
           </div>
 
-          <section class="sf-shearDes__conditionBox" aria-label="Condition checking">
-            <div class="sf-shearDes__conditionTitle">CONDITION CHECKING</div>
-
-            <div class="sf-shearDes__conditionGrid">
-              <div class="sf-shearDes__conditionLeft">
-                <div class="sf-shearDes__conditionSubTitle">LIMITING SLENDERNESS</div>
-                <div class="sf-shearDes__conditionFormula">
-                  <img src="./assets/shear/limiting-slenderness-clear.png" alt="Limiting slenderness equations" />
+          <div class="sf-shearDes__column sf-shearDes__column--right">
+            <section class="sf-shearDes-card sf-shearDes__capBox" aria-label="Shear capacity">
+              <div class="sf-shearDes-cardTitle sf-shearDes__capTitle">SHEAR CAPACITY (C<sub>v</sub> = 1)</div>
+              <div class="sf-shearDes__capBody">
+                <div class="sf-shearDes__capRow">
+                  <span class="sf-shearDes__capLabel">WEB SHEAR COEFFICIENT</span>
+                  <span class="sf-shearDes__capExpr">C<sub>v</sub> =</span>
+                  <span class="sf-shearDes__capPill" id="sfShearDesCapCv">—</span>
                 </div>
-                <div class="sf-shearDes__conditionPillCol">
-                  <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaVal">—</span>
-                  <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaP">—</span>
-                  <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaR">—</span>
+                <div class="sf-shearDes__capRow">
+                  <span class="sf-shearDes__capLabel">NOMINAL SHEAR</span>
+                  <span class="sf-shearDes__capExpr">V<sub>n</sub> =</span>
+                  <span class="sf-shearDes__capPill" id="sfShearDesCapVn">—</span>
+                  <span class="sf-shearDes__capUnit">kips</span>
                 </div>
-              </div>
-
-              <div class="sf-shearDes__conditionRight">
-                <div class="sf-shearDes__conditionRow">
-                  <span class="sf-shearDes__conditionLabel">WEB SHEAR STRENGTH COEFFICIENT</span>
-                  <span class="sf-shearDes__conditionExpr">C<sub>v</sub> =</span>
-                  <span class="sf-shearDes__conditionPill" id="sfShearDesCv">—</span>
+                <div class="sf-shearDes__capRow">
+                  <span class="sf-shearDes__capLabel" id="sfShearDesCapCapLabel">SHEAR CAPACITY</span>
+                  <span class="sf-shearDes__capExpr" id="sfShearDesCapCapExpr">ϕV<sub>n</sub> =</span>
+                  <span class="sf-shearDes__capPill" id="sfShearDesCapPhiVn">—</span>
+                  <span class="sf-shearDes__capUnit">kips</span>
                 </div>
-                <div class="sf-shearDes__conditionRow">
-                  <span class="sf-shearDes__conditionLabel">RESISTANCE FACTOR</span>
-                  <span class="sf-shearDes__conditionExpr">Φ<sub>v</sub> =</span>
-                  <span class="sf-shearDes__conditionPill" id="sfShearDesPhi">—</span>
-                </div>
-                <div class="sf-shearDes__conditionRow">
-                  <span class="sf-shearDes__conditionLabel">SAFETY FACTOR</span>
-                  <span class="sf-shearDes__conditionExpr">Ω<sub>v</sub> =</span>
-                  <span class="sf-shearDes__conditionPill" id="sfShearDesOmega">—</span>
-                </div>
-                <div class="sf-shearDes__conditionRow sf-shearDes__conditionRow--vn">
-                  <span class="sf-shearDes__conditionLabel">NOMINAL SHEAR STRENGTH</span>
-                  <span class="sf-shearDes__conditionExpr">V<sub>n</sub> =</span>
-                  <span class="sf-shearDes__conditionPill sf-shearDes__conditionPill--accent" id="sfShearDesVn">—</span>
-                  <span class="sf-shearDes__conditionUnit">kips</span>
+                <div class="sf-shearDes__capRow sf-shearDes__capRow--remarks">
+                  <span class="sf-shearDes__capRemLabel">REMARKS</span>
+                  <span class="sf-shearDes__capPill sf-shearDes__capPill--accent" id="sfShearDesRemarks">—</span>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <section class="sf-shearDes__ultimateBox" aria-label="Ultimate shear summary">
-            <div class="sf-shearDes__ultimateTitle" id="sfShearDesUltimateTitle">ULTIMATE SHEAR</div>
-            <div class="sf-shearDes__ultimateGrid">
-              <div class="sf-shearDes__ultimateRow">
-                <span class="sf-shearDes__ultimateExpr" id="sfShearDesUltimateExpr">V<sub>u</sub> =</span>
-                <span class="sf-shearDes__ultimatePill" id="sfShearDesUltimateVal">—</span>
-                <span class="sf-shearDes__ultimateUnit">kips</span>
+            <section class="sf-shearDes-photos-card sf-shearDes__shapePanel" aria-label="Section shape visuals">
+              <div class="sf-shearDes-photo-box sf-shearDes__shapeCard">
+                <img
+                  class="sf-shearDes__shapeImg"
+                  src="./assets/shear/shear-plain.png"
+                  alt="Steel section image 1"
+                />
               </div>
-              <div class="sf-shearDes__ultimateRow sf-shearDes__ultimateRow--remarks">
-                <span class="sf-shearDes__ultimateRemarksLabel">REMARKS</span>
-                <span class="sf-shearDes__ultimatePill" id="sfShearDesRemarks">—</span>
+              <div class="sf-shearDes-photo-box sf-shearDes__shapeCard">
+                <img
+                  class="sf-shearDes__shapeImg"
+                  src="./assets/shear/shear-stiffened.png"
+                  alt="Steel section image 2"
+                />
               </div>
-            </div>
-          </section>
+            </section>
 
-          <section class="sf-shearDes__shapePanel" aria-label="Section shape visuals">
-            <div class="sf-shearDes__shapeCard">
-              <img
-                class="sf-shearDes__shapeImg"
-                src="./assets/shear/shear-plain.png"
-                alt="Steel section image 1"
-              />
-            </div>
-            <div class="sf-shearDes__shapeCard">
-              <img
-                class="sf-shearDes__shapeImg"
-                src="./assets/shear/shear-stiffened.png"
-                alt="Steel section image 2"
-              />
-            </div>
-          </section>
-
-          <section class="sf-shearDes__beamBox" aria-label="Beam load">
-            <div class="sf-shearDes__beamTitle">BEAM LOAD:</div>
-
-            <div class="sf-shearDes__beamRow sf-shearDes__beamRow--select">
-              <span class="sf-shearDes__beamLabel">BEAM TYPE =</span>
-              <select class="sf-shearDes__beamSelect" id="sfShearDesBeamType" aria-label="Beam type">
-                <option value="simple" selected>SIMPLE BEAM - Uniformly distributed load</option>
-                <option value="cantilever">CANTILEVER - Uniformly distributed load</option>
-              </select>
-            </div>
-
-            <div class="sf-shearDes__beamRow">
-              <span class="sf-shearDes__beamLabel" id="sfShearDesBeamMomentLabel">ULTIMATE MOMENT (M<sub>u</sub>) =</span>
-              <div class="sf-shearDes__beamPill sf-shearDes__beamPill--formula" id="sfShearDesBeamMomentFormula">WL²/8</div>
-            </div>
-
-            <div class="sf-shearDes__beamRow">
-              <span class="sf-shearDes__beamLabel" id="sfShearDesBeamDeflLabel">ULTIMATE DEFLECTION (Δ<sub>Max</sub>)=</span>
-              <div class="sf-shearDes__beamPill sf-shearDes__beamPill--formula" id="sfShearDesBeamDeflFormula">5WL<sup>4</sup>/384EI</div>
-            </div>
-          </section>
-
-          <section class="sf-shearDes__loadBox" aria-label="Load without beam weight">
-            <div class="sf-shearDes__loadTitle">LOAD W/O BEAM WEIGHT</div>
-            <div class="sf-shearDes__loadGrid">
-              <div class="sf-shearDes__loadRow sf-shearDes__loadRow--leftTop">
-                <span class="sf-shearDes__loadLabel" id="sfShearDesLoadTopLabel">1.2DL + 1.6LL =</span>
-                <span class="sf-shearDes__loadPill" id="sfShearDesWult">—</span>
-                <span class="sf-shearDes__loadUnit" id="sfShearDesLoadTopUnit">kips/ft</span>
+            <section class="sf-shearDes-card sf-shearDes-card--highlight" aria-label="Lightest W-section to use">
+              <div class="sf-shearDes-cardTitle">LIGHTEST W-SECTION TO USE</div>
+              <div class="sf-shearDes__lightestCard">
+                <span class="sf-shearDes__lightestPill" id="sfShearDesLightest">—</span>
               </div>
-              <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wu">
-                <span class="sf-shearDes__loadLabel" id="sfShearDesWuLabel">W<sub>u</sub> =</span>
-                <span class="sf-shearDes__loadPill sf-shearDes__loadPill--accent" id="sfShearDesWu">—</span>
-                <span class="sf-shearDes__loadUnit" id="sfShearDesWuUnit">kips/ft</span>
-              </div>
-              <div class="sf-shearDes__loadRow sf-shearDes__loadRow--leftBottom" id="sfShearDesLoadBottomRow">
-                <span class="sf-shearDes__loadLabel" id="sfShearDesLoadBottomLabel">1.4DL =</span>
-                <span class="sf-shearDes__loadPill" id="sfShearDesW14">—</span>
-                <span class="sf-shearDes__loadUnit" id="sfShearDesLoadBottomUnit">kips/ft</span>
-              </div>
-              <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wide">
-                <span class="sf-shearDes__loadLabel" id="sfShearDesMomentLabel">ALLOWABLE MOMENT (M<sub>a</sub>) =</span>
-                <span class="sf-shearDes__loadPill" id="sfShearDesMu">—</span>
-                <span class="sf-shearDes__loadUnit" id="sfShearDesMomentUnit">kip-ft</span>
-              </div>
-              <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wide">
-                <span class="sf-shearDes__loadLabel" id="sfShearDesShearLabel">ALLOWABLE SHEAR (V<sub>a</sub>) =</span>
-                <span class="sf-shearDes__loadPill" id="sfShearDesVu">—</span>
-                <span class="sf-shearDes__loadUnit" id="sfShearDesShearUnit">kips</span>
-              </div>
-              <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wide sf-shearDes__loadRow--zx">
-                <span class="sf-shearDes__loadLabel">ASSUMING COMPACTION FOR Z<sub>x</sub> =</span>
-                <span class="sf-shearDes__loadPill" id="sfShearDesZx">—</span>
-                <span class="sf-shearDes__loadUnit">in<sup>3</sup></span>
-              </div>
-            </div>
-          </section>
+            </section>
+          </div>
+        </div>
         </div>
       </div>
     </div>

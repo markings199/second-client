@@ -1,0 +1,432 @@
+/*
+ * DESIGN SHEAR — tension-rod-style cream cards inside a taupe main shell (.sf-shearDes-shell).
+ * Scoped to design mode; IDs unchanged (presentation only).
+ */
+
+/* Main container: taupe shell around the design grid */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell {
+  color: #1f2937;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: none;
+  width: 100%;
+  margin: 0 auto;
+  padding: 18px;
+  overflow-x: hidden;
+  background: #d8d2c4 !important;
+  border-radius: 28px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8),
+    0 20px 50px rgba(30, 41, 59, 0.12);
+  border: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell *,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell *::before,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell *::after {
+  box-sizing: border-box;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-hero-tab {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 12px 22px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%) !important;
+  border: 1px solid rgba(15, 61, 110, 0.55);
+  box-shadow:
+    0 2px 8px rgba(19, 78, 138, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #f0f7ff !important;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: clamp(12px, 1.4vw, 18px) !important;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__column {
+  display: grid !important;
+  gap: clamp(12px, 1.2vw, 18px) !important;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  align-self: stretch;
+  height: auto;
+  min-height: 0;
+  align-items: stretch;
+  align-content: start;
+  justify-items: stretch;
+}
+
+/* Right stack: grow the diagram row so the column uses vertical space */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__column--right {
+  grid-template-rows: auto minmax(200px, 1fr) auto !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__column--right .sf-shearDes__shapePanel,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__column--right .sf-shearDes-photos-card {
+  min-height: 200px;
+  height: 100%;
+  align-self: stretch;
+}
+
+/* ----- Card shell (matches .tr-rod-shell .card) ----- */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-card,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__miniCard,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__beamBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__loadBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__steelBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__conditionBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__ultimateBox,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__capBox {
+  background: #f7f5ef !important;
+  border-radius: 24px !important;
+  padding: 20px !important;
+  border: 1px solid rgba(104, 109, 120, 0.16) !important;
+  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.06) !important;
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-card--small,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-card--small.sf-shearDes-card {
+  padding: 18px !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-card--highlight {
+  text-align: center;
+  padding: 22px 20px !important;
+}
+
+/* ----- Blue banner titles (matches .card-title) ----- */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-cardTitle,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__paramsTitle,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__beamTitle,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__loadTitle,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__steelTitle,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__conditionTitle,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__ultimateTitle,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__capTitle {
+  display: block !important;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 14px !important;
+  padding: 9px 12px !important;
+  border-radius: 999px !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  color: #f0f7ff !important;
+  background: linear-gradient(180deg, #1a5fa8 0%, #134e8a 50%, #0f3d6e 100%) !important;
+  border: 1px solid rgba(15, 61, 110, 0.55) !important;
+  box-shadow:
+    0 2px 8px rgba(19, 78, 138, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  line-height: 1.35 !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  height: auto !important;
+}
+
+/* ----- Design method pill ----- */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-method-pill {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 14px;
+  border-radius: 18px;
+  background: #e5e5e2 !important;
+  color: #1c2431 !important;
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-method-pill select,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-method-select {
+  flex: 1;
+  border: none !important;
+  background: transparent !important;
+  font: inherit !important;
+  font-weight: 900 !important;
+  color: inherit !important;
+  cursor: pointer;
+  text-align: center;
+  appearance: none;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-method-arrow {
+  margin-left: 10px;
+  opacity: 0.6;
+  pointer-events: none;
+  font-size: 0.75rem;
+}
+
+/* Hide legacy method bar when shell present */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__methodBar {
+  display: none !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__paramsBox {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+}
+
+/* ----- Parameters / inputs (rod-like) ----- */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shear__input,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shear__select {
+  width: 100%;
+  max-width: 10rem;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  border-radius: 10px !important;
+  padding: 6px 10px !important;
+  font-weight: 700 !important;
+  background: #fff !important;
+  color: #1f2937 !important;
+  box-shadow: none !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__paramsBox .sf-shear__row--select .sf-shear__select {
+  max-width: 14rem;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__paramsBox .sf-shear__row--fy .sf-shear__input {
+  background: #fff !important;
+  color: #1f2937 !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shear__label,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__unit {
+  color: #53606c !important;
+  font-size: 0.88rem !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__beamSelect {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  border-radius: 10px !important;
+  padding: 8px 12px !important;
+  background: #fff !important;
+  color: #1f2937 !important;
+  font-weight: 700 !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__beamPill--formula {
+  background: #fff !important;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  color: #1f2937 !important;
+}
+
+/* ----- Result / load pills → rod palette ----- */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__loadPill:not(.sf-shearDes__loadPill--accent) {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__loadPill--accent {
+  background: #facc15 !important;
+  color: #1f2937 !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__steelTopPill,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__steelPill {
+  background: #2563eb !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__conditionPill:not(.sf-shearDes__conditionPill--accent) {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__conditionPill--accent,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__ultimatePill {
+  background: #ff751f !important;
+  color: #fff !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__capPill:not(.sf-shearDes__capPill--accent) {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__capPill--accent {
+  background: #ff751f !important;
+  color: #fff !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__lightestPill {
+  background: #ff751f !important;
+  color: #fff !important;
+  font-size: 1.05rem !important;
+  min-width: 140px;
+}
+
+/* ----- Photo strip (matches .photos-card / .photo-box) ----- */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__shapePanel,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-photos-card {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: none !important;
+  gap: 14px !important;
+  background: #f7f5ef !important;
+  border-radius: 24px !important;
+  padding: 20px !important;
+  border: 1px solid rgba(104, 109, 120, 0.16) !important;
+  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.06) !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__shapeCard,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-photo-box {
+  min-height: min(220px, 28vh);
+  height: 100%;
+  border-radius: 22px;
+  border: 1px dashed rgba(100, 116, 139, 0.35) !important;
+  background: #fbfbf8 !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__shapeImg {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #fff;
+}
+
+@media (min-width: 1121px) {
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__shapePanel .sf-shearDes__shapeCard:first-child,
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-photos-card .sf-shearDes-photo-box:first-child {
+    border-right: none !important;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__shapePanel .sf-shearDes__shapeCard:last-child,
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-photos-card .sf-shearDes-photo-box:last-child {
+    border-left: none !important;
+  }
+}
+
+/* Lightest highlight card */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__lightestCard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 4px !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+/* Remarks SAFE / UNSAFE → rod verdict colors (classes set from text only; no calc change) */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell #sfShearDesRemarks {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell #sfShearDesRemarks:not(:empty) {
+  min-width: 72px;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell #sfShearDesRemarks.sf-shearDes-remark--safe {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell #sfShearDesRemarks.sf-shearDes-remark--unsafe {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+/* Design: outer .sf-comp__card stays flat; taupe shell above is the main chrome */
+.content-panel.comp-panel > .sf-comp.sf-comp--shear > .sf-comp__mode[data-comp-mode-pane="design"].is-active > .sf-comp__card:has(.sf-shearDes-shell) {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow-y: visible !important;
+  --sf-shear-card-h: auto !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 4px 0 12px !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__start:has(.sf-shearDes-shell) {
+  padding: 0 !important;
+}
+
+@media (max-width: 1120px) {
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__column--right {
+    grid-template-rows: auto !important;
+  }
+
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__shapePanel,
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-photos-card {
+    height: auto;
+    grid-template-columns: 1fr !important;
+  }
+}

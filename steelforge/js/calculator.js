@@ -2203,6 +2203,14 @@
         if (el) el.innerHTML = value;
       };
 
+      const syncShearDesRemarksUi = () => {
+        const el = out('sfShearDesRemarks');
+        if (!el?.classList) return;
+        const t = (el.textContent || '').trim();
+        el.classList.toggle('sf-shearDes-remark--safe', t === 'SAFE');
+        el.classList.toggle('sf-shearDes-remark--unsafe', t === 'UNSAFE');
+      };
+
       const fy = num('sfShearDesFy');
       const dl = num('sfShearDesDL');
       const ll = num('sfShearDesLL');
@@ -2257,6 +2265,8 @@
 
       const bottomRow = out('sfShearDesLoadBottomRow');
       if (bottomRow) bottomRow.style.display = layout.showBottomRow ? '' : 'none';
+      const bwBottomRow = out('sfShearDesBwLoadBottomRow');
+      if (bwBottomRow) bwBottomRow.style.display = layout.showBottomRow ? '' : 'none';
 
       const ok =
         Number.isFinite(fy) && fy > 0 &&
@@ -2298,6 +2308,7 @@
         setText('sfShearDesSectionName', '—');
         setText('sfShearDesLightest', '—');
         setText('sfShearDesRemarks', '—');
+        syncShearDesRemarksUi();
         return;
       }
 
@@ -2451,6 +2462,7 @@
       } else {
         setText('sfShearDesRemarks', isSafe ? 'SAFE' : 'UNSAFE');
       }
+      syncShearDesRemarksUi();
 
       if (shearDebugEnabled()) {
         console.debug('[SteelForge shear · design]', {

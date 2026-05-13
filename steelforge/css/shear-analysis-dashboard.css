@@ -1,4 +1,4 @@
-/* ANALYSIS SHEAR — bending-style frame: light gray shell + separate white sheets */
+/* ANALYSIS SHEAR — dashboard: gray-brown main container (.sf-shearDash) + cream sheets inside. */
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash {
   box-sizing: border-box;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -8,7 +8,7 @@
   max-width: none;
   margin: 0 auto;
   padding: clamp(8px, 1.2vw, 12px) clamp(8px, 1vw, 14px) clamp(10px, 1.4vw, 14px);
-  /* Align with DESIGN SHEAR outer `.sf-comp__card` chrome */
+  /* Main container: gray-brown shell (cream sheets sit inside) */
   background: rgba(151, 148, 140, 0.95);
   border: 1px solid rgba(90, 86, 78, 0.25);
   border-radius: 12px;
@@ -96,14 +96,21 @@
   display: grid;
   /* Give the results column enough room so limiting-slenderness + verdict do not overlap */
   grid-template-columns: minmax(280px, 1.35fr) minmax(260px, 1fr);
-  gap: 12px;
-  align-items: start;
+  gap: clamp(10px, 1.2vw, 16px);
+  align-items: stretch;
+  width: 100%;
 }
 
 @media (min-width: 1100px) {
   .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__workspace {
-    grid-template-columns: minmax(340px, 1.25fr) minmax(380px, 1.15fr);
-    gap: 14px;
+    grid-template-columns: minmax(300px, 1.2fr) minmax(320px, 1fr);
+    gap: clamp(12px, 1.4vw, 20px);
+  }
+}
+
+@media (min-width: 1400px) {
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__workspace {
+    grid-template-columns: minmax(320px, 1.1fr) minmax(380px, 1fr);
   }
 }
 
@@ -758,10 +765,7 @@
   }
 }
 
-/*
- * ANALYSIS SHEAR: no outer gray frame — only the inner dashboard (sf-shearDash__card) shows
- * on the notebook panel. DESIGN SHEAR still uses the default .sf-comp__card chrome.
- */
+/* ANALYSIS SHEAR: transparent outer .sf-comp__card; gray-brown main body is .sf-shearDash */
 .content-panel.comp-panel > .sf-comp.sf-comp--shear > .sf-comp__mode[data-comp-mode-pane="analysis"].is-active > .sf-comp__card {
   background: transparent !important;
   border: none !important;
@@ -773,10 +777,14 @@
   min-height: 0 !important;
   overflow-y: visible;
   flex: 0 1 auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 /* Use horizontal space for SHEAR (default comp-panel uses 76px side padding). */
 .content-panel.comp-panel > .sf-comp.sf-comp--shear {
-  padding-left: clamp(8px, 1.8vw, 28px);
-  padding-right: clamp(8px, 1.8vw, 28px);
+  padding-left: clamp(6px, 1.2vw, 20px);
+  padding-right: clamp(6px, 1.2vw, 20px);
 }
