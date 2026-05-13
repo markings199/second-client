@@ -38,22 +38,34 @@
   <link rel="stylesheet" href="./css/tension-design-layout.css" />
   <link rel="stylesheet" href="./css/tension-rod-modern.css" />
 
-  <script defer src="./js/sf-static-assets.js"></script>
-  <script defer src="./js/steel-db.js"></script>
-  <script defer src="./js/workbook-materials.js"></script>
-  <script defer src="./js/shear-csv-shapes.js"></script>
-  <script defer src="./js/steel-grade.js"></script>
-  <script defer src="./js/section-props.js"></script>
-  <script defer src="./js/calculator.js"></script>
-  <script defer src="./js/tension-analysis.js"></script>
-  <script defer src="./js/tension-rod-analysis.js"></script>
-  <script defer src="./js/bending-analysis.js"></script>
-  <script defer src="./js/bending-design.js"></script>
-  <script defer src="./js/main.js"></script>
   <script>
-    // Always reload local CSS (dev-friendly). Bust every ./css/*.css link so auxiliary sheets cannot stay stale.
+    /* Always reload local CSS + JS (dev-friendly). Inject every script with ?v=<build> so
+       browsers never serve stale section-props.js, tension-analysis.js, etc. */
     (function () {
       var v = Date.now();
+      var scripts = [
+        './js/sf-static-assets.js',
+        './js/steel-db.js',
+        './js/workbook-materials.js',
+        './js/shear-csv-shapes.js',
+        './js/steel-grade.js',
+        './js/section-props.js',
+        './js/calculator.js',
+        './js/tension-analysis.js',
+        './js/tension-rod-analysis.js',
+        './js/bending-analysis.js',
+        './js/bending-design.js',
+        './js/main.js',
+      ];
+      scripts.forEach(function (src) {
+        var s = document.createElement('script');
+        // async=false on dynamically-inserted scripts preserves DOM-insertion order,
+        // matching the original <script defer> behavior.
+        s.async = false;
+        s.defer = true;
+        s.src = src + '?v=' + v;
+        document.head.appendChild(s);
+      });
       document.querySelectorAll('link[rel="stylesheet"]').forEach(function (lnk) {
         var href = lnk.getAttribute('href') || '';
         if (href.indexOf('./css/') !== 0) return;

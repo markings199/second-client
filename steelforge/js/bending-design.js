@@ -93,8 +93,15 @@
     return v.toFixed(d).replace(/\.?0+$/, '');
   }
 
-  /** Same flexural strength model as Analysis Bending (`bending-analysis.js`). */
-  function nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF) {
+  /**
+   * Same flexural strength model as Analysis Bending (`bending-analysis.js`).
+   * Strict parity with workbook BENDING sheet:
+   *   COMPACT      → M_p
+   *   NON-COMPACT  → M_p − (M_p − 0.7 M_y) · (λ_f − λ_pf)/(λ_rf − λ_pf)
+   *   SLENDER      → 0.9 · E · S_x · (4/λ_w) / λ_f²  (workbook elastic FLB form)
+   * Web slenderness is NOT used to govern M_n in workbook (flange-only classification).
+   */
+  function nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF, lamW) {
     if (![Fy, E, Zx, Sx, lamF].every((x) => Number.isFinite(x) && x > 0)) return null;
     const Mp = (Fy * Zx) / 12;
     const My = (Fy * Sx) / 12;
@@ -105,6 +112,9 @@
       const den = lrF - lpF;
       if (!(den > 0)) return Mp;
       return Mp - (Mp - 0.7 * My) * ((lamF - lpF) / den);
+    }
+    if (Number.isFinite(lamW) && lamW > 0) {
+      return (0.9 * E * Sx * (4 / lamW)) / (lamF * lamF * 12);
     }
     return 0.7 * My;
   }
@@ -124,11 +134,9 @@
     return 0.7 * My;
   }
 
+  /** Workbook BENDING uses flange classification only — web result kept for diagnostic display. */
   function nominalMomentKipFt(Fy, E, Zx, Sx, lamF, lamW) {
-    const mnF = nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF);
-    const mnW = nominalMomentWebKipFt(Fy, E, Zx, Sx, lamW);
-    if (mnF == null || mnW == null) return null;
-    return Math.min(mnF, mnW);
+    return nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF, lamW);
   }
 
   /** CHECK COMPACTNESS card — flange classification vs λ_pf / λ_rf only. */

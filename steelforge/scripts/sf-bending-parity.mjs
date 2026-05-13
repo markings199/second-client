@@ -7,7 +7,14 @@ const PHI_B = 0.9;
 const OMEGA_B = 1.67;
 const E = 29000;
 
-function nominalMomentFlangeKipFt(Fy, Zx, Sx, lamF) {
+/**
+ * Workbook BENDING!F22 — strict parity:
+ *   COMPACT      → Fy·Zx/12
+ *   NON-COMPACT  → Mp − (Mp − 0.7·Fy·Sx/12) · (λf − λpf)/(λrf − λpf)
+ *   SLENDER      → 0.9·E·Sx·(4/λw) / (λf² · 12)
+ * Flange classification only — web slenderness not used to govern.
+ */
+function nominalMomentFlangeKipFt(Fy, Zx, Sx, lamF, lamW) {
   const Mp = (Fy * Zx) / 12;
   const My = (Fy * Sx) / 12;
   const lpF = 0.38 * Math.sqrt(E / Fy);
@@ -17,24 +24,14 @@ function nominalMomentFlangeKipFt(Fy, Zx, Sx, lamF) {
     const den = lrF - lpF;
     return Mp - (Mp - 0.7 * My) * ((lamF - lpF) / den);
   }
-  return 0.7 * My;
-}
-
-function nominalMomentWebKipFt(Fy, Zx, Sx, lamW) {
-  const Mp = (Fy * Zx) / 12;
-  const My = (Fy * Sx) / 12;
-  const lpW = 3.76 * Math.sqrt(E / Fy);
-  const lrW = 5.7 * Math.sqrt(E / Fy);
-  if (lamW <= lpW) return Mp;
-  if (lamW <= lrW) {
-    const den = lrW - lpW;
-    return Mp - (Mp - 0.7 * My) * ((lamW - lpW) / den);
+  if (Number.isFinite(lamW) && lamW > 0) {
+    return (0.9 * E * Sx * (4 / lamW)) / (lamF * lamF * 12);
   }
   return 0.7 * My;
 }
 
 function nominalMomentKipFt(Fy, Zx, Sx, lamF, lamW) {
-  return Math.min(nominalMomentFlangeKipFt(Fy, Zx, Sx, lamF), nominalMomentWebKipFt(Fy, Zx, Sx, lamW));
+  return nominalMomentFlangeKipFt(Fy, Zx, Sx, lamF, lamW);
 }
 
 function flangeCompactnessVerdict(lamF, Fy) {
@@ -113,6 +110,32 @@ add('Defl Mn/Ω ASD (309.431)', nearly(Mn_w21_65 / OMEGA_B, 309.4311377, 0.02));
 const Ldef_ft = 35;
 const delta_allow_ft = Ldef_ft / 360;
 add('Δallow L/n as ft (0.097222)', nearly(delta_allow_ft, 0.097222222, 1e-6));
+
+/**
+ * Workbook BENDING sheet — full analysis example.
+ * Section W21X48 at Fy=100, Zx=107, Sx=93, λf=9.47, λw=53.6.
+ *   Mp = 100·107/12 = 891.667 kip·ft (E13)
+ *   λpf = 0.38·√(290) = 6.47117 (F17)
+ *   λrf = √(290) = 17.0294 (F19)
+ *   λf = 9.47 → NON-COMPACT FLANGE (D21)
+ *   Mn (F22) ≈ 891.667 − (891.667 − 0.7·100·93/12) · (9.47 − 6.47117)/(17.0294 − 6.47117)
+ *            ≈ 792.49 kip·ft
+ *   E25 = 0.9·Mn ≈ 713.244 (workbook cached)
+ *   E26 = Mn/1.67 ≈ 474.547 (workbook cached)
+ */
+const Mn_W21X48 = nominalMomentKipFt(100, 107, 93, 9.47, 53.6);
+add('Workbook W21X48 Mn analysis (~792.49)', nearly(Mn_W21X48, 792.4934, 0.1), `got ${Mn_W21X48}`);
+add('Workbook W21X48 φMn LRFD (~713.24)', nearly(PHI_B * Mn_W21X48, 713.2441, 0.1), `got ${PHI_B * Mn_W21X48}`);
+add('Workbook W21X48 Mn/Ω ASD (~474.547)', nearly(Mn_W21X48 / OMEGA_B, 474.547, 0.1), `got ${Mn_W21X48 / OMEGA_B}`);
+
+/**
+ * Slender flange branch parity — uses workbook elastic FLB form.
+ * Synthetic: Fy=100, Sx=50, λf=20 (>λrf=17.03), λw=30
+ *   Mn = 0.9·29000·50·(4/30)/(20²·12) = 174000·(0.13333)/4800 = 36.25 kip·ft
+ */
+const Mn_slender = nominalMomentKipFt(100, 60, 50, 20, 30);
+const expected_slender = (0.9 * E * 50 * (4 / 30)) / (20 * 20 * 12);
+add('Slender flange branch (workbook elastic form)', nearly(Mn_slender, expected_slender, 1e-6), `got ${Mn_slender}, expected ${expected_slender}`);
 
 const passed = checks.filter((c) => c.ok).length;
 const total = checks.length;

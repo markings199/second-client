@@ -113,3 +113,67 @@ for (const [, pass] of parityAxes) {
 console.log(
   `\nSpec vs implementation checklist: ${axisOk}/${parityAxes.length} (${((100 * axisOk) / parityAxes.length).toFixed(1)}%)`,
 );
+
+/**
+ * Workbook COMPRESSION sheet — actual example values.
+ * Section W12X58 @ A992 (Fy=50, Fu=65). Properties from workbook cached cells:
+ *   Ag=17, rx=5.28, ry=2.51, λf=7.82, λw=27
+ *   Length x1 = y1 = 22 ft, K=1 (Pinned-Pinned), rest zero.
+ *   E29 λrf = 0.56·√(29000/50) = 13.487
+ *   E31 λrw = 1.49·√(29000/50) = 35.884
+ *   G29: λf 7.82 < 13.487 → "Compact Flange"
+ *   G31: λw 27 < 35.884 → "Compact Web"
+ *   G36 = 264·1/5.28 = 50 ; G41 = 264·1/2.51 = 105.18 → governing KL/r = 105.18
+ *   F49 Fe = π²·29000 / 105.18² = 25.87 ksi
+ *   F50 Fcr = 0.658^(50/25.87)·50 ≈ 22.3 ksi
+ *   F53 φPn = 0.9·Fcr·Ag, F56 Pn/Ω = Fcr·Ag/1.67, F60 Pn = Fcr·Ag
+ */
+const wb = (() => {
+  const E_ksi = 29000;
+  const Fy = 50;
+  const AgW = 17;
+  const rxW = 5.28;
+  const ryW = 2.51;
+  const lamF = 7.82;
+  const lamW = 27;
+  const lrF = 0.56 * Math.sqrt(E_ksi / Fy);
+  const lrW = 1.49 * Math.sqrt(E_ksi / Fy);
+  const flangeOk = lamF < lrF;
+  const webOk = lamW < lrW;
+  const KLx = 22 * 12 * 1; // Pinned-Pinned, x1 only
+  const KLy = 22 * 12 * 1; // Pinned-Pinned, y1 only
+  const klrX = KLx / rxW;
+  const klrY = KLy / ryW;
+  const govKLr = Math.max(klrX, klrY);
+  const FeW = (Math.PI ** 2 * E_ksi) / govKLr ** 2;
+  const FcrW = sfCompressionWorkbookFcr(Fy, FeW);
+  const PnW = FcrW * AgW;
+  return {
+    lrF, lrW, flangeOk, webOk,
+    klrX, klrY, govKLr,
+    Fe: FeW, Fcr: FcrW, Pn: PnW,
+    phiPn: 0.9 * PnW, Pa: PnW / 1.67,
+  };
+})();
+console.log('\nWorkbook COMPRESSION W12X58 sample:');
+console.log(wb);
+
+const wbChecks = [
+  ['λrf = 0.56·√(E/Fy) ≈ 13.487', Math.abs(wb.lrF - 13.4866) < 1e-3],
+  ['λrw = 1.49·√(E/Fy) ≈ 35.884', Math.abs(wb.lrW - 35.884) < 1e-3],
+  ['Flange compact (λf=7.82 < λrf)', wb.flangeOk === true],
+  ['Web compact (λw=27 < λrw)', wb.webOk === true],
+  ['KLx/rx = 50.00', Math.abs(wb.klrX - 50.0) < 0.01],
+  ['KLy/ry ≈ 105.18', Math.abs(wb.klrY - 105.18) < 0.05],
+  ['Governing KL/r = 105.18', Math.abs(wb.govKLr - 105.18) < 0.05],
+  ['Fe ≈ 25.87 ksi', Math.abs(wb.Fe - 25.87) < 0.05],
+  ['Fcr (single 0.658 branch) ≈ 22.3 ksi', Math.abs(wb.Fcr - 22.3) < 0.2],
+];
+let wbOk = 0;
+for (const [name, pass] of wbChecks) {
+  if (pass) wbOk++;
+  console.log(`${pass ? 'OK' : 'FAIL'} — ${name}`);
+}
+console.log(`Workbook W12X58 parity: ${wbOk}/${wbChecks.length}`);
+
+process.exitCode = ok + wbOk === checks.length + wbChecks.length ? 0 : 1;

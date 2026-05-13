@@ -16,14 +16,32 @@ Your machine’s folder name (for example `Civil Engineering Department`) does n
 
 ## Run locally
 
-From this folder:
+From this folder (workspace root, where `start.ps1` lives), run:
 
-```bash
+```powershell
+.\start.ps1
+```
+
+This always serves the app from `steelforge\` on port 5500 and opens your browser to `http://127.0.0.1:5500/`.
+
+Manual equivalent (if you prefer):
+
+```powershell
 cd steelforge
 python -m http.server 5500
 ```
 
-Open [http://127.0.0.1:5500/](http://127.0.0.1:5500/) (or open `steelforge/index.html` in a browser; a local server avoids fetch/CORS issues for CSV assets).
+Then open one of:
+
+- App: <http://127.0.0.1:5500/>
+- Compression: <http://127.0.0.1:5500/#compression>
+- Tension: <http://127.0.0.1:5500/#tension>
+- Bending: <http://127.0.0.1:5500/#bending>
+- Shear: <http://127.0.0.1:5500/#shear>
+
+If you see a directory listing with an unrelated folder name (e.g. `born2be-steel-header`), it means an HTTP server on port 5500 is being run from a different folder by another VS Code/Cursor window or another tool. Stop that server first, then run `.\start.ps1` from this workspace.
+
+Opening `steelforge/index.html` directly with `file://` will not work reliably — the calculators load CSV assets and require a local HTTP server.
 
 ## Layout
 

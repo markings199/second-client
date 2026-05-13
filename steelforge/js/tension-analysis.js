@@ -127,9 +127,7 @@
     const steelEl = el('sfTenAnaSteel');
     const fyEl = el('sfTenAnaFy');
     const fuEl = el('sfTenAnaFu');
-    const case1El = el('sfTenAnaCase1');
-    const case2El = el('sfTenAnaCase2');
-    const case8El = el('sfTenAnaCase8');
+    const lagEl = el('sfTenAnaShearLag');
     const uGovEl = el('sfTenAnaUgovern');
     const nEl = el('sfTenAnaNBolts');
     const boltKindEl = el('sfTenAnaBoltKind');
@@ -154,14 +152,20 @@
 
     if (!methodEl || !shapeEl || !aiscEl) return;
 
-    const dataListId = 'sfTenAnaAiscList';
-    let dl = pane.querySelector(`#${dataListId}`);
-    if (!dl) {
-      dl = document.createElement('datalist');
-      dl.id = dataListId;
-      pane.appendChild(dl);
+    const suggestEl = pane.querySelector('#sfTenAnaAiscSuggest');
+    const toggleEl = pane.querySelector('#sfTenAnaAiscToggle');
+    const searchWrap = aiscEl.closest('.sf-tenAna__searchWrap');
+
+    /** Normalize free-text query: uppercase, strip whitespace and separators. */
+    function normalizeQuery(s) {
+      return String(s || '').toUpperCase().replace(/[\s\-_.·]/g, '');
     }
-    aiscEl.setAttribute('list', dataListId);
+
+    function setSuggestOpen(isOpen) {
+      if (!suggestEl) return;
+      suggestEl.hidden = !isOpen;
+      aiscEl.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
 
     const CSV_TYPES = new Set(['L', '2L', 'W', 'WT', 'HP', 'C', 'MC', 'S', 'ST', 'MT']);
 
@@ -183,9 +187,29 @@
 
     let allSteelRows = [];
     let angleRows = [];
-    let case2Touched = false;
-    let case8Touched = false;
     let stagSumTouched = false;
+
+    /**
+     * Parse the SHEAR LAG FACTOR selector into a numeric U:
+     *   - Numeric input ("0.85") → use directly.
+     *   - "CASE X" → look up workbook table (S(ASTM)) via SHEAR_LAG_CASES.
+     *   - Bare "CASE 8" coerces to 8a for parity with design tension.
+     */
+    function getUFromLagSelect() {
+      const raw = String(lagEl?.value || '').trim();
+      if (!raw) return null;
+      const nDirect = parseNumLike(raw);
+      if (Number.isFinite(nDirect)) return nDirect;
+      const m = raw.match(/^case\s*(.+)$/i);
+      if (m && window.SteelForgeWorkbookShearLagU) {
+        let key = String(m[1]).trim().replace(/\s+/g, '').toLowerCase();
+        key = key.replace(/^0+/, '') || '0';
+        if (key === '8') key = '8a';
+        const uBook = window.SteelForgeWorkbookShearLagU(key);
+        if (Number.isFinite(uBook)) return uBook;
+      }
+      return null;
+    }
 
     const isManualMode = () => String(shapeEl.value || '').toLowerCase() === 'manual';
 
@@ -195,12 +219,49 @@
         want.size === 0
           ? []
           : allSteelRows.filter((r) => want.has(String(r[COL.type] || '').trim()));
-      dl.innerHTML = '';
-      angleRows.forEach((r) => {
-        const opt = document.createElement('option');
-        opt.value = String(r[COL.label] || '').trim();
-        dl.appendChild(opt);
-      });
+    }
+
+    /**
+     * Build dropdown matches by normalized substring match and show them.
+     * Empty query shows the first 30 of the current shape pool so scroll/pick works.
+     */
+    function renderSuggest(qRaw) {
+      if (!suggestEl) return;
+      if (isManualMode()) {
+        setSuggestOpen(false);
+        return;
+      }
+      const q = normalizeQuery(qRaw);
+      const pool = angleRows;
+      const matches = !q
+        ? pool.slice(0, 30)
+        : pool
+            .filter((r) => normalizeQuery(r[COL.label]).includes(q))
+            .slice(0, 50);
+
+      suggestEl.innerHTML = '';
+      if (matches.length === 0) {
+        const li = document.createElement('li');
+        li.className = 'sf-tenAna__suggestEmpty';
+        li.textContent = pool.length ? 'No matching section' : 'Catalog unavailable';
+        suggestEl.appendChild(li);
+      } else {
+        matches.forEach((row) => {
+          const lab = String(row[COL.label] || '').trim();
+          const li = document.createElement('li');
+          li.className = 'sf-tenAna__suggestItem';
+          li.textContent = lab;
+          li.setAttribute('role', 'option');
+          li.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            applyAiscRowByLabel(lab);
+            setSuggestOpen(false);
+            recompute();
+          });
+          suggestEl.appendChild(li);
+        });
+      }
+      setSuggestOpen(true);
     }
 
     function setGeometryReadOnly(isReadOnly) {
@@ -233,8 +294,6 @@
       if (agEl) agEl.value = toNumInput(agVal);
       if (xbarEl) xbarEl.value = toNumInput(xbarVal);
       aiscEl.value = String(hit[COL.label] || '').trim();
-      case2Touched = false;
-      case8Touched = false;
       stagSumTouched = false;
       return true;
     }
@@ -272,18 +331,6 @@
         const n = parseNumLike(nEl.value);
         if (Number.isFinite(n)) nEl.value = String(Math.max(0, Math.round(n)));
       }
-      if (case1El) {
-        const v = parseNumLike(case1El.value);
-        if (Number.isFinite(v)) case1El.value = fmt(v, 3);
-      }
-      if (case2El) {
-        const v2 = parseNumLike(case2El.value);
-        if (Number.isFinite(v2)) case2El.value = fmt(v2, 6);
-      }
-      if (case8El) {
-        const v = parseNumLike(case8El.value);
-        if (Number.isFinite(v)) case8El.value = fmt(v, 3);
-      }
       ['sfTenAnaBlkNShear', 'sfTenAnaBlkNTension'].forEach((bid) => {
         const bx = el(bid);
         if (!bx) return;
@@ -298,33 +345,16 @@
     }
 
     function recompute() {
-      if (!case2El || !uGovEl || !ahEl || !anNsEl || !anStEl || !anGovEl) return;
+      if (!lagEl || !uGovEl || !ahEl || !anNsEl || !anStEl || !anGovEl) return;
       normalizeInputs();
       const t = parseNumLike(tEl?.value);
       const Ag = parseNumLike(agEl?.value);
-      const xbar = parseNumLike(xbarEl?.value);
       const L = parseNumLike(lenEl?.value);
       const n = parseNumLike(nEl?.value);
       const Fy = parseNumLike(fyEl?.value);
       const Fu = parseNumLike(fuEl?.value);
 
-      if (!case2Touched && Number.isFinite(xbar) && Number.isFinite(L) && L > 0) {
-        const uCase2 = Math.max(0.6, 1 - xbar / L);
-        case2El.value = fmt(uCase2, 6);
-      }
-
-      if (!case8Touched && nEl && case8El) {
-        const nv = parseNumLike(nEl.value);
-        if (Number.isFinite(nv) && nv >= 0) {
-          const u8 = nv >= 4 ? 0.8 : 0.6;
-          case8El.value = fmt(u8, 3);
-        }
-      }
-
-      const c1 = parseNumLike(case1El?.value);
-      const c2 = parseNumLike(case2El?.value);
-      const c8 = parseNumLike(case8El?.value);
-      const U = minPositive([c1, c2, c8]);
+      const U = getUFromLagSelect();
       uGovEl.textContent = fmt(U, 3);
 
       const givenDia = parseNumLike(dhEl?.value);
@@ -371,8 +401,10 @@
       if (sumEl && !stagSumTouched) sumEl.value = hasPair ? fmt(sum, 3) : '';
       const stagSum = parseNumLike(sumEl?.value);
 
-      const AnSt = Number.isFinite(Ag) && Number.isFinite(Ah) && Number.isFinite(t) && Number.isFinite(stagSum)
-        ? Ag - Ah + t * stagSum
+      // Strict workbook parity (TENSION D30): An_staggered = (Ag − Ah) + Σ(s²/4g)
+      // — workbook does NOT multiply the staggered correction by t.
+      const AnSt = Number.isFinite(Ag) && Number.isFinite(Ah) && Number.isFinite(stagSum)
+        ? Ag - Ah + stagSum
         : null;
       anStEl.textContent = fmt(AnSt, 3);
 
@@ -402,7 +434,7 @@
       let lrfdBlock = null;
       let asdBlock = null;
 
-      const ntBlk = Number.isFinite(blkNT) ? blkNT : n;
+      const ntBlk = Number.isFinite(blkNT) ? blkNT : null;
       const clearBlkOut = () => {
         [outBlkAgv, outBlkAnv, outBlkRnCap, outBlkRnTen, outBlkRnGov, capBlkEl].forEach((node) => {
           if (node) node.textContent = '—';
@@ -493,16 +525,15 @@
       if (methodEl && !methodEl.value) methodEl.value = 'lrfd';
       if (shapeEl && !shapeEl.value) shapeEl.value = 'l';
       if (lenEl && !String(lenEl.value).trim()) lenEl.value = '120';
-      if (nEl && !String(nEl.value).trim()) nEl.value = '2';
+      if (nEl && !String(nEl.value).trim()) nEl.value = '1';
       if (dhEl && !String(dhEl.value).trim()) dhEl.value = '3/4';
-      if (case1El && !String(case1El.value).trim()) case1El.value = '1.0';
+      if (lagEl && !String(lagEl.value).trim()) lagEl.value = 'CASE 8a';
       if (steelEl && !String(steelEl.value).trim()) steelEl.value = activeGrade?.label ?? 'A992';
       applySteelDefaults();
       setGeometryReadOnly(!isManualMode());
-      case2Touched = false;
-      case8Touched = false;
       stagSumTouched = false;
       const blkNS = el('sfTenAnaBlkNShear');
+      const blkNT = el('sfTenAnaBlkNTension');
       const blkLS = el('sfTenAnaBlkLshear');
       const blkLT = el('sfTenAnaBlkLtension');
       const blkUbsEl = el('sfTenAnaBlkUbs');
@@ -510,6 +541,12 @@
       if (blkLS && !String(blkLS.value).trim()) blkLS.value = '7.5';
       if (blkLT && !String(blkLT.value).trim()) blkLT.value = '9';
       if (blkUbsEl && !String(blkUbsEl.value).trim()) blkUbsEl.value = '1';
+      if (blkNT && !String(blkNT.value).trim()) {
+        const nsStr = blkNS && String(blkNS.value).trim();
+        const nStr = nEl && String(nEl.value).trim();
+        if (nsStr) blkNT.value = nsStr;
+        else if (nStr) blkNT.value = nStr;
+      }
     }
 
     function defaultCatalogRow() {
@@ -532,18 +569,67 @@
     }
 
     function wire() {
+      const bump = () => {
+        recompute();
+      };
+
+      sumEl?.addEventListener(
+        'input',
+        () => {
+          stagSumTouched = String(sumEl.value || '').trim() !== '';
+        },
+        true,
+      );
+
       pane.querySelectorAll('input, select').forEach((x) => {
-        x.addEventListener('input', recompute);
-        x.addEventListener('change', recompute);
+        x.addEventListener('input', bump);
+        x.addEventListener('change', bump);
       });
-      aiscEl.addEventListener('change', () => {
-        if (!isManualMode()) applyAiscRowByLabel(aiscEl.value);
-        recompute();
+
+      let debounce;
+      aiscEl.addEventListener('input', () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => renderSuggest(aiscEl.value), 90);
       });
-      aiscEl.addEventListener('blur', () => {
-        if (!isManualMode()) applyAiscRowByLabel(aiscEl.value);
-        recompute();
+      aiscEl.addEventListener('focus', () => {
+        if (!isManualMode()) renderSuggest(aiscEl.value);
       });
+      aiscEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          setSuggestOpen(false);
+          return;
+        }
+        if (e.key === 'Enter') {
+          if (isManualMode()) return;
+          e.preventDefault();
+          const q = normalizeQuery(aiscEl.value);
+          const exact = angleRows.find((r) => normalizeQuery(r[COL.label]) === q);
+          const hit = exact || angleRows.find((r) => normalizeQuery(r[COL.label]).includes(q));
+          if (hit) {
+            applyAiscRowByLabel(String(hit[COL.label] || '').trim());
+            setSuggestOpen(false);
+            recompute();
+          }
+        }
+      });
+      toggleEl?.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (isManualMode()) return;
+        if (suggestEl?.hidden) {
+          aiscEl.focus();
+          renderSuggest('');
+        } else {
+          setSuggestOpen(false);
+        }
+      });
+      document.addEventListener(
+        'click',
+        (e) => {
+          if (searchWrap && !searchWrap.contains(e.target)) setSuggestOpen(false);
+        },
+        true,
+      );
+
       steelEl?.addEventListener('change', () => {
         applySteelDefaults();
         recompute();
@@ -551,25 +637,16 @@
       shapeEl?.addEventListener('change', () => {
         const manual = isManualMode();
         setGeometryReadOnly(!manual);
-        case2Touched = false;
-        case8Touched = false;
         stagSumTouched = false;
         refreshShapeCatalog();
-        if (!manual && angleRows.length) {
+        if (manual) {
+          setSuggestOpen(false);
+        } else if (angleRows.length) {
           applyAiscRowByLabel(aiscEl.value) || applyAiscRowByLabel(String(angleRows[0][COL.label] || '').trim());
         }
         recompute();
       });
-      case2El?.addEventListener('input', () => {
-        case2Touched = String(case2El.value || '').trim() !== '';
-      });
-      case8El?.addEventListener('input', () => {
-        case8Touched = String(case8El.value || '').trim() !== '';
-      });
-      sumEl?.addEventListener('input', () => {
-        stagSumTouched = String(sumEl.value || '').trim() !== '';
-      });
-      solveBtn?.addEventListener('click', recompute);
+      solveBtn?.addEventListener('click', bump);
     }
 
     const attachAnalysisGradeListener = () => {
@@ -584,6 +661,19 @@
       window.SteelForge._sfTenAnaGradeListener = fn;
       window.addEventListener('sf:steel-grade-change', fn);
     };
+
+    /** Listeners must exist before CSV returns; otherwise stagger / block-shear cells feel “dead” on load. */
+    let wired = false;
+    function ensureWire() {
+      if (wired) return;
+      wired = true;
+      wire();
+      attachAnalysisGradeListener();
+    }
+
+    setDefaults();
+    ensureWire();
+    recompute();
 
     fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
       .then((r) => {
@@ -605,14 +695,10 @@
         setDefaults();
         const dflt = defaultCatalogRow();
         if (dflt) applyAiscRowByLabel(dflt[COL.label]);
-        wire();
-        attachAnalysisGradeListener();
         recompute();
       })
       .catch(() => {
         setDefaults();
-        wire();
-        attachAnalysisGradeListener();
         recompute();
       });
   };
@@ -743,14 +829,28 @@
       normalizeInputs();
     }
 
-    function renderTable(govAg) {
+    /**
+     * Render selection-of-section table. A row is SAFE only when:
+     *   1. Section area Ag ≥ required Ag (yield + fracture governing), AND
+     *   2. Section r_min ≥ required r_min = L/300 (workbook slenderness ceiling).
+     */
+    function renderTable(govAg, rMinReq) {
       const rows = sortedByArea(angleRows);
-      const safeRows = rows.filter((r) => Number.isFinite(rowArea(r)) && Number.isFinite(govAg) && rowArea(r) >= govAg);
+      const isSafe = (r) => {
+        const ag = rowArea(r);
+        if (!Number.isFinite(ag) || !Number.isFinite(govAg) || ag < govAg) return false;
+        if (Number.isFinite(rMinReq) && rMinReq > 0) {
+          const rmin = rowRmin(r);
+          if (!Number.isFinite(rmin) || rmin < rMinReq) return false;
+        }
+        return true;
+      };
+      const safeRows = rows.filter(isSafe);
       const lightest = safeRows[0] ?? null;
 
       let displayRows = rows.slice(0, 12);
       if (Number.isFinite(govAg) && rows.length > 0) {
-        let pivot = rows.findIndex((r) => Number.isFinite(rowArea(r)) && rowArea(r) >= govAg);
+        let pivot = rows.findIndex(isSafe);
         if (pivot < 0) pivot = rows.length - 1;
         const before = 5;
         const total = 12;
@@ -763,13 +863,13 @@
       tb.innerHTML = '';
       displayRows.forEach((r) => {
         const ag = rowArea(r);
-        const ok = Number.isFinite(ag) && Number.isFinite(govAg) ? ag >= govAg : false;
+        const ok = isSafe(r);
         const label = String(r[COL.label] || '').trim();
         const isThreshold = lightest && label === String(lightest[COL.label] || '').trim();
         const tr = document.createElement('tr');
         if (isThreshold) {
           tr.classList.add('sf-tensDes__row--threshold');
-          tr.title = 'Threshold row: first section meeting required Ag';
+          tr.title = 'Threshold row: first section meeting Ag ≥ req. AND r ≥ L/300';
         }
         tr.innerHTML = `
           <td>${label}</td>
@@ -818,10 +918,22 @@
       const agYield = Number.isFinite(Treq) && Number.isFinite(Fy) && Fy > 0
         ? (isLRFD ? Treq / (0.9 * Fy) : (Treq * 1.67) / Fy)
         : null;
-      const aeFrac = Number.isFinite(Treq) && Number.isFinite(Fu) && Fu > 0
-        ? (isLRFD ? Treq / (0.75 * Fu) : (Treq * 2.0) / Fu)
-        : null;
-      const agFromFrac = Number.isFinite(aeFrac) && Number.isFinite(U) && U > 0 ? aeFrac / U : null;
+      /**
+       * Workbook TENSION sheet (column Q, design) — STRICT parity:
+       *   LRFD: Q25 = Tu / (0.75 · Fu · U)                            → Ae_req
+       *   LRFD: Q26 = Q25 / 0.85                                       → Ag_req (assumed Ae/Ag ≈ 0.85)
+       *   ASD : Q32 = (Ta · 2) / (Fu · r_min)  where r_min = L/300    → Ae_req  (matches workbook cell verbatim)
+       *   ASD : Q33 = Q32 / 0.85
+       *   Q27/Q34 = MAX(Ag_yield, Ag_frac)
+       */
+      const lengthInForAsd = parseNumLike(lEl?.value);
+      const rMinForAsd = Number.isFinite(lengthInForAsd) && lengthInForAsd > 0 ? lengthInForAsd / 300 : null;
+      const aeFrac = !Number.isFinite(Treq) || !Number.isFinite(Fu) || Fu <= 0
+        ? null
+        : (isLRFD
+          ? (Number.isFinite(U) && U > 0 ? Treq / (0.75 * Fu * U) : null)
+          : (Number.isFinite(rMinForAsd) && rMinForAsd > 0 ? (Treq * 2.0) / (Fu * rMinForAsd) : null));
+      const agFromFrac = Number.isFinite(aeFrac) ? aeFrac / 0.85 : null;
       const govAg = Number.isFinite(agYield) && Number.isFinite(agFromFrac) ? Math.max(agYield, agFromFrac)
         : Number.isFinite(agYield) ? agYield
         : Number.isFinite(agFromFrac) ? agFromFrac : null;
@@ -836,7 +948,10 @@
       const df = effectiveHoleDiameterInches(boltKind, nominalDia);
       if (dfEl) dfEl.textContent = fmt(df, 4);
 
-      renderTable(govAg);
+      // Slenderness ceiling: section r_min must exceed L/300 (workbook TENSION Q12).
+      const lengthIn = parseNumLike(lEl?.value);
+      const rMinReq = Number.isFinite(lengthIn) && lengthIn > 0 ? lengthIn / 300 : null;
+      renderTable(govAg, rMinReq);
     }
 
     function wire() {

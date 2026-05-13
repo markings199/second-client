@@ -394,13 +394,23 @@
       'fixed-free': 1.2,
     };
 
+    /**
+     * Compression-element slenderness limits — strict workbook parity (COMPRESSION!E29, E31):
+     *   Flange (unstiffened, rolled W): λr = 0.56 · √(E/Fy)
+     *   Web   (stiffened)             : λr = 1.49 · √(E/Fy)
+     * Workbook uses a binary λr-only check ("Compact Flange" / "Non-Compact Flange").
+     * We expose lp = lr so the dashboard's λp/λr widgets render the same single threshold
+     * (AISC E-chapter has no separate λp for compression elements).
+     */
     function compactLimits(Fy, Eksi = E_DEFAULT) {
       if (!Number.isFinite(Fy) || Fy <= 0) return null;
       const Euse = Number.isFinite(Eksi) && Eksi > 0 ? Eksi : E_DEFAULT;
       const root = Math.sqrt(Euse / Fy);
+      const lrF = 0.56 * root;
+      const lrW = 1.49 * root;
       return {
-        flange: { lp: 0.38 * root, lr: 1.0 * root },
-        web: { lp: 3.76 * root, lr: 5.7 * root },
+        flange: { lp: lrF, lr: lrF },
+        web: { lp: lrW, lr: lrW },
       };
     }
 
@@ -543,11 +553,11 @@
       const ry = parseNum(input('sfCompAnaRy')?.value);
 
       const lim = compactLimits(Fy, Euse);
-      const classify = (lam, { lp, lr }, kind) => {
+      // Strict workbook parity (COMPRESSION!G29, G31): binary "Compact" vs "Non-Compact" using λr only.
+      const classify = (lam, { lr }, kind) => {
         if (!Number.isFinite(lam)) return `${kind.toUpperCase()} —`;
-        if (lam <= lp) return `COMPACT ${kind.toUpperCase()}`;
-        if (lam <= lr) return `NONCOMPACT ${kind.toUpperCase()}`;
-        return `SLENDER ${kind.toUpperCase()}`;
+        if (lam < lr) return `COMPACT ${kind.toUpperCase()}`;
+        return `NON-COMPACT ${kind.toUpperCase()}`;
       };
 
       const lamFDash = pane.querySelector('#sfCompDashLamF');
@@ -1731,7 +1741,17 @@
       norm('sfShearAnaFu', 3, 0);
       norm('sfShearAnaAw', 4, 0);
       norm('sfShearAnaAs', 4, 0);
-      norm('sfShearAnaVu', 3, 0);
+      const vuEl = input('sfShearAnaVu');
+      if (vuEl) {
+        const vuStr = String(vuEl.value || '').trim();
+        const vuNum = parseNum(vuStr);
+        if (vuStr === '' || (Number.isFinite(vuNum) && vuNum === 0)) {
+          // Per client request: never display "0.000" in the demand box; leave it empty until typed.
+          if (vuStr !== '') vuEl.value = '';
+        } else if (Number.isFinite(vuNum) && vuNum > 0) {
+          vuEl.value = fmtNum(vuNum, 3);
+        }
+      }
     };
 
     const syncWebSpacingAndKv = () => {
@@ -2002,12 +2022,18 @@
     applySteelGradeProps();
     const E0 = input('sfShearAnaE');
     const kv0 = input('sfShearAnaKv');
+    const vu0 = input('sfShearAnaVu');
     if (E0 && String(E0.value).trim() === '') E0.value = '29000';
     if (kv0 && String(kv0.value).trim() === '') kv0.value = '5';
     if (E0) E0.readOnly = true;
     if (kv0) {
       kv0.readOnly = true;
       kv0.setAttribute('aria-label', 'Web shear coefficient k_v');
+    }
+    if (vu0) {
+      // Client request: shear-analysis demand starts empty (no "0.000" autofill).
+      const vu0Num = parseNum(vu0.value);
+      if (Number.isFinite(vu0Num) && vu0Num === 0) vu0.value = '';
     }
     setManualGeometryMode(!(shapeSel?.value));
     syncWebSpacingAndKv();
@@ -2195,6 +2221,31 @@
       setText('sfShearDesUltimateTitle', layout.ultimateTitle);
       setHtml('sfShearDesUltimateExpr', layout.ultimateExpr);
 
+      // Mirror the dynamic labels on the new LOAD WITH BEAM WEIGHT card.
+      setHtml('sfShearDesBwLoadTopLabel', layout.loadTopLabel);
+      setText('sfShearDesBwLoadTopUnit', layout.loadTopUnit);
+      setHtml('sfShearDesBwWuLabel', layout.wCombLabel);
+      setText('sfShearDesBwWuUnit', layout.wCombUnit);
+      setHtml('sfShearDesBwLoadBottomLabel', layout.loadBottomLabel);
+      setText('sfShearDesBwLoadBottomUnit', layout.loadBottomUnit);
+      setHtml('sfShearDesBwMomentLabel', layout.momentLabel);
+      setText('sfShearDesBwMomentUnit', layout.momentUnit);
+      setHtml('sfShearDesBwShearLabel', layout.shearLabel);
+      setText('sfShearDesBwShearUnit', layout.shearUnit);
+
+      // Mirror the dynamic CONDITION CHECKING ultimate-row labels with the design method.
+      setHtml('sfShearDesUltLabel', isLRFD ? 'ULTIMATE SHEAR STRENGTH' : 'ALLOWABLE SHEAR STRENGTH');
+      setHtml('sfShearDesUltExpr', layout.ultimateExpr);
+      // Top-right SHEAR CAPACITY card label/expr swap (ϕVn vs Vn/Ω).
+      setHtml(
+        'sfShearDesCapCapLabel',
+        isLRFD ? 'SHEAR CAPACITY' : 'ALLOWABLE SHEAR',
+      );
+      setHtml(
+        'sfShearDesCapCapExpr',
+        isLRFD ? 'ϕV<sub>n</sub> =' : 'V<sub>n</sub>/Ω =',
+      );
+
       const beamMomentLbl = pane.querySelector('#sfShearDesBeamMomentLabel');
       const beamDeflLbl = pane.querySelector('#sfShearDesBeamDeflLabel');
       const beamMomentFormula = pane.querySelector('#sfShearDesBeamMomentFormula');
@@ -2233,6 +2284,16 @@
           'sfShearDesOmega',
           'sfShearDesVn',
           'sfShearDesUltimateVal',
+          // New SHEAR CAPACITY card (top-right):
+          'sfShearDesCapCv',
+          'sfShearDesCapVn',
+          'sfShearDesCapPhiVn',
+          // New LOAD WITH BEAM WEIGHT:
+          'sfShearDesBwWult',
+          'sfShearDesBwWu',
+          'sfShearDesBwW14',
+          'sfShearDesBwMu',
+          'sfShearDesBwVu',
         ].forEach((id) => setText(id, '—'));
         setText('sfShearDesSectionName', '—');
         setText('sfShearDesLightest', '—');
@@ -2316,6 +2377,35 @@
       setText('sfShearDesVu', fmtNum(V, 3));
       setText('sfShearDesZx', fmtNum(zxReq, 4));
 
+      // ---- LOAD WITH BEAM WEIGHT (uses assumedShape.weight in lbs/ft → klf) ----
+      // If the AISC catalog provides the section's self-weight (lbs/ft), add it
+      // to DL and recompute the combined load + moment + shear. If unknown, fall
+      // back to the same numbers as LOAD W/O to keep the card visually consistent.
+      const beamWeightKlf =
+        assumedShape && Number.isFinite(assumedShape.weight)
+          ? assumedShape.weight / 1000
+          : 0;
+      const dlWithBw = dl + beamWeightKlf;
+      let wTopBw;
+      let w14Bw;
+      let wCombBw;
+      if (isLRFD) {
+        wTopBw = 1.2 * dlWithBw + 1.6 * ll;
+        w14Bw = 1.4 * dlWithBw;
+        wCombBw = Math.max(wTopBw, w14Bw);
+      } else {
+        wTopBw = dlWithBw + ll;
+        w14Bw = null;
+        wCombBw = dlWithBw + ll;
+      }
+      const Mbw = wCombBw * L ** 2 * momentFac;
+      const Vbw = wCombBw * L * shearFac;
+      setText('sfShearDesBwWult', fmtNum(wTopBw, 2));
+      setText('sfShearDesBwWu', fmtNum(wCombBw, 2));
+      setText('sfShearDesBwW14', w14Bw == null ? '—' : fmtNum(w14Bw, 2));
+      setText('sfShearDesBwMu', fmtNum(Mbw, 3));
+      setText('sfShearDesBwVu', fmtNum(Vbw, 3));
+
       setText('sfShearDesPlasticMod', assumedShape?.zx == null ? '—' : fmtNum(assumedShape.zx, 2));
       setText('sfShearDesTw', assumedShape?.tw == null ? '—' : fmtNum(assumedShape.tw, 3));
       setText('sfShearDesDepth', assumedShape?.d == null ? '—' : fmtNum(assumedShape.d, 2));
@@ -2334,6 +2424,18 @@
         shearCondShapeResult?.omegaV != null ? fmtNum(shearCondShapeResult.omegaV, 2) : '—',
       );
       setText('sfShearDesVn', fmtNum(Vn, 2));
+
+      // ---- SHEAR CAPACITY card (top-right) ----
+      // Title shows Cv (rounded), then Vn and the design capacity (ϕVn for LRFD
+      // / Vn/Ω for ASD). Remarks pill shares the same id as before so the SAFE
+      // / UNSAFE logic below still drives it.
+      setText('sfShearDesCapCv', Number.isFinite(cv) ? fmtNum(cv, 3) : '—');
+      setText('sfShearDesCapVn', Number.isFinite(Vn) ? fmtNum(Vn, 3) : '—');
+      const designShearCap = isLRFD ? phiVn : Vallow;
+      setText(
+        'sfShearDesCapPhiVn',
+        Number.isFinite(designShearCap) ? fmtNum(designShearCap, 3) : '—',
+      );
 
       let isSafe;
       if (isLRFD) {

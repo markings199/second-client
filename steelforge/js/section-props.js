@@ -139,10 +139,16 @@
       return catalog.filter((row) => allow.has(String(row[COL.type] || '').trim()));
     }
 
+    /** Normalize free-text query: uppercase + strip whitespace/separators (so "w 21 x 44" === "W21X44"). */
+    function normalizeQuery(s) {
+      return String(s || '').toUpperCase().replace(/[\s\-_.·]/g, '');
+    }
+
     function rowByLabel(label) {
-      const t = String(label || '').trim().toUpperCase();
+      const t = normalizeQuery(label);
+      if (!t) return null;
       const pool = filteredCatalog();
-      return pool.find((r) => String(r[COL.aiscLabel] || '').trim().toUpperCase() === t) || null;
+      return pool.find((r) => normalizeQuery(r[COL.aiscLabel]) === t) || null;
     }
 
     function getDisplayValueFromCols(row, cols) {
@@ -184,27 +190,23 @@
       if (lab) searchEl.value = lab;
     }
 
-    function defaultRow() {
-      const pool = filteredCatalog();
-      if (shapeFamily === 'w') {
-        // Match UI reference default when available.
-        const preferred = pool.find(
-          (r) => String(r[COL.aiscLabel] || '').trim().toUpperCase() === 'W44X335',
-        );
-        if (preferred) return preferred;
-      }
-      const wFirst = pool.find((r) => String(r[COL.type] || '').trim() === 'W');
-      return wFirst || pool[0] || null;
+    /** Clear all value pills + search input so user must pick from the dropdown. */
+    function clearFields() {
+      rows.forEach((r) => {
+        const inp = r.querySelector('.sf-secprops__val');
+        if (inp) inp.value = '';
+      });
+      searchEl.value = '';
     }
 
     function renderSuggest(q) {
-      const query = String(q || '').trim().toUpperCase();
+      const query = normalizeQuery(q);
       const pool = filteredCatalog();
       const matches = !query
-        ? pool.slice(0, 25)
+        ? pool.slice(0, 30)
         : pool
-            .filter((r) => String(r[COL.aiscLabel] || '').toUpperCase().includes(query))
-            .slice(0, 25);
+            .filter((r) => normalizeQuery(r[COL.aiscLabel]).includes(query))
+            .slice(0, 50);
 
       suggestEl.innerHTML = '';
       if (matches.length === 0) {
@@ -238,6 +240,9 @@
     searchEl.addEventListener('focus', () => {
       renderSuggest(searchEl.value);
     });
+    searchEl.addEventListener('click', () => {
+      renderSuggest(searchEl.value);
+    });
 
     searchEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -248,8 +253,8 @@
           setSuggestOpen(false);
         } else {
           const pool = filteredCatalog();
-          const q = String(searchEl.value || '').trim().toUpperCase();
-          const first = pool.find((r) => String(r[COL.aiscLabel] || '').toUpperCase().includes(q));
+          const q = normalizeQuery(searchEl.value);
+          const first = q ? pool.find((r) => normalizeQuery(r[COL.aiscLabel]).includes(q)) : null;
           if (first) {
             applyRow(first);
             setSuggestOpen(false);
@@ -271,17 +276,8 @@
       shapeFamily = fam;
       shapes.forEach((s) => s.classList.toggle('sf-secprops__shape--active', s === el));
       applyFieldLayoutForFamily(shapeFamily);
-      const row = defaultRow();
-      if (row) applyRow(row);
-      else {
-        rows.forEach((r) => {
-          const inp = r.querySelector('.sf-secprops__val');
-          if (!inp) return;
-          inp.value = '';
-        });
-        searchEl.value = '';
-      }
-      renderSuggest(searchEl.value);
+      clearFields();
+      setSuggestOpen(false);
     }
 
     shapes.forEach((el) => {
@@ -317,17 +313,13 @@
         if (catalog.length === 0) throw new Error('empty');
 
         applyFieldLayoutForFamily(shapeFamily);
-        applyRow(defaultRow() || catalog[0]);
+        clearFields();
+        searchEl.placeholder = 'Search section (e.g. W21X44)';
         setSuggestOpen(false);
       })
       .catch(() => {
         loadError = 'Could not load section catalog.';
-        rows.forEach((r) => {
-          const inp = r.querySelector('.sf-secprops__val');
-          if (!inp) return;
-          inp.value = '';
-        });
-        searchEl.value = '';
+        clearFields();
         searchEl.placeholder = loadError;
         setSuggestOpen(false);
       });

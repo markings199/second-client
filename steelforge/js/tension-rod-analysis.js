@@ -6,6 +6,48 @@
   const OMEGA_Y = 1.67;
   const OMEGA_F = 2.0;
 
+  /**
+   * Standard threaded rod diameters per workbook (in inches).
+   * Order matters: must be ascending so we can snap UP to the next available size.
+   * Display label uses the workbook glyphs (3/4, 7/8, 1¼, etc.).
+   */
+  const STANDARD_ROD_SIZES = [
+    { label: '3/4', value: 0.75 },
+    { label: '7/8', value: 0.875 },
+    { label: '1', value: 1.0 },
+    { label: '1¼', value: 1.25 },
+    { label: '1½', value: 1.5 },
+    { label: '1¾', value: 1.75 },
+    { label: '2', value: 2.0 },
+    { label: '2½', value: 2.5 },
+  ];
+
+  /** Snap a required diameter (in.) UP to the next standard rod size. */
+  function snapUpToStandardRod(dReq) {
+    if (!Number.isFinite(dReq) || dReq <= 0) return null;
+    for (const s of STANDARD_ROD_SIZES) {
+      if (s.value + 1e-9 >= dReq) return s;
+    }
+    return STANDARD_ROD_SIZES[STANDARD_ROD_SIZES.length - 1];
+  }
+
+  /**
+   * Workbook formula for rod design (threaded rod, tensile fracture governs the bar diameter):
+   *   LRFD: φ Tn = 0.75 × Fu × (0.75 × Ab)  →  required Ab = Tu / (0.75² × Fu)
+   *   ASD : Tn/Ω = (0.75 × Fu × Ab) / 2     →  required Ab = (2 × Ta) / (0.75 × Fu)
+   * Then d = √(4 Ab / π).
+   */
+  function requiredRodDiameter(demandKips, FuKsi, method) {
+    if (!Number.isFinite(demandKips) || demandKips <= 0) return null;
+    if (!Number.isFinite(FuKsi) || FuKsi <= 0) return null;
+    const isLRFD = String(method || 'lrfd').toLowerCase() === 'lrfd';
+    const Ab = isLRFD
+      ? demandKips / (0.75 * 0.75 * FuKsi)
+      : (2 * demandKips) / (0.75 * FuKsi);
+    if (!Number.isFinite(Ab) || Ab <= 0) return null;
+    return Math.sqrt((4 * Ab) / Math.PI);
+  }
+
   let rodCatalogPromise = null;
 
   function parseCsvLine(line) {
@@ -430,6 +472,8 @@
     const outFrac = $('sfRodDesFrac');
     const outCapLbl = $('sfRodDesCapLbl');
     const outCapGov = $('sfRodDesCapGov');
+    const outDreq = $('sfRodDesDreq');
+    const outDuse = $('sfRodDesDuse');
     const verdictEl = $('sfRodDesVerdict');
     const solveBtn = $('sfRodDesSolve');
 
@@ -519,6 +563,11 @@
       const Fy = parseNumLike(fyEl?.value);
       const Fu = parseNumLike(fuEl?.value);
       const kOk = Number.isFinite(k) && k >= 0 && k <= 1;
+
+      const dReqFromFormula = requiredRodDiameter(demand, Fu, method);
+      const standardRod = snapUpToStandardRod(dReqFromFormula);
+      if (outDreq) outDreq.textContent = fmt(dReqFromFormula, 4);
+      if (outDuse) outDuse.textContent = standardRod ? standardRod.label : '—';
 
       const picked = kOk && catalogRows.length
         ? pickLightestRod(catalogRows, demand, k, Fy, Fu, method)

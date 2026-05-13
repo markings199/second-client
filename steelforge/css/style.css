@@ -767,7 +767,8 @@ body::before {
 
 /* Manual height hooks for the 3 inner boxes */
 .sf-grade__panel--table {
-  height: var(--sf-grade-left-h);
+  /* Tall enough to fit ~27 ASTM rows + header before scrolling. */
+  height: var(--sf-grade-left-h-tall, 580px);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -1090,7 +1091,7 @@ body::before {
 }
 
 .sf-grade__info {
-  height: var(--sf-grade-right-bottom-h);
+  min-height: var(--sf-grade-right-bottom-h);
   transform: translate(var(--sf-grade-right-bottom-box-x), var(--sf-grade-right-bottom-box-y));
   background: rgba(255,255,255,0.92);
   border-radius: 12px;
@@ -1101,7 +1102,7 @@ body::before {
   gap: 12px;
   padding: 14px 14px;
   align-items: start;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .sf-grade__infoIcon {
@@ -1129,8 +1130,8 @@ body::before {
   color: rgba(62, 55, 49, 0.70);
   font-weight: 400;
   text-align: left;
-  max-height: 112px;
-  overflow: auto;
+  max-height: none;
+  overflow: visible;
   padding-right: 4px;
 }
 
@@ -1148,8 +1149,8 @@ body::before {
   }
   .sf-grade__panel--table {
     height: auto;
-    min-height: min(420px, 58vh);
-    max-height: 58vh;
+    min-height: min(580px, 70vh);
+    max-height: 75vh;
   }
   .sf-grade__panel--select {
     height: auto;
@@ -11389,3 +11390,4 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
 .sf-comp.sf-comp--bending .sf-comp__mode * {
   font-family: 'Inter', sans-serif;
 }
+

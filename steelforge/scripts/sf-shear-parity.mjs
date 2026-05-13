@@ -266,6 +266,77 @@ try {
   add('Catalog shape CSV readable', false, String(e?.message || e));
 }
 
+/**
+ * Workbook SHEAR ANALYSIS — actual sample.
+ * Section W24X62, Steel Grade "50" (Fy=50), web UNSTIFFENED, h=21.52, λf=5.97, λw=50.1,
+ * Aw=10.191, kv=5, E=29000.
+ * Cached values: λp=53.9463, λr_lower=59.2368, λr_upper=73.7768,
+ *   λw=50.1 < λp → Cond 1 → Cv=1, φv=1, Ωv=1.5
+ *   Vn = 0.6·50·10.191 = 305.73 ; φVn = 305.73 ; Va = Vn/1.5 = 203.82
+ */
+const wbAna = (() => {
+  const Fy = 50, lamWv = 50.1, Awv = 10.191, kvv = 5;
+  const lp = 2.24 * Math.sqrt(E / Fy);
+  const lr1 = 1.10 * Math.sqrt((kvv * E) / Fy);
+  const lr2 = 1.37 * Math.sqrt((kvv * E) / Fy);
+  const Cv = calcShearCv(lamWv, lr1, lr2, Fy, E, kvv);
+  const VnA = 0.6 * Fy * Awv * Cv;
+  return { lp, lr1, lr2, Cv, VnA, phiVn: 1 * VnA, Va: VnA / 1.5 };
+})();
+add('Workbook SHEAR ANALYSIS λp (53.9463)', nearly(wbAna.lp, 53.94634371, 1e-5), `got ${wbAna.lp}`);
+add('Workbook SHEAR ANALYSIS λr_lower (59.2368)', nearly(wbAna.lr1, 59.23681288, 1e-5));
+add('Workbook SHEAR ANALYSIS λr_upper (73.7768)', nearly(wbAna.lr2, 73.77675786, 1e-5));
+add('Workbook SHEAR ANALYSIS Cv = 1 (Cond 1)', wbAna.Cv === 1);
+add('Workbook SHEAR ANALYSIS Vn = 305.73', nearly(wbAna.VnA, 305.73, 0.01), `got ${wbAna.VnA}`);
+add('Workbook SHEAR ANALYSIS φVn = 305.73', nearly(wbAna.phiVn, 305.73, 0.01));
+add('Workbook SHEAR ANALYSIS Va = 203.82', nearly(wbAna.Va, 203.82, 0.01), `got ${wbAna.Va}`);
+
+/**
+ * Workbook SHEAR DESIGN — actual sample.
+ * Steel "A36" (Fy=36), DL=2, LL=18, L=7 ft, SIMPLE BEAM UDL.
+ * Cached: Wu=31.2, Wu_alt=2.8, Mu=191.1, Vu=109.2, Wa=20, Ma=122.5, Va=70.
+ * Zx_req_LRFD = 191.1·12/(36·0.9) = 70.778 ; Zx_req_ASD = 122.5·12·1.67/36 = 68.192.
+ * Assumed section W16X40 (Zx=73, d=16, tw=0.305): Vn = 0.6·36·16·0.305·1 = 105.408,
+ *   φVn = 105.408 (φ=1 because λw=46.5 < λp=63.576 at Fy=36), Va = Vn/1.5 = 70.272.
+ * Check: φVn (105.408) < Vu (109.2) → UNSAFE, Va (70.272) > Vu_ASD (70) → SAFE.
+ */
+const wbDes = (() => {
+  const Fy = 36, DL = 2, LL = 18, Ld = 7;
+  const Wu_lrfd = Math.max(1.2 * DL + 1.6 * LL, 1.4 * DL);
+  const Wa_asd = DL + LL;
+  const Mu = (Wu_lrfd * Ld * Ld) / 8;
+  const Vu = (Wu_lrfd * Ld) / 2;
+  const Ma = (Wa_asd * Ld * Ld) / 8;
+  const Va_demand = (Wa_asd * Ld) / 2;
+  const Zx_req_L = (Mu * 12) / (Fy * 0.9);
+  const Zx_req_A = (Ma * 12 * 1.67) / Fy;
+  // W16X40 section
+  const d = 16, tw = 0.305, lamW = 46.5;
+  const lp = 2.24 * Math.sqrt(E / Fy);
+  const lr1 = 1.10 * Math.sqrt((5 * E) / Fy);
+  const lr2 = 1.37 * Math.sqrt((5 * E) / Fy);
+  const Cv = calcShearCv(lamW, lr1, lr2, Fy, E, 5);
+  const phiV = lamW < lp ? 1 : 0.9;
+  const omegaV = lamW < lp ? 1.5 : 1.67;
+  const Vn = 0.6 * Fy * d * tw * Cv;
+  return {
+    Wu_lrfd, Wa_asd, Mu, Vu, Ma, Va_demand, Zx_req_L, Zx_req_A,
+    lp, lr1, lr2, Cv, phiV, omegaV,
+    Vn, phiVn: phiV * Vn, Va: Vn / omegaV,
+    safeLRFD: phiV * Vn > Vu,
+    safeASD: Vn / omegaV > Va_demand,
+  };
+})();
+add('Workbook SHEAR DESIGN Wu LRFD = 31.2', nearly(wbDes.Wu_lrfd, 31.2, 1e-9));
+add('Workbook SHEAR DESIGN Mu = 191.1', nearly(wbDes.Mu, 191.1, 0.01), `got ${wbDes.Mu}`);
+add('Workbook SHEAR DESIGN Vu = 109.2', nearly(wbDes.Vu, 109.2, 0.01));
+add('Workbook SHEAR DESIGN Zx_req LRFD ≈ 70.778', nearly(wbDes.Zx_req_L, 70.7778, 0.01), `got ${wbDes.Zx_req_L}`);
+add('Workbook SHEAR DESIGN Zx_req ASD ≈ 68.192', nearly(wbDes.Zx_req_A, 68.1917, 0.01), `got ${wbDes.Zx_req_A}`);
+add('Workbook SHEAR DESIGN W16X40 Cv = 1', wbDes.Cv === 1);
+add('Workbook SHEAR DESIGN W16X40 Vn = 105.408', nearly(wbDes.Vn, 105.408, 0.01), `got ${wbDes.Vn}`);
+add('Workbook SHEAR DESIGN W16X40 LRFD UNSAFE (φVn < Vu)', wbDes.safeLRFD === false);
+add('Workbook SHEAR DESIGN W16X40 ASD SAFE (Va > Vu_ASD)', wbDes.safeASD === true);
+
 const passed = checks.filter((c) => c.ok).length;
 const total = checks.length;
 console.log(`Shear workbook parity: ${passed}/${total} (${((100 * passed) / total).toFixed(1)}%)`);

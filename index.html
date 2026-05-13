@@ -3,11 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <title>Steel Analysis &amp; Design Calculator</title>
-  <meta http-equiv="refresh" content="0; url=steelforge/index.html" />
+  <script>
+    (function () {
+      var target = 'steelforge/index.html' + (window.location.search || '') + (window.location.hash || '');
+      window.location.replace(target);
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=steelforge/index.html" />
+  </noscript>
   <link rel="canonical" href="steelforge/index.html" />
-  <script>location.replace('steelforge/index.html');</script>
 </head>
 <body>
-  <p>Loading Steel Analysis &amp; Design Calculator… If nothing happens, open <a href="steelforge/index.html">steelforge/index.html</a>.</p>
+  <p>Loading Steel Analysis &amp; Design Calculator… If nothing happens, open
+    <a href="steelforge/index.html">steelforge/index.html</a>.
+  </p>
 </body>
 </html>

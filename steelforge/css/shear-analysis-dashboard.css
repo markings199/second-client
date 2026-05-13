@@ -402,10 +402,12 @@
 /* Figure + stacked value pills (reference: formula column + light-blue chips) */
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual {
   display: grid;
-  grid-template-columns: minmax(160px, 1fr) minmax(112px, max-content);
+  /* Hug each column's content so the pair sits as one centered block. */
+  grid-template-columns: auto auto;
   grid-template-rows: repeat(3, minmax(32px, auto));
-  gap: 6px 12px;
+  gap: 6px 18px;
   align-items: center;
+  justify-content: center;
   padding: 10px 12px;
   /* Match DESIGN SHEAR `.sf-shearDes__steelBox` inner tone */
   background: rgba(248, 244, 234, 0.94);
@@ -424,27 +426,27 @@
   max-height: 140px;
   height: auto;
   object-fit: contain;
-  object-position: left center;
+  object-position: center center;
   align-self: center;
-  justify-self: start;
+  justify-self: center;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual #sfShearAnaBar1 {
   grid-column: 2;
   grid-row: 1;
-  justify-self: end;
+  justify-self: center;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual #sfShearAnaBar2 {
   grid-column: 2;
   grid-row: 2;
-  justify-self: end;
+  justify-self: center;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaVisual #sfShearAnaBar3 {
   grid-column: 2;
   grid-row: 3;
-  justify-self: end;
+  justify-self: center;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"] .sf-shearDash__formulaBar {

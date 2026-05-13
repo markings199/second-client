@@ -40,7 +40,27 @@
               </tr>
               <tr>
                 <th>AISC MANUAL SELECTION</th>
-                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaAisc" type="text" autocomplete="off" placeholder="e.g. L4X4X1/2" /></td>
+                <td>
+                  <div class="sf-tenAna__searchWrap" aria-label="Search AISC section">
+                    <input
+                      class="sf-tensionAnalysisLayout__inp sf-tenAna__searchInp"
+                      id="sfTenAnaAisc"
+                      type="text"
+                      autocomplete="off"
+                      placeholder="e.g. L4X4X1/2"
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                    />
+                    <button
+                      type="button"
+                      class="sf-tenAna__searchToggle"
+                      id="sfTenAnaAiscToggle"
+                      aria-label="Show AISC section list"
+                      tabindex="-1"
+                    >▾</button>
+                    <ul class="sf-tenAna__suggest" id="sfTenAnaAiscSuggest" role="listbox" hidden></ul>
+                  </div>
+                </td>
               </tr>
               <tr>
                 <th>t</th>
@@ -88,22 +108,30 @@
             </div>
 
             <div class="subsection">
-              <div class="subheading">SHEAR LAG FACTOR (U)</div>
+              <div class="subheading">SHEAR LAG FACTOR</div>
               <table>
                 <tr>
-                  <th>CASE 1</th>
-                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaCase1" inputmode="decimal" autocomplete="off" /></td>
+                  <th>CASE</th>
+                  <td>
+                    <select
+                      class="sf-tensionAnalysisLayout__sel"
+                      id="sfTenAnaShearLag"
+                      aria-label="Shear lag case selector"
+                      title="Pick the AISC D3 shear-lag case. Choosing a case auto-fills U from the workbook table (S(ASTM))."
+                    >
+                      <option value="">— select case —</option>
+                      <option value="CASE 1">CASE 1 — direct to fasteners (U = 1.00)</option>
+                      <option value="CASE 2">CASE 2 — some to fasteners (U = 0.75)</option>
+                      <option value="CASE 3">CASE 3 — transverse welds (U = 1.00)</option>
+                      <option value="CASE 4">CASE 4 — longitudinal welds (U = 0.5625)</option>
+                      <option value="CASE 7b">CASE 7b — W / H / S / HP web ≥ 4 (U = 0.70)</option>
+                      <option value="CASE 8a" selected>CASE 8a — L / 2L (≥ 4 bolts, U = 0.80)</option>
+                      <option value="CASE 8b">CASE 8b — L / 2L (&lt; 3 bolts, U = 0.60)</option>
+                    </select>
+                  </td>
                 </tr>
                 <tr>
-                  <th title="U₂ = max(0.6, 1 − x̄/L) from length and x̄ when not edited; override by typing.">CASE 2</th>
-                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaCase2" inputmode="decimal" autocomplete="off" /></td>
-                </tr>
-                <tr>
-                  <th title="U₈ = 0.80 if n ≥ 4 bolts, else 0.60 (L / 2L Case 8a / 8b); override by typing.">CASE 8</th>
-                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaCase8" inputmode="decimal" autocomplete="off" /></td>
-                </tr>
-                <tr>
-                  <th>GOVERNING U</th>
+                  <th>U</th>
                   <td><span class="sf-tensionAnalysisLayout__pillYellow sf-tensionAnalysisLayout__out" id="sfTenAnaUgovern"></span></td>
                 </tr>
               </table>
@@ -113,8 +141,10 @@
               <div class="subheading">BOLT SPECIFICATIONS</div>
               <table>
                 <tr>
-                  <th>NUMBER OF BOLTS</th>
-                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaNBolts" inputmode="numeric" autocomplete="off" /></td>
+                  <th
+                    title="Number of bolt holes the assumed transverse (non-staggered) failure path crosses. Typically 1 for an angle with one gage line, 2 for two gage lines, etc."
+                  >HOLES ACROSS SECTION</th>
+                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaNBolts" inputmode="numeric" autocomplete="off" placeholder="1" /></td>
                 </tr>
                 <tr>
                   <th>GIVEN DIAMETER</th>
@@ -187,7 +217,10 @@
 
               <div class="subsection-block">
                 <div class="subheading">STAGGERED (s, g)</div>
-                <table class="stagger-mini">
+                <table
+                  class="stagger-mini"
+                  title="For each row, enter both s and g (g > 0). SUM updates with Σ(s²/4g); NET AREA (STAGGERED) uses that SUM with gross area and hole area."
+                >
                   <tr>
                     <th></th>
                     <th>s</th>

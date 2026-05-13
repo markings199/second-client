@@ -221,13 +221,15 @@
   }
 
   /**
-   * Flange local buckling (AISC-style limits used with student workbook):
-   * λ_pf = 0.38√(E/Fy), λ_rf = 1.0√(E/Fy).
-   * Compact: M_n = M_p = F_y Z_x / 12.
-   * Non-compact: M_n = M_p − (M_p − 0.7 F_y S_x / 12)((λ_f − λ_pf)/(λ_rf − λ_pf)).
-   * Slender flange (simplified): M_n = 0.7 F_y S_x / 12.
+   * Flange local buckling — strict parity with workbook BENDING!F22:
+   *   λ_pf = 0.38√(E/Fy), λ_rf = 1.0√(E/Fy).
+   *   COMPACT:        M_n = M_p = F_y Z_x / 12.
+   *   NON-COMPACT:    M_n = M_p − (M_p − 0.7 F_y S_x / 12)·(λ_f − λ_pf)/(λ_rf − λ_pf).
+   *   SLENDER FLANGE: M_n = 0.9 · E · S_x · (4/λ_w) / λ_f²   ·1/12
+   *                   (workbook elastic flange-local-buckling form using h/tw directly).
+   * The slender branch needs λ_w (web slenderness h/tw); when unavailable, returns null.
    */
-  function nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF) {
+  function nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF, lamW) {
     if (![Fy, E, Zx, Sx, lamF].every((x) => Number.isFinite(x) && x > 0)) return null;
     const Mp = (Fy * Zx) / 12;
     const My = (Fy * Sx) / 12;
@@ -238,6 +240,10 @@
       const den = lrF - lpF;
       if (!(den > 0)) return Mp;
       return Mp - (Mp - 0.7 * My) * ((lamF - lpF) / den);
+    }
+    // Slender flange (workbook strict form). Falls back to 0.7·My if λ_w not provided.
+    if (Number.isFinite(lamW) && lamW > 0) {
+      return (0.9 * E * Sx * (4 / lamW)) / (lamF * lamF * 12);
     }
     return 0.7 * My;
   }
@@ -261,12 +267,14 @@
     return 0.7 * My;
   }
 
-  /** Governing nominal flexural strength M_n = min(M_n,flange, M_n,web) in kip·ft. */
+  /**
+   * Governing nominal flexural strength — strict workbook parity.
+   * Workbook classifies on flange only (BENDING!D21 uses λ_f). Web slenderness λ_w is
+   * only used inside the slender-flange branch (4/λ_w term). We keep `nominalMomentWebKipFt`
+   * available for diagnostic UI but it is NOT used to govern M_n.
+   */
   function nominalMomentKipFt(Fy, E, Zx, Sx, lamF, lamW) {
-    const mnF = nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF);
-    const mnW = nominalMomentWebKipFt(Fy, E, Zx, Sx, lamW);
-    if (mnF == null || mnW == null) return null;
-    return Math.min(mnF, mnW);
+    return nominalMomentFlangeKipFt(Fy, E, Zx, Sx, lamF, lamW);
   }
 
   /** UI verdict for CHECK COMPACTNESS card — flange slenderness only (matches λ_pf / λ_rf labels). */
