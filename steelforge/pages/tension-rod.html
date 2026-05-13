@@ -37,10 +37,6 @@
                   <td><input type="text" id="sfRodDesFu" inputmode="decimal" autocomplete="off" aria-label="Fu" /> ksi</td>
                 </tr>
                 <tr>
-                  <th>k (A<sub>e</sub> = k A<sub>g</sub>)</th>
-                  <td><input type="text" id="sfRodDesK" inputmode="decimal" autocomplete="off" value="0.75" aria-label="Effective area factor k" /></td>
-                </tr>
-                <tr>
                   <th>DL</th>
                   <td><input type="text" id="sfRodDesDl" inputmode="decimal" autocomplete="off" aria-label="Dead load" /> kips</td>
                 </tr>
@@ -54,46 +50,10 @@
         </section>
 
         <section class="panel panel-center">
-          <div class="card">
-            <div class="card-title">LIGHTEST ADEQUATE SECTION</div>
-            <table>
-              <tbody>
-                <tr>
-                  <th>LABEL</th>
-                  <td><span class="value-pill blue" id="sfRodDesSection">—</span></td>
-                </tr>
-                <tr>
-                  <th>d (SOLID, EQUIV.)</th>
-                  <td><span id="sfRodDesD">—</span> in</td>
-                </tr>
-                <tr>
-                  <th>A<sub>g</sub></th>
-                  <td><span id="sfRodDesAg">—</span> in²</td>
-                </tr>
-                <tr>
-                  <th>A<sub>e</sub></th>
-                  <td><span id="sfRodDesAe">—</span> in²</td>
-                </tr>
-                <tr>
-                  <th>TENSILE YIELDING</th>
-                  <td><span id="sfRodDesYield">—</span> kips</td>
-                </tr>
-                <tr>
-                  <th>TENSILE RUPTURE</th>
-                  <td><span id="sfRodDesFrac">—</span> kips</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
           <div class="card highlight-card">
             <div class="card-title">CAPACITY SUMMARY</div>
             <table>
               <tbody>
-                <tr>
-                  <th id="sfRodDesCapLbl">GOVERNING CAPACITY</th>
-                  <td><span class="result-pill orange" id="sfRodDesCapGov">—</span> kips</td>
-                </tr>
                 <tr>
                   <th>REQUIRED d (FROM FORMULA)</th>
                   <td><span id="sfRodDesDreq">—</span> in</td>
@@ -115,15 +75,15 @@
               <tbody>
                 <tr>
                   <th>1.2DL + 1.6LL</th>
-                  <td><span class="result-pill blue" id="sfRodDesOut1216">—</span> kips</td>
+                  <td><span class="result-pill sf-rod__demPill sf-rod__dem1216" id="sfRodDesOut1216">—</span> kips</td>
                 </tr>
                 <tr>
                   <th>1.4DL</th>
-                  <td><span class="result-pill yellow" id="sfRodDesOut14">—</span> kips</td>
+                  <td><span class="result-pill sf-rod__demPill sf-rod__dem14" id="sfRodDesOut14">—</span> kips</td>
                 </tr>
                 <tr>
                   <th>DL + LL</th>
-                  <td><span class="result-pill gray" id="sfRodDesOutDlLl">—</span> kips</td>
+                  <td><span class="result-pill sf-rod__demPill sf-rod__demDlll" id="sfRodDesOutDlLl">—</span> kips</td>
                 </tr>
                 <tr>
                   <th id="sfRodDesGovLbl">GOVERNING DEMAND</th>

@@ -412,6 +412,29 @@
   color: #334155 !important;
 }
 
+/* TENSILE DEMAND: LRFD highlights factored pair; ASD highlights service DL+LL */
+.sf-comp--tensionRod.sf-rod--lrfd .tr-rod-shell .tensile-card .sf-rod__dem1216,
+.sf-comp--tensionRod.sf-rod--lrfd .tr-rod-shell .tensile-card .sf-rod__dem14 {
+  background: #facc15 !important;
+  color: #1f2937 !important;
+}
+
+.sf-comp--tensionRod.sf-rod--lrfd .tr-rod-shell .tensile-card .sf-rod__demDlll {
+  background: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+.sf-comp--tensionRod.sf-rod--asd .tr-rod-shell .tensile-card .sf-rod__demDlll {
+  background: #facc15 !important;
+  color: #1f2937 !important;
+}
+
+.sf-comp--tensionRod.sf-rod--asd .tr-rod-shell .tensile-card .sf-rod__dem1216,
+.sf-comp--tensionRod.sf-rod--asd .tr-rod-shell .tensile-card .sf-rod__dem14 {
+  background: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
 .sf-comp--tensionRod .tr-rod-shell .photos-card {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;

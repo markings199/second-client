@@ -6,6 +6,9 @@
   const OMEGA_Y = 1.67;
   const OMEGA_F = 2.0;
 
+  /** Workbook A<sub>e</sub> = k A<sub>g</sub> with k = 0.75 (design page omits k input). */
+  const ROD_K_EFFECTIVE = 0.75;
+
   /**
    * Standard threaded rod diameters per workbook (in inches).
    * Order matters: must be ascending so we can snap UP to the next available size.
@@ -453,7 +456,6 @@
 
     const $ = (id) => pane.querySelector(`#${id}`);
     const methodEl = $('sfRodDesMethod');
-    const kEl = $('sfRodDesK');
     const steelEl = $('sfRodDesSteel');
     const fyEl = $('sfRodDesFy');
     const fuEl = $('sfRodDesFu');
@@ -464,30 +466,14 @@
     const outDlLl = $('sfRodDesOutDlLl');
     const outGovLbl = $('sfRodDesGovLbl');
     const outTGov = $('sfRodDesTGov');
-    const outSection = $('sfRodDesSection');
-    const outD = $('sfRodDesD');
-    const outAg = $('sfRodDesAg');
-    const outAe = $('sfRodDesAe');
-    const outYield = $('sfRodDesYield');
-    const outFrac = $('sfRodDesFrac');
-    const outCapLbl = $('sfRodDesCapLbl');
-    const outCapGov = $('sfRodDesCapGov');
     const outDreq = $('sfRodDesDreq');
     const outDuse = $('sfRodDesDuse');
     const verdictEl = $('sfRodDesVerdict');
     const solveBtn = $('sfRodDesSolve');
 
-    if (!methodEl || !kEl || !steelEl || !fyEl || !fuEl) return;
-
-    let catalogRows = [];
+    if (!methodEl || !steelEl || !fyEl || !fuEl) return;
 
     function normalizeInputs() {
-      const k = parseNumLike(kEl?.value);
-      if (kEl && Number.isFinite(k)) {
-        const kc = Math.max(0, Math.min(1, k));
-        kEl.value = fmt(kc, 4);
-      }
-
       const dl = parseNumLike(dlEl?.value);
       if (dlEl && Number.isFinite(dl)) dlEl.value = dl < 0 ? '0' : fmt(dl, 3);
 
@@ -541,9 +527,6 @@
         if (outGovLbl) {
           outGovLbl.innerHTML = 'GOVERNING <span class="sf-tbRef__mono">T<sub>u</sub></span> =';
         }
-        if (outCapLbl) {
-          outCapLbl.innerHTML = 'GOVERNING CAPACITY <span class="sf-tbRef__mono">φT<sub>n</sub></span> =';
-        }
         demand =
           Number.isFinite(u1216) && Number.isFinite(u14) ? Math.max(u1216, u14) :
           Number.isFinite(u1216) ? u1216 :
@@ -552,73 +535,43 @@
         if (outGovLbl) {
           outGovLbl.innerHTML = 'GOVERNING <span class="sf-tbRef__mono">T<sub>a</sub></span> =';
         }
-        if (outCapLbl) {
-          outCapLbl.innerHTML = 'GOVERNING CAPACITY <span class="sf-tbRef__mono">T<sub>n</sub>/Ω</span> =';
-        }
         demand = svc;
       }
       if (outTGov) outTGov.textContent = fmt(demand, 3);
 
-      const k = parseNumLike(kEl?.value);
       const Fy = parseNumLike(fyEl?.value);
       const Fu = parseNumLike(fuEl?.value);
-      const kOk = Number.isFinite(k) && k >= 0 && k <= 1;
 
       const dReqFromFormula = requiredRodDiameter(demand, Fu, method);
       const standardRod = snapUpToStandardRod(dReqFromFormula);
       if (outDreq) outDreq.textContent = fmt(dReqFromFormula, 4);
       if (outDuse) outDuse.textContent = standardRod ? standardRod.label : '—';
 
-      const picked = kOk && catalogRows.length
-        ? pickLightestRod(catalogRows, demand, k, Fy, Fu, method)
-        : null;
-
-      if (picked) {
-        const Ag = picked.Ag;
-        const Ae = kOk ? k * Ag : null;
-        const dEq = Math.sqrt((4 * Ag) / Math.PI);
-        if (outSection) outSection.textContent = picked.lab;
-        if (outD) outD.textContent = fmt(dEq, 4);
-        if (outAg) outAg.textContent = fmt(Ag, 4);
-        if (outAe) outAe.textContent = fmt(Ae, 4);
-
-        const { yieldCap, fracCap, capGov } = capacityBreakdown(Ag, Ae, Fy, Fu, method);
-        if (outYield) outYield.textContent = fmt(yieldCap, 3);
-        if (outFrac) outFrac.textContent = fmt(fracCap, 3);
-        if (outCapGov) outCapGov.textContent = fmt(capGov, 3);
-
-        if (verdictEl) {
-          verdictEl.classList.remove('sf-rod__verdict--safe', 'sf-rod__verdict--unsafe');
-          if (Number.isFinite(capGov) && Number.isFinite(demand)) {
-            const ok = capGov + 1e-6 >= demand;
-            verdictEl.textContent = ok ? 'SAFE' : 'UNSAFE';
-            verdictEl.classList.add(ok ? 'sf-rod__verdict--safe' : 'sf-rod__verdict--unsafe');
-          } else {
-            verdictEl.textContent = '—';
-          }
+      let capGov = null;
+      if (standardRod && Number.isFinite(Fy) && Number.isFinite(Fu)) {
+        const Ag = grossAreaFromD(standardRod.value);
+        if (Number.isFinite(Ag) && Ag > 0) {
+          const Ae = ROD_K_EFFECTIVE * Ag;
+          capGov = capacityBreakdown(Ag, Ae, Fy, Fu, method).capGov;
         }
-      } else {
-        if (outSection) outSection.textContent = '—';
-        if (outD) outD.textContent = '—';
-        if (outAg) outAg.textContent = '—';
-        if (outAe) outAe.textContent = '—';
-        if (outYield) outYield.textContent = '—';
-        if (outFrac) outFrac.textContent = '—';
-        if (outCapGov) outCapGov.textContent = '—';
-        if (verdictEl) {
-          verdictEl.classList.remove('sf-rod__verdict--safe', 'sf-rod__verdict--unsafe');
-          if (!kOk || !Number.isFinite(demand) || !Number.isFinite(Fy) || !Number.isFinite(Fu)) {
-            verdictEl.textContent = '—';
-          } else {
-            verdictEl.textContent = 'UNSAFE';
-            verdictEl.classList.add('sf-rod__verdict--unsafe');
-          }
+      }
+
+      if (verdictEl) {
+        verdictEl.classList.remove('sf-rod__verdict--safe', 'sf-rod__verdict--unsafe');
+        if (Number.isFinite(capGov) && Number.isFinite(demand) && demand > 0) {
+          const ok = capGov + 1e-6 >= demand;
+          verdictEl.textContent = ok ? 'SAFE' : 'UNSAFE';
+          verdictEl.classList.add(ok ? 'sf-rod__verdict--safe' : 'sf-rod__verdict--unsafe');
+        } else if (!Number.isFinite(demand) || demand <= 0 || !Number.isFinite(Fy) || !Number.isFinite(Fu)) {
+          verdictEl.textContent = '—';
+        } else {
+          verdictEl.textContent = 'UNSAFE';
+          verdictEl.classList.add('sf-rod__verdict--unsafe');
         }
       }
     }
 
     function setDefaults() {
-      if (kEl && !String(kEl.value).trim()) kEl.value = '0.75';
       if (dlEl && !String(dlEl.value).trim()) dlEl.value = '10';
       if (llEl && !String(llEl.value).trim()) llEl.value = '20';
       if (methodEl && !methodEl.value) methodEl.value = 'lrfd';
@@ -639,10 +592,6 @@
     attachStructuralGradeSync('_sfRodTrDesGradeSync', steelEl, syncSteel, recompute);
 
     window.SteelForge.__tensionRodRecomputeDesign = recompute;
-
-    ensureRodCatalog().then((rows) => {
-      catalogRows = rows;
-      recompute();
-    });
+    recompute();
   };
 })();
