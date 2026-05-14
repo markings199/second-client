@@ -1,7 +1,13 @@
 /**
  * Node parity checks vs reference workbook `exel program EWIWIWI(BENDING) (1).csv`.
- * Run: node scripts/sf-bending-parity.mjs
+ * Run: node steelforge/scripts/sf-bending-parity.mjs
  */
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PHI_B = 0.9;
 const OMEGA_B = 1.67;
@@ -140,6 +146,60 @@ add(
   zxCsv[largestIndexGeNonIncreasing(ixCol, 798.362069)]?.lab === 'W21X44',
 );
 
+/** Parse `exel program EWIWIWI(SECTION ZX).csv` (no quoted fields in practice). */
+function parseSectionZxCsv(txt) {
+  const lines = String(txt || '')
+    .split(/\r?\n/)
+    .map((ln) => ln.trim())
+    .filter(Boolean);
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(',');
+    const lab = String(parts[1] || '').trim();
+    const zx = Number(parts[2]);
+    const ix = Number(parts[3]);
+    if (lab && Number.isFinite(zx) && Number.isFinite(ix)) rows.push({ lab, zx, ix });
+  }
+  return rows;
+}
+
+function sectionZxLabelForZxReq(rows, zxReq) {
+  if (!rows.length || !Number.isFinite(zxReq) || zxReq <= 0) return null;
+  const zxCol = rows.map((r) => r.zx);
+  const idx = largestIndexGeNonIncreasing(zxCol, zxReq);
+  return idx >= 0 ? rows[idx].lab : null;
+}
+
+function canonWLabel(s) {
+  return String(s || '')
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, '');
+}
+
+const zxCsvPath = path.join(__dirname, '..', 'exel program EWIWIWI(SECTION ZX).csv');
+const zxRowsFull = parseSectionZxCsv(fs.readFileSync(zxCsvPath, 'utf8'));
+add('SECTION ZX CSV loads (≥60 rows)', zxRowsFull.length >= 60, `got ${zxRowsFull.length}`);
+let zxMidpointsOk = true;
+let zxMidDetail = '';
+for (let i = 0; i < zxRowsFull.length - 1; i++) {
+  const zHi = zxRowsFull[i].zx;
+  const zLo = zxRowsFull[i + 1].zx;
+  if (!(zHi > zLo)) continue;
+  const mid = (zHi + zLo) / 2;
+  const lab = sectionZxLabelForZxReq(zxRowsFull, mid);
+  if (lab !== zxRowsFull[i].lab) {
+    zxMidpointsOk = false;
+    zxMidDetail = `row ${i + 1}↔${i + 2}: Z=${mid} → ${lab} (expect ${zxRowsFull[i].lab})`;
+    break;
+  }
+}
+add('SECTION ZX Zx MATCH(-1) all midpoints', zxMidpointsOk, zxMidDetail);
+add(
+  'SECTION ZX Zx req 54.3 → W14x34 (canon)',
+  canonWLabel(sectionZxLabelForZxReq(zxRowsFull, 54.3)) === 'W14X34',
+  `got ${sectionZxLabelForZxReq(zxRowsFull, 54.3)}`,
+);
 // BENDING DESIGN WITH DEFLECTION — L=35 ft, A992 Fy=50, DL=0.2, LL=0.8, simple UDL, L/360 (workbook screenshots)
 const dl35 = 0.2;
 const ll35 = 0.8;

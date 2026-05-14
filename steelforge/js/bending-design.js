@@ -353,6 +353,29 @@
     return sorted.find((s) => canonWLabel(s.lab) === t) ?? null;
   }
 
+  function findSectionZxRow(rows, lab) {
+    const t = canonWLabel(lab);
+    if (!t || !Array.isArray(rows) || rows.length === 0) return null;
+    return rows.find((r) => canonWLabel(r.lab) === t) ?? null;
+  }
+
+  /**
+   * Workbook `INDEX(SECTION ZX!B, MATCH(Z_req, SECTION ZX!C, -1))` always resolves a label from SECTION ZX.
+   * If that label is missing from the loaded steel catalog, still show SECTION ZX Zx/Ix so AC25 (BENDING!AC25)
+   * matches Excel; other fields come from STEEL SECTION V16 when available.
+   */
+  function shapeFromSectionZxTableOnly(zxRow) {
+    if (!zxRow || !Number.isFinite(zxRow.ix) || zxRow.ix <= 0) return null;
+    return {
+      lab: zxRow.lab,
+      Ix: zxRow.ix,
+      wLb: null,
+      row: null,
+      _tableOnly: true,
+      _tableZx: zxRow.zx,
+    };
+  }
+
   /** Lightest W-shape in CSV order whose I<sub>x</sub> meets the serviceability minimum. */
   function pickLightestMeetingIx(I_min, sorted) {
     if (!sorted.length) return null;
@@ -817,6 +840,18 @@
     }
 
     function shapeProps(shape, Fy, E) {
+      if (!shape) return null;
+      if (shape._tableOnly) {
+        return {
+          row: null,
+          Zx: shape._tableZx,
+          Sx: null,
+          lamF: null,
+          lamW: null,
+          Mn: null,
+          verdict: '—',
+        };
+      }
       const row = shape.row;
       const Zx = parseNumLike(row[COL.Zx]);
       const Sx = parseNumLike(row[COL.Sx]);
@@ -1090,13 +1125,25 @@
       if (deflOn && sectionZxRows.length && Number.isFinite(Fy) && Fy > 0) {
         const ZreqL = (12 * Mu_val) / (Fy * PHI_B);
         const labZL = sectionZxLabelForZxReq(sectionZxRows, ZreqL);
-        if (labZL) shapeZxL_wb = findSortedShapeByLab(sorted, labZL);
+        if (labZL) {
+          shapeZxL_wb =
+            findSortedShapeByLab(sorted, labZL) ??
+            shapeFromSectionZxTableOnly(findSectionZxRow(sectionZxRows, labZL));
+        }
         const ZreqA = (12 * Ma_req_val * OMEGA_B) / Fy;
         const labZA = sectionZxLabelForZxReq(sectionZxRows, ZreqA);
-        if (labZA) shapeZxA_wb = findSortedShapeByLab(sorted, labZA);
+        if (labZA) {
+          shapeZxA_wb =
+            findSortedShapeByLab(sorted, labZA) ??
+            shapeFromSectionZxTableOnly(findSectionZxRow(sectionZxRows, labZA));
+        }
         if (Number.isFinite(I_min) && I_min > 0) {
           const labI = sectionZxLabelForIxReq(sectionZxRows, I_min);
-          if (labI) shapeIx_wb = findSortedShapeByLab(sorted, labI);
+          if (labI) {
+            shapeIx_wb =
+              findSortedShapeByLab(sorted, labI) ??
+              shapeFromSectionZxTableOnly(findSectionZxRow(sectionZxRows, labI));
+          }
         }
       }
 
@@ -1108,31 +1155,9 @@
           return !(I_min > shapeZx.Ix + 1e-9);
         };
 
-        const deflAss1Remark = (shape, lrfdDemand) => {
-          if (!shape) return null;
-          const cap = designStrengthKipFt(Fy, E, shape.row, lrfdDemand);
-          /** With deflection, workbook line loads include beam self-weight — use converged M_u / M_a from pickBeamSelfWeightShape. */
-          const dem = deflOn
-            ? lrfdDemand
-              ? lrfdR.Mu_tot
-              : asdR.Ma_tot
-            : lrfdDemand
-              ? Mu_val
-              : Ma_req_val;
-          const wBeam = shape.wLb / 1000;
-          let ok = cap != null && cap >= dem - 1e-6;
-          if (Number.isFinite(I_min) && I_min > 0) ok = ok && shape.Ix >= I_min - 1e-6;
-          if (!deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
-            const Wsvc = dlll_val + wBeam;
-            const dMax = deltaInches(Wsvc, L, E, shape.Ix, bcDesign.deflectionK);
-            ok = ok && Number.isFinite(dMax) && dMax <= deltaLimIn + 1e-9;
-          }
-          return ok;
-        };
-
         if (deflOn) {
           const shapeZx = isLRFD ? shapeZxL_wb : shapeZxA_wb;
-          const disp = shapeZx || (isLRFD ? lrfdR.picked : asdR.picked);
+          const disp = shapeZx;
           if (disp) {
             const p = shapeProps(disp, Fy, E);
             setOutSpan(els.ass1.sec, disp.lab);
@@ -1141,7 +1166,7 @@
             setOutSpan(els.ass1.sx, fmt(p.Sx, 3));
             setOutSpan(els.ass1.ix, fmt(disp.Ix, 1));
             setOutSpan(els.ass1.lf, fmt(p.lamF, 6));
-            setRemarkSafe(els.ass1.rm, shapeZx ? deflAss1RemarkWorkbook(shapeZx) : deflAss1Remark(disp, isLRFD));
+            setRemarkSafe(els.ass1.rm, deflAss1RemarkWorkbook(disp));
           } else {
             ['sec', 'zx', 'w', 'sx', 'ix', 'lf'].forEach((k) => setOutSpan(els.ass1[k], '—'));
             setRemarkSafe(els.ass1.rm, null);
