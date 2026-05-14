@@ -2327,6 +2327,17 @@
       const zxFromMomentKft = (mKft) =>
         isLRFD ? (mKft * 12) / (phiB * fy) : (mKft * 12) / (fy / omegaB);
 
+      /** Member weight as distributed load (klf) from CSV / steel-db shape (lb/ft → kips/ft). */
+      const shapeWeightKlf = (shape) => {
+        if (!shape) return 0;
+        const lbFt = Number.isFinite(shape.weightLbFt)
+          ? shape.weightLbFt
+          : Number.isFinite(shape.weight)
+            ? shape.weight
+            : null;
+        return lbFt != null && lbFt >= 0 ? lbFt / 1000 : 0;
+      };
+
       /**
        * Converge trial section weight (BW, klf) with factored / service line load so the
        * "LOAD WITH BEAM WEIGHT" card matches LRFD 1.2(DL+BW)+1.6LL (and ASD DL+BW+LL).
@@ -2356,10 +2367,7 @@
         const Vb = wC * L * shearFac;
         const zxIter = zxFromMomentKft(Mb);
         const nextShape = pickAssumedForMoment(zxIter);
-        const nextBw =
-          nextShape && Number.isFinite(nextShape.weight) && nextShape.weight >= 0
-            ? nextShape.weight / 1000
-            : 0;
+        const nextBw = shapeWeightKlf(nextShape);
         wTopBw = wT;
         w14Bw = w14i;
         wCombBw = wC;
