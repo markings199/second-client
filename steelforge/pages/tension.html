@@ -95,15 +95,11 @@
                 <tr>
                   <th>GRADE</th>
                   <td>
-                    <input
-                      class="sf-tensionAnalysisLayout__inp sf-tbRef__inp--steelGrade"
+                    <select
+                      class="sf-tensionAnalysisLayout__sel sf-tbRef__inp--steelGrade"
                       id="sfTenAnaSteel"
-                      type="text"
-                      list="sfTenAnaSteelList"
-                      autocomplete="off"
-                      title="Pick a catalog grade or type a custom name; Fy/Fu fill when a listed grade matches."
-                    />
-                    <datalist id="sfTenAnaSteelList"></datalist>
+                      aria-label="Steel grade (ASTM)"
+                    ></select>
                   </td>
                 </tr>
                 <tr>
@@ -423,16 +419,14 @@
               <div class="section-card narrow-card">
                 <div class="section-header">STEEL GRADE</div>
                 <div class="grade-row">
-                  <input
-                    class="grade-row__inp sf-tbRef__inp--steelGrade"
-                    id="sfTenDesSteel"
-                    type="text"
-                    list="sfTenDesSteelList"
-                    autocomplete="off"
-                    aria-label="Steel grade"
-                    title="Pick a catalog grade or type custom; Fy/Fu auto-fill when a listed grade matches."
-                  />
-                  <datalist id="sfTenDesSteelList"></datalist>
+                  <label class="grade-row__selectWrap">
+                    <select
+                      class="grade-row__sel sf-tbRef__inp--steelGrade"
+                      id="sfTenDesSteel"
+                      aria-label="Steel grade (ASTM)"
+                    ></select>
+                    <span class="grade-row__selectCaret" aria-hidden="true">▾</span>
+                  </label>
                   <label class="grade-value"><span class="vh">Fy</span>F<sub>y</sub> = <input id="sfTenDesFy" class="grade-value__inp" inputmode="decimal" /> ksi</label>
                   <label class="grade-value"><span class="vh">Fu</span>F<sub>u</sub> = <input id="sfTenDesFu" class="grade-value__inp" inputmode="decimal" /> ksi</label>
                 </div>

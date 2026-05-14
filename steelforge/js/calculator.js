@@ -1628,8 +1628,10 @@
     sorted.forEach((g) => {
       const opt = document.createElement('option');
       opt.value = g.id;
-      const idPart = g.catalogId != null ? `[${g.catalogId}] ` : '';
-      opt.textContent = `${idPart}${g.label} — Fy=${g.fy}, Fu=${g.fu} ksi`;
+      const label = String(g.label || '').trim() || g.id;
+      opt.textContent = label;
+      const cat = g.catalogId != null ? `ASTM catalog ${g.catalogId}. ` : '';
+      opt.title = `${cat}Fy = ${g.fy} ksi, Fu = ${g.fu} ksi`;
       selectEl.appendChild(opt);
     });
     const customOpt = document.createElement('option');
@@ -2565,4 +2567,9 @@
       runAttach();
     }
   };
+
+  window.SteelForge = window.SteelForge || {};
+  window.SteelForge.populateStructuralSteelGradeSelect = populateStructuralSteelGradeSelect;
+  window.SteelForge.steelPropsFromStructuralGradeSelect = steelPropsFromStructuralGradeSelect;
+  window.SteelForge.getPreferredStructuralSteelGradeId = getPreferredStructuralSteelGradeId;
 })();

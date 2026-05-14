@@ -92,18 +92,6 @@
     return vals.length ? Math.min(...vals) : null;
   }
 
-  function getSteelByText(s) {
-    const t = String(s || '').trim().toUpperCase();
-    if (!t) return null;
-    const grades = window.SteelForgeStructuralSteelGrades ?? [];
-    return (
-      grades.find((g) => String(g.id).toUpperCase() === t) ||
-      grades.find((g) => String(g.label).toUpperCase() === t) ||
-      grades.find((g) => String(g.label).toUpperCase().includes(t)) ||
-      null
-    );
-  }
-
   function getActiveSteelGrade() {
     const g = window.SteelForge?.activeStructuralSteelGrade;
     if (!g) return null;
@@ -111,25 +99,31 @@
     return g;
   }
 
-  /** Populate a datalist with catalog steel grade labels (searchable combobox). */
-  function fillSteelGradeDatalist(datalistEl) {
-    if (!datalistEl) return;
-    const grades = window.SteelForgeStructuralSteelGrades ?? [];
-    datalistEl.innerHTML = '';
-    const seen = new Set();
-    [...grades]
-      .slice()
-      .sort((a, b) => String(a.label || '').localeCompare(String(b.label || '')))
-      .forEach((g) => {
-        const lab = String(g.label || '').trim();
-        if (!lab) return;
-        const up = lab.toUpperCase();
-        if (seen.has(up)) return;
-        seen.add(up);
-        const opt = document.createElement('option');
-        opt.value = lab;
-        datalistEl.appendChild(opt);
-      });
+  function populateTenSteelGradeSelect(selectEl, preferredId) {
+    const pop = window.SteelForge?.populateStructuralSteelGradeSelect;
+    if (typeof pop !== 'function' || !selectEl) return;
+    const pref =
+      preferredId ??
+      window.SteelForge?.getPreferredStructuralSteelGradeId?.() ??
+      'a992';
+    pop(selectEl, pref);
+  }
+
+  function applyStructuralGradeSelectToFyFu(steelSelect, fyEl, fuEl) {
+    const propsFn = window.SteelForge?.steelPropsFromStructuralGradeSelect;
+    if (!steelSelect || !fyEl || !fuEl || typeof propsFn !== 'function') return;
+    if (steelSelect.value === 'custom') {
+      fyEl.readOnly = false;
+      fuEl.readOnly = false;
+      return;
+    }
+    const g = propsFn(steelSelect.value);
+    if (g && Number.isFinite(Number(g.fy)) && Number.isFinite(Number(g.fu))) {
+      fyEl.value = String(g.fy);
+      fuEl.value = String(g.fu);
+      fyEl.readOnly = true;
+      fuEl.readOnly = true;
+    }
   }
 
   /**
@@ -199,6 +193,8 @@
     const solveBtn = el('sfTenAnaSolve');
 
     if (!methodEl || !shapeEl || !aiscEl) return;
+
+    populateTenSteelGradeSelect(steelEl);
 
     const suggestEl = pane.querySelector('#sfTenAnaAiscSuggest');
     const toggleEl = pane.querySelector('#sfTenAnaAiscToggle');
@@ -339,18 +335,7 @@
     }
 
     function applySteelDefaults() {
-      if (!steelEl || !fyEl || !fuEl) return;
-      const hit = getSteelByText(steelEl.value);
-      if (!hit) {
-        fyEl.readOnly = false;
-        fuEl.readOnly = false;
-        return;
-      }
-      steelEl.value = hit.label;
-      fyEl.value = String(hit.fy);
-      fuEl.value = String(hit.fu);
-      fyEl.readOnly = true;
-      fuEl.readOnly = true;
+      applyStructuralGradeSelectToFyFu(steelEl, fyEl, fuEl);
     }
 
     function syncAnalysisCapacityLabels(isLRFD) {
@@ -551,14 +536,12 @@
     }
 
     function setDefaults() {
-      const activeGrade = getActiveSteelGrade();
       if (methodEl && !methodEl.value) methodEl.value = 'lrfd';
       if (shapeEl && !shapeEl.value) shapeEl.value = 'l';
       if (lenEl && !String(lenEl.value).trim()) lenEl.value = '120';
       if (nEl && !String(nEl.value).trim()) nEl.value = '1';
       if (dhEl && !String(dhEl.value).trim()) dhEl.value = '3/4';
       if (lagEl && !String(lagEl.value).trim()) lagEl.value = 'CASE 8a';
-      if (steelEl && !String(steelEl.value).trim()) steelEl.value = activeGrade?.label ?? 'A992';
       applySteelDefaults();
       setGeometryReadOnly(!isManualMode());
       stagSumTouched = false;
@@ -599,7 +582,7 @@
     }
 
     function wire() {
-      fillSteelGradeDatalist(pane.querySelector('#sfTenAnaSteelList'));
+      populateTenSteelGradeSelect(steelEl);
       const bump = () => {
         recompute();
       };
@@ -686,7 +669,10 @@
     const attachAnalysisGradeListener = () => {
       const fn = () => {
         const g = getActiveSteelGrade();
-        if (g && steelEl) steelEl.value = g.label;
+        if (g && steelEl) {
+          populateTenSteelGradeSelect(steelEl, g.id);
+          steelEl.value = g.id;
+        }
         applySteelDefaults();
         recompute();
       };
@@ -705,8 +691,8 @@
       attachAnalysisGradeListener();
     }
 
-    setDefaults();
     ensureWire();
+    setDefaults();
     recompute();
 
     fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
@@ -775,6 +761,8 @@
 
     if (!methodEl || !dlEl || !llEl || !lEl || !steelEl || !fyEl || !fuEl || !uEl || !tb) return;
 
+    populateTenSteelGradeSelect(steelEl);
+
     let angleRows = [];
 
     const getUFromLagText = () =>
@@ -800,17 +788,7 @@
       });
 
     function applySteelDefaults() {
-      const hit = getSteelByText(steelEl.value);
-      if (!hit) {
-        fyEl.readOnly = false;
-        fuEl.readOnly = false;
-        return;
-      }
-      steelEl.value = hit.label;
-      fyEl.value = String(hit.fy);
-      fuEl.value = String(hit.fu);
-      fyEl.readOnly = true;
-      fuEl.readOnly = true;
+      applyStructuralGradeSelectToFyFu(steelEl, fyEl, fuEl);
     }
 
     function normalizeInputs() {
@@ -837,12 +815,10 @@
     }
 
     function setDefaults() {
-      const activeGrade = getActiveSteelGrade();
       if (!methodEl.value) methodEl.value = 'lrfd';
       if (!String(dlEl.value).trim()) dlEl.value = '70';
       if (!String(llEl.value).trim()) llEl.value = '30';
       if (!String(lEl.value).trim()) lEl.value = '120';
-      if (!String(steelEl.value).trim()) steelEl.value = activeGrade?.label ?? 'A992';
       if (!String(lagEl?.value || '').trim()) lagEl.value = 'CASE 2';
       if (xbarDesEl && !String(xbarDesEl.value).trim()) xbarDesEl.value = '1.2';
       if (!String(nEl?.value || '').trim()) nEl.value = '2';
@@ -978,7 +954,7 @@
     }
 
     function wire() {
-      fillSteelGradeDatalist(pane.querySelector('#sfTenDesSteelList'));
+      populateTenSteelGradeSelect(steelEl);
       const bumpSteel = () => {
         applySteelDefaults();
         recompute();
@@ -990,13 +966,34 @@
       });
       steelEl.addEventListener('input', bumpSteel);
       steelEl.addEventListener('change', bumpSteel);
+      if (steelEl && !steelEl.dataset.sfTenDesSteelPickerBound) {
+        steelEl.dataset.sfTenDesSteelPickerBound = '1';
+        if (typeof steelEl.showPicker === 'function') {
+          steelEl.addEventListener(
+            'pointerdown',
+            (e) => {
+              if (e.pointerType === 'mouse' && e.button !== 0) return;
+              try {
+                steelEl.showPicker();
+                e.preventDefault();
+              } catch (_) {
+                /* Unsupported or not user-activated: keep native behavior */
+              }
+            },
+            { capture: true },
+          );
+        }
+      }
       solveBtn?.addEventListener('click', recompute);
     }
 
     const attachDesignGradeListener = () => {
       const fn = () => {
         const g = getActiveSteelGrade();
-        if (g && steelEl) steelEl.value = g.label;
+        if (g && steelEl) {
+          populateTenSteelGradeSelect(steelEl, g.id);
+          steelEl.value = g.id;
+        }
         applySteelDefaults();
         normalizeInputs();
         recompute();
@@ -1023,15 +1020,13 @@
             const lbl = String(r[COL.label] || '').trim();
             return (typ === 'L' || typ === '2L') && !!lbl && Number.isFinite(rowArea(r));
           });
-        setDefaults();
         wire();
-        attachDesignGradeListener();
+        setDefaults();
         recompute();
       })
       .catch(() => {
-        setDefaults();
         wire();
-        attachDesignGradeListener();
+        setDefaults();
         recompute();
       });
   };

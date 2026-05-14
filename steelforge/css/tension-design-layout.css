@@ -241,6 +241,47 @@
   width: 100%;
 }
 
+/* DESIGN TENSION steel grade: reads as a dropdown; tap/click opens native option list */
+.sf-comp--tension .sf-tensionDesignLayout .grade-row__selectWrap {
+  display: block;
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+}
+
+.sf-comp--tension .sf-tensionDesignLayout .grade-row__selectWrap .grade-row__sel {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 2.5rem 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #f7f8fa;
+  color: #24314b;
+  font-weight: 700;
+  cursor: pointer;
+  /* Styled like other fields but remains a real <select>; list shows all grades on tap/click */
+  -webkit-appearance: none;
+  appearance: none;
+  background-clip: padding-box;
+}
+
+.sf-comp--tension .sf-tensionDesignLayout .grade-row__selectWrap .grade-row__sel::-ms-expand {
+  display: none;
+}
+
+.sf-comp--tension .sf-tensionDesignLayout .grade-row__selectCaret {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 0.72rem;
+  color: rgba(36, 49, 75, 0.55);
+  line-height: 1;
+  user-select: none;
+}
+
 .sf-comp--tension .sf-tensionDesignLayout .grade-value {
   display: block;
   padding: 12px 14px;
