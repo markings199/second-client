@@ -587,6 +587,13 @@
       if (lagEl && !String(lagEl.value).trim()) lagEl.value = 'CASE 8a';
       applySteelDefaults();
       setGeometryReadOnly(!isManualMode());
+      // Block shear (and gross net areas) need t and Ag. Until the steel CSV applies a row,
+      // catalog mode can still have empty geometry — use a small demo thickness/area so the
+      // FOR BLOCK SHEAR table is not stuck on "—" when the network or path fails.
+      if (!isManualMode()) {
+        if (tEl && !String(tEl.value).trim()) tEl.value = '0.375';
+        if (agEl && !String(agEl.value).trim()) agEl.value = '3.5';
+      }
       stagSumTouched = false;
       const blkNS = el('sfTenAnaBlkNShear');
       const blkNT = el('sfTenAnaBlkNTension');

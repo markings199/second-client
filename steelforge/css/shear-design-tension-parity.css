@@ -256,10 +256,27 @@
   min-width: 0;
   border: 1px solid rgba(148, 163, 184, 0.45) !important;
   border-radius: 10px !important;
-  padding: 8px 12px !important;
+  /* style.css fixes height at --des-beam-pill-h (20px); padding here was clipping the closed
+     select label (no vertical room). Let height follow content + padding. */
+  height: auto !important;
+  min-height: 36px !important;
+  line-height: 1.25 !important;
+  padding: 6px 28px 6px 10px !important;
   background: #fff !important;
-  color: #1f2937 !important;
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  font-size: 0.8rem !important;
   font-weight: 700 !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__beamSelect option {
+  color: #0f172a !important;
+  background: #fff !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__beamSelect option:checked {
+  color: #0f172a !important;
+  background: #e2e8f0 !important;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__beamPill--formula {

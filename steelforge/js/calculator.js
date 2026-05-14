@@ -1515,7 +1515,12 @@
   };
 
   function attachShearThumbs(root) {
-    const groups = Array.from(root.querySelectorAll('.sf-comp--shear .sf-shear__thumbs'));
+    const shearEl =
+      root && root.matches && root.matches('.sf-comp--shear')
+        ? root
+        : root?.querySelector?.('.sf-comp--shear');
+    if (!shearEl) return;
+    const groups = Array.from(shearEl.querySelectorAll('.sf-shear__thumbs'));
     if (groups.length === 0) return;
 
     groups.forEach((wrap) => {
@@ -1654,7 +1659,9 @@
   }
 
   function attachShearAnalysis(root) {
-    const pane = root.querySelector('.sf-comp__mode[data-comp-mode-pane="analysis"]');
+    const pane =
+      root.querySelector('.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="analysis"]') ||
+      root.querySelector('.sf-comp__mode[data-comp-mode-pane="analysis"]');
     if (!pane) return;
 
     const shapes = window.SteelForgeShearShapes ?? [];
@@ -2031,7 +2038,9 @@
   }
 
   function attachShearDesign(root) {
-    const pane = root.querySelector('.sf-comp__mode[data-comp-mode-pane="design"]');
+    const pane =
+      root.querySelector('.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"]') ||
+      root.querySelector('.sf-comp__mode[data-comp-mode-pane="design"]');
     if (!pane) return;
 
     const input = (id) => pane.querySelector(`#${id}`);
@@ -2570,10 +2579,22 @@
     };
 
     pane.querySelectorAll('input, select').forEach((el) => {
-      if (el === steelTypeEl) return;
+      if (el === steelTypeEl || el.id === 'sfShearDesMethod') return;
       el.addEventListener('input', update);
       el.addEventListener('change', update);
     });
+    const methodEl = input('sfShearDesMethod');
+    if (methodEl) {
+      const deferUpdate = () => queueMicrotask(() => update());
+      methodEl.addEventListener('change', deferUpdate);
+      methodEl.addEventListener('input', deferUpdate);
+    }
+    const shearShell = pane.closest('.sf-comp--shear') || root.querySelector('.sf-comp--shear');
+    const modeNav = shearShell?.querySelector('.sf-comp__modeNav');
+    if (modeNav && !modeNav.dataset.sfShearDesNavSync) {
+      modeNav.dataset.sfShearDesNavSync = '1';
+      modeNav.addEventListener('click', () => queueMicrotask(() => update()));
+    }
     if (steelTypeEl) {
       steelTypeEl.addEventListener('change', () => {
         syncSteelPropsFromGrade();
@@ -2605,13 +2626,17 @@
   };
 
   window.SteelForge.initShear = (panelRoot, opts = {}) => {
-    const root = panelRoot.querySelector('.sf-comp') ? panelRoot : document;
-    attachModeToggle(root, { topic: 'SHEAR' });
-    attachShearThumbs(root);
+    const compRoot =
+      panelRoot?.querySelector?.('.sf-comp.sf-comp--shear') ??
+      panelRoot?.querySelector?.('.sf-comp') ??
+      panelRoot ??
+      document;
+    attachModeToggle(compRoot, { topic: 'SHEAR' });
+    attachShearThumbs(compRoot);
     const initialMode = opts.initialMode === 'design' ? 'design' : 'analysis';
     const runAttach = () => {
-      attachShearAnalysis(root);
-      attachShearDesign(root);
+      attachShearAnalysis(compRoot);
+      attachShearDesign(compRoot);
       if (initialMode === 'design') {
         window.SteelForge.activateModuleMode(panelRoot, 'design');
       }

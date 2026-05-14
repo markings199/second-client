@@ -7903,14 +7903,15 @@ input.sf-secprops__val:focus {
   --des-load-title-size: 0.78rem;
   --des-beam-label-size: 0.66rem;
   --des-beam-field-size: 0.66rem;
-  --des-beam-select-size: 0.52rem;
+  --des-beam-select-size: 0.8rem;
   --des-beam-label-col: minmax(0, 1fr);
   --des-beam-row-gap: 6px;
   --des-beam-row-space: 5px;
   --des-beam-pill-h: 20px;
   --des-beam-pill-pad-x: 8px;
   --des-beam-field-w: minmax(96px, 1fr);
-  --des-beam-select-w: minmax(0, 1fr);
+  /* Avoid minmax(0,1fr) as max track inside minmax(0, …) on the select column (weak width + tiny text). */
+  --des-beam-select-w: minmax(160px, 1fr);
   --des-load-box-min-h: 0;
   --des-load-box-pad-y: 10px;
   --des-load-box-pad-x: 10px;
@@ -8899,6 +8900,10 @@ input.sf-secprops__val:focus {
   min-width: 0;
   padding: 0 14px 0 8px;
   font-size: var(--des-beam-select-size);
+  /* Fixed 20px height clips long option text on many browsers; allow auto height. */
+  height: auto;
+  min-height: var(--des-beam-pill-h);
+  line-height: 1.2;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__beamPill {
@@ -8965,21 +8970,6 @@ input.sf-secprops__val:focus {
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--leftBottom .sf-shearDes__loadLabel,
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wu .sf-shearDes__loadLabel {
   text-align: left;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wide {
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  justify-items: start;
-  justify-content: start;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wide .sf-shearDes__loadLabel {
-  text-align: left;
-  justify-self: start;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--zx {
-  grid-template-columns: minmax(0, 1fr) auto auto;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadTitle {
@@ -9087,6 +9077,36 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadRow--zx {
   grid-template-columns: 1fr var(--des-load-zx-pill-w) auto;
+}
+
+/* LOAD W/O BEAM WEIGHT + LOAD WITH BEAM WEIGHT: wide rows use auto pill width → pills
+   “stair-step”. Fixed numeric track + start alignment keeps value pills in one column. */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wide,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__bwLoadBox .sf-shearDes__loadRow--wide {
+  grid-template-columns: minmax(0, 1fr) minmax(6.75rem, 7.25rem) max-content;
+  justify-items: start;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wide .sf-shearDes__loadLabel,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__bwLoadBox .sf-shearDes__loadRow--wide .sf-shearDes__loadLabel {
+  text-align: right;
+  justify-self: end;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wide .sf-shearDes__loadPill,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__bwLoadBox .sf-shearDes__loadRow--wide .sf-shearDes__loadPill {
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wide .sf-shearDes__loadUnit,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__bwLoadBox .sf-shearDes__loadRow--wide .sf-shearDes__loadUnit {
+  justify-self: start;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wide.sf-shearDes__loadRow--zx {
+  grid-template-columns: minmax(0, 1fr) minmax(6.75rem, 7.25rem) max-content;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadLabel {

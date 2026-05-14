@@ -535,3 +535,32 @@
 .sf-comp--tension .sf-comp__card--tensionDesign {
   background: linear-gradient(180deg, rgba(248, 246, 242, 0.55) 0%, rgba(221, 216, 206, 0.35) 100%);
 }
+
+/* Right column: drop the extra white “slab” so blocks sit on the taupe panel-frame only */
+.sf-comp--tension .sf-tensionDesignLayout .right-column > .section-card {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.sf-comp--tension .sf-tensionDesignLayout .right-column .selection-card table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.sf-comp--tension .sf-tensionDesignLayout .right-column .selection-card thead th:first-child,
+.sf-comp--tension .sf-tensionDesignLayout .right-column .selection-card tbody td:first-child {
+  width: 44%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sf-comp--tension .sf-tensionDesignLayout .right-column .selection-card tbody td {
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.sf-comp--tension .sf-tensionDesignLayout .right-column .photo-slot--img {
+  background: rgba(255, 255, 255, 0.55);
+}
