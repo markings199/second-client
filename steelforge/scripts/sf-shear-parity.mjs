@@ -1,6 +1,7 @@
 /**
  * Node parity checks vs reference workbook `reference/exel program EWIWIWI(SHEAR).csv`.
- * Mirrors shear formulas in js/calculator.js (analysis φv=1 Ωv=1.5; design φv=0.9 Ωv=1.67).
+ * Mirrors shear formulas in js/calculator.js (analysis φv=1 Ωv=1.5; design CONDITION CHECKING
+ * uses λ-band φ/Ω; design SHEAR CAPACITY card assumes Cv=1 → ϕVn=Vn, Vn/Ω=Vn/1.5).
  * Loads shape catalog like js/shear-csv-shapes.js for section-pick regression checks.
  * Run: node scripts/sf-shear-parity.mjs
  */
@@ -159,9 +160,24 @@ function pickAssumedForMoment(shapesSorted, zxReqV) {
   return shapesSorted.reduce((a, b) => ((a.zx ?? 0) >= (b.zx ?? 0) ? a : b));
 }
 
-function pickLightestForShear(shapesSorted, zxReqV, shearVV, fyV, EV, kvV, lrfd, phiV, omegaV) {
+function shearStrengthCv1Cap(shape, fyV) {
+  const aw =
+    Number.isFinite(shape.Aw)
+      ? shape.Aw
+      : Number.isFinite(shape.d) && Number.isFinite(shape.tw)
+        ? shape.d * shape.tw
+        : null;
+  const Vn1 = Number.isFinite(fyV) && Number.isFinite(aw) ? 0.6 * fyV * aw * 1 : null;
+  return {
+    Vn: Vn1,
+    phiVn: Vn1,
+    Vallow: Number.isFinite(Vn1) ? Vn1 / 1.5 : null,
+  };
+}
+
+function pickLightestForShear(shapesSorted, zxReqV, shearVV, fyV, lrfd) {
   const passes = (shape) => {
-    const { phiVn: pv, Vallow: va } = shearStrengthForShape(shape, fyV, EV, kvV, phiV, omegaV);
+    const { phiVn: pv, Vallow: va } = shearStrengthCv1Cap(shape, fyV);
     if (lrfd) return Number.isFinite(pv) && Number.isFinite(shearVV) && shearVV <= pv;
     return Number.isFinite(va) && Number.isFinite(shearVV) && shearVV <= va;
   };
@@ -222,14 +238,14 @@ const zxReqAsd = (Ma * 12 * OMEGA_B) / fy65;
 add('Design Zx,req LRFD (~314.393)', nearly(zxReqLrfd, 314.3931624, 0.05), `got ${zxReqLrfd}`);
 add('Design Zx,req ASD (~310.877)', nearly(zxReqAsd, 310.8769231, 0.05), `got ${zxReqAsd}`);
 
-add('Design pane φv (0.9)', PHI_V_DESIGN === 0.9);
-add('Design pane Ωv (1.67)', nearly(OMEGA_V_DESIGN, 1.67, 1e-9));
+add('Design CONDITION CHECKING pane may use φv=0.9 in λ-band (not cap card)', PHI_V_DESIGN === 0.9);
+add('Design CONDITION CHECKING pane Ωv (1.67)', nearly(OMEGA_V_DESIGN, 1.67, 1e-9));
 
 const VnAt65 = 0.6 * fy65 * Aw * 1;
-const phiVnAt65 = PHI_V_DESIGN * VnAt65;
-const VallowAt65 = VnAt65 / OMEGA_V_DESIGN;
-add('Design φVn @ W12×40 Aw with Fy=65 (~123.219)', nearly(phiVnAt65, 123.21855, 0.02), `got ${phiVnAt65}`);
-add('Design Vn/Ω @ same (~81.982)', nearly(VallowAt65, 81.98173652694611, 0.002), `got ${VallowAt65}`);
+const phiVnCv1Cap = VnAt65;
+const VallowCv1Cap = VnAt65 / 1.5;
+add('Design Cv=1 cap ϕVn (=Vn @ W12×40, Fy=65) (~136.91)', nearly(phiVnCv1Cap, 136.9095, 0.02), `got ${phiVnCv1Cap}`);
+add('Design Cv=1 cap Vn/Ω (~91.273)', nearly(VallowCv1Cap, 91.273, 0.002), `got ${VallowCv1Cap}`);
 
 // --- Catalog section picks (workbook row ~21: LRFD assumed W30X108, ASD W30X99)
 let shapesSortedByWeight = [];
@@ -237,8 +253,7 @@ try {
   ({ shapesSortedByWeight } = loadShearShapesFromRepoCsv());
   const assumedLrfd = pickAssumedForMoment(shapesSortedByWeight, zxReqLrfd);
   const lightLrfd =
-    pickLightestForShear(shapesSortedByWeight, zxReqLrfd, Vu, fy65, E, KV, true, PHI_V_DESIGN, OMEGA_V_DESIGN) ??
-    assumedLrfd;
+    pickLightestForShear(shapesSortedByWeight, zxReqLrfd, Vu, fy65, true) ?? assumedLrfd;
   add(
     'Catalog pick LRFD assumed section matches workbook (W30X108)',
     assumedLrfd?.name === 'W30X108',
@@ -252,8 +267,7 @@ try {
 
   const assumedAsd = pickAssumedForMoment(shapesSortedByWeight, zxReqAsd);
   const lightAsd =
-    pickLightestForShear(shapesSortedByWeight, zxReqAsd, Va, fy65, E, KV, false, PHI_V_DESIGN, OMEGA_V_DESIGN) ??
-    assumedAsd;
+    pickLightestForShear(shapesSortedByWeight, zxReqAsd, Va, fy65, false) ?? assumedAsd;
   add(
     'Catalog pick ASD assumed section matches workbook (W30X99)',
     assumedAsd?.name === 'W30X99',

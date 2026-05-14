@@ -12,13 +12,6 @@
     <div class="sf-comp__card sf-bendAna" role="region" aria-label="Analysis bending workspace">
       <div class="sf-comp__star" aria-hidden="true">★</div>
 
-      <input type="radio" id="sfBendAnaDefNo" name="sfBendAnaDefMode" checked hidden />
-      <input type="radio" id="sfBendAnaDefYes" name="sfBendAnaDefMode" hidden />
-      <div class="sf-bendDes__subNav sf-bendAna__subNav" role="tablist" aria-label="Analysis deflection mode">
-        <label class="sf-bendDes__subBtn" for="sfBendAnaDefNo">WITHOUT DEFLECTION</label>
-        <label class="sf-bendDes__subBtn" for="sfBendAnaDefYes">WITH DEFLECTION</label>
-      </div>
-
       <main class="sf-bendAna__contentGrid">
         <section class="sf-bendAna__panel sf-bendAna__panelLeft">
           <div class="sf-bendAna__panelTitle">ANALYSIS METHOD</div>
@@ -123,43 +116,6 @@
               <span id="sfBendAnaCapLrfdLbl" class="sf-bendAna__capGovLbl">φM<sub>n</sub> (LRFD) — governing</span>
               <div class="sf-bendAna__bendingValue sf-bendAna__bendingValue--compact">
                 <strong id="sfBendAnaGovCap">—</strong> <span class="sf-bendAna__unit" style="color: rgba(255,255,255,0.9)">kips·ft</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="sf-bendAna__deflBlock">
-            <div class="sf-bendAna__card sf-bendAna__deflCard">
-              <div class="sf-bendAna__cardTitle">DEFLECTION</div>
-              <p class="sf-bendAna__deflHint">Simple beam, uniform service load w; uses I<sub>x</sub> from the selected W-shape.</p>
-              <div class="sf-bendAna__propertyRow">
-                <span>SPAN L</span>
-                <span><input id="sfBendAnaSpanFt" class="sf-bendAna__inp sf-bendAna__inp--inline" type="text" inputmode="decimal" autocomplete="off" value="35" aria-label="Span length ft" /> <span class="sf-bendAna__unit">ft</span></span>
-              </div>
-              <div class="sf-bendAna__propertyRow">
-                <span>SERVICE w (DL+LL)</span>
-                <span><input id="sfBendAnaWsvc" class="sf-bendAna__inp sf-bendAna__inp--inline" type="text" inputmode="decimal" autocomplete="off" value="1" aria-label="Service uniform load klf" /> <span class="sf-bendAna__unit">kips/ft</span></span>
-              </div>
-              <div class="sf-bendAna__fieldGroup">
-                <label for="sfBendAnaDeflLim">DEFLECTION LIMITATION</label>
-                <div class="sf-bendAna__selectBox sf-bendAna__selectBox--flush">
-                  <select id="sfBendAnaDeflLim" class="sf-bendAna__selectNative" aria-label="Deflection limit span over n"></select>
-                </div>
-              </div>
-              <div class="sf-bendAna__propertyRow">
-                <span>I<sub>x</sub> (shape)</span>
-                <span><strong id="sfBendAnaIxDisp">—</strong> <span class="sf-bendAna__unit">in⁴</span></span>
-              </div>
-              <div class="sf-bendAna__propertyRow">
-                <span>Δ<sub>allow</sub></span>
-                <span id="sfBendAnaDeltaAllow">—</span>
-              </div>
-              <div class="sf-bendAna__propertyRow">
-                <span>Δ<sub>max</sub></span>
-                <span id="sfBendAnaDeltaMax">—</span>
-              </div>
-              <div class="sf-bendAna__compactVerdict" style="margin-top: 10px;">
-                <div class="sf-bendAna__verdictLabel">REMARKS</div>
-                <div class="sf-bendAna__verdictPill" id="sfBendAnaDeflRm">—</div>
               </div>
             </div>
           </div>

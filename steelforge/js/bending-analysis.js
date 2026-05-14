@@ -52,67 +52,6 @@
     return v.toFixed(d).replace(/\.?0+$/, '');
   }
 
-  /** Δ_allow (in) from span L (ft) and workbook denominator n (Δ = L/n). */
-  function allowableDeflectionInches(L_ft, denomRaw) {
-    const n = parseNumLike(denomRaw);
-    if (!Number.isFinite(L_ft) || L_ft <= 0 || !Number.isFinite(n) || n <= 0) return null;
-    return (L_ft * 12) / n;
-  }
-
-  function deltaInches(W_klf, L_ft, E_ksi, I_in4, deflectionK) {
-    if (![W_klf, L_ft, E_ksi, I_in4].every((x) => Number.isFinite(x) && x > 0)) return null;
-    const k = deflectionK;
-    if (!Number.isFinite(k) || k <= 0) return null;
-    return (k * W_klf * Math.pow(12, 3) * Math.pow(L_ft, 4)) / (E_ksi * I_in4);
-  }
-
-  function workbookBeamCaseAna(rawId) {
-    return window.SteelForgeWorkbookBeamCaseById
-      ? window.SteelForgeWorkbookBeamCaseById(rawId)
-      : {
-          id: 'simple-u',
-          deflectionK: 5 / 384,
-        };
-  }
-
-  function populateAnalysisDeflectionSelect(selectEl, preferredDenom) {
-    if (!selectEl) return;
-    const presets = window.SteelForgeWorkbookDeflectionLimitPresets;
-    if (!presets || presets.length === 0) return;
-    const prior = String(selectEl.value || '').trim();
-    selectEl.innerHTML = '';
-    for (const p of presets) {
-      const opt = document.createElement('option');
-      opt.value = String(p.denom);
-      opt.textContent = p.label;
-      selectEl.appendChild(opt);
-    }
-    const pref = String(preferredDenom ?? '').trim();
-    const pick =
-      presets.some((p) => String(p.denom) === prior)
-        ? prior
-        : presets.some((p) => String(p.denom) === pref)
-          ? pref
-          : String(presets.find((x) => x.denom === 360)?.denom ?? presets[0].denom);
-    selectEl.value = pick;
-  }
-
-  function preferredAnaDeflDenom() {
-    const g = window.SteelForge?.activeStructuralSteelGrade;
-    const d = g?.workbookDeflectionDenom;
-    return Number.isFinite(d) && d > 0 ? d : 360;
-  }
-
-  function formatDeflectionDual(deltaIn) {
-    if (!Number.isFinite(deltaIn)) return '—';
-    return `${fmt(deltaIn / 12, 9)} ft (${fmt(deltaIn, 4)} in)`;
-  }
-
-  function formatDeflectionWorkbookFt(deltaIn) {
-    if (!Number.isFinite(deltaIn)) return '—';
-    return fmt(deltaIn / 12, 9);
-  }
-
   function steelPropsFromGradeSelect(selectValue) {
     if (selectValue === 'custom') return null;
     const grades = window.SteelForgeStructuralSteelGrades ?? [];
@@ -324,25 +263,10 @@
     const outPhiMn = $('sfBendAnaMu');
     const capLrfdLbl = $('sfBendAnaCapLrfdLbl');
     const solveBtn = $('sfBendAnaSolve');
-    const anaDefNo = $('sfBendAnaDefNo');
-    const anaDefYes = $('sfBendAnaDefYes');
-    const spanFt = $('sfBendAnaSpanFt');
-    const wsvc = $('sfBendAnaWsvc');
-    const deflLimSel = $('sfBendAnaDeflLim');
-    const ixDisp = $('sfBendAnaIxDisp');
-    const deltaAllow = $('sfBendAnaDeltaAllow');
-    const deltaMax = $('sfBendAnaDeltaMax');
-    const deflRm = $('sfBendAnaDeflRm');
 
     if (!methodEl || !shapeEl || !steelEl || !fyEl || !eEl || !mpEl) return;
 
     let wRows = [];
-    let curIx = null;
-
-    function syncAnaDeflDataset() {
-      if (!root || !anaDefYes || !anaDefNo) return;
-      root.dataset.sfBendAnaDefl = anaDefYes.checked ? 'with' : 'without';
-    }
 
     const isManual = () => String(shapeEl.value || '') === 'manual';
 
@@ -361,9 +285,6 @@
       if (lwEl) lwEl.value = fmt(parseNumLike(hit[COL.lamW]), 6);
       if (zxEl) zxEl.value = fmt(parseNumLike(hit[COL.Zx]), 3);
       if (sxEl) sxEl.value = fmt(parseNumLike(hit[COL.Sx]), 3);
-      const ix = parseNumLike(hit[COL.Ix]);
-      curIx = Number.isFinite(ix) && ix > 0 ? ix : null;
-      if (ixDisp) ixDisp.textContent = Number.isFinite(ix) ? fmt(ix, 1) : '—';
       return true;
     }
 
@@ -397,62 +318,10 @@
       num(lwEl, 6, 0);
       num(zxEl, 3, 0);
       num(sxEl, 3, 0);
-      num(spanFt, 3, 0);
-      num(wsvc, 4, 0);
       num(fyEl, 3, 0);
     }
 
-    function updateDeflectionOutputs() {
-      const clearPill = () => {
-        if (!deflRm) return;
-        deflRm.textContent = '—';
-        deflRm.classList.remove('sf-bendAna__verdictPill--safe', 'sf-bendAna__verdictPill--unsafe');
-      };
-
-      if (!anaDefYes?.checked) {
-        if (deltaAllow) deltaAllow.textContent = '—';
-        if (deltaMax) deltaMax.textContent = '—';
-        clearPill();
-        return;
-      }
-
-      const L = parseNumLike(spanFt?.value);
-      const W = parseNumLike(wsvc?.value);
-      const denom = deflLimSel?.value;
-      const dAllow = allowableDeflectionInches(L, denom);
-
-      if (deltaAllow) deltaAllow.textContent = formatDeflectionWorkbookFt(dAllow);
-
-      if (!Number.isFinite(curIx) || curIx <= 0 || !Number.isFinite(W) || W <= 0 || !Number.isFinite(L) || L <= 0) {
-        if (deltaMax) deltaMax.textContent = '—';
-        clearPill();
-        return;
-      }
-
-      const bc = workbookBeamCaseAna('simple-u');
-      const k = bc.deflectionK ?? 5 / 384;
-      const dMax = deltaInches(W, L, E_DEFAULT, curIx, k);
-
-      if (deltaMax) deltaMax.textContent = formatDeflectionWorkbookFt(dMax);
-
-      if (deflRm) {
-        const ok =
-          Number.isFinite(dMax) &&
-          Number.isFinite(dAllow) &&
-          dAllow > 0 &&
-          dMax <= dAllow + 1e-9;
-        deflRm.textContent =
-          !Number.isFinite(dMax) || !Number.isFinite(dAllow) || dAllow <= 0 ? '—' : ok ? 'SAFE' : 'UNSAFE';
-        deflRm.classList.toggle('sf-bendAna__verdictPill--safe', ok);
-        deflRm.classList.toggle(
-          'sf-bendAna__verdictPill--unsafe',
-          Number.isFinite(dMax) && Number.isFinite(dAllow) && dAllow > 0 && !ok,
-        );
-      }
-    }
-
     function recompute() {
-      syncAnaDeflDataset();
       normalizeInputs();
       syncSteel();
       if (eEl) eEl.value = String(E_DEFAULT);
@@ -496,8 +365,6 @@
       if (outPhiMn) outPhiMn.textContent = fmt(phiMn, 3);
       const govEl = $('sfBendAnaGovCap');
       if (govEl) govEl.textContent = fmt(design, 3);
-
-      updateDeflectionOutputs();
     }
 
     function buildShapeOptions() {
@@ -528,8 +395,6 @@
       shapeEl.addEventListener('change', () => {
         if (isManual()) {
           setGeomReadOnly(false);
-          curIx = null;
-          if (ixDisp) ixDisp.textContent = '—';
         } else if (wRows.length) {
           applyWRowByLabel(shapeEl.value);
           setGeomReadOnly(true);
@@ -549,16 +414,13 @@
       mpEl.classList.add('sf-bend__readonly');
     }
     populateSteelControl(steelEl, getPreferredSteelGradeId());
-    populateAnalysisDeflectionSelect(deflLimSel, preferredAnaDeflDenom());
     syncSteel();
-    syncAnaDeflDataset();
     buildShapeOptions();
     wire();
 
     window.addEventListener('sf:steel-grade-change', () => {
       const pid = window.SteelForge?.activeStructuralSteelGrade?.id ?? getPreferredSteelGradeId();
       populateSteelControl(steelEl, pid);
-      populateAnalysisDeflectionSelect(deflLimSel, preferredAnaDeflDenom());
       syncSteel();
       recompute();
     });

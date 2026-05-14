@@ -10268,17 +10268,6 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   display: none !important;
 }
 
-/* Analysis: optional deflection card (hidden unless WITH DEFLECTION) */
-.sf-comp.sf-comp--bending[data-sf-bend-ana-defl='without'] .sf-bendAna__deflBlock {
-  display: none !important;
-}
-
-.sf-comp--bending[data-sf-bend-ana-defl='without'] label.sf-bendDes__subBtn[for='sfBendAnaDefNo'],
-.sf-comp--bending[data-sf-bend-ana-defl='with'] label.sf-bendDes__subBtn[for='sfBendAnaDefYes'] {
-  background: rgba(205, 218, 232, 0.92);
-  border-color: rgba(29, 120, 179, 0.35);
-}
-
 .sf-bendDes__subNav {
   display: flex;
   flex-wrap: wrap;

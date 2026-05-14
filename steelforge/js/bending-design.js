@@ -300,35 +300,6 @@
     return null;
   }
 
-  /**
-   * Workbook `SECTION ZX` + MATCH(…,-1): smallest tabulated Z<sub>x</sub> (in³) that still meets Z_req.
-   * Tie-break: lighter nominal weight, then smaller I<sub>x</sub> (same as Excel row order for a given Z<sub>x</sub> tier).
-   */
-  function pickSmallestZxGeq(Z_req, sorted) {
-    if (!Number.isFinite(Z_req) || Z_req <= 0 || !sorted?.length) return null;
-    let best = null;
-    let bestZ = Infinity;
-    let bestW = Infinity;
-    let bestIx = Infinity;
-    for (const s of sorted) {
-      const Zx = parseNumLike(s.row[COL.Zx]);
-      if (!Number.isFinite(Zx) || Zx + 1e-9 < Z_req) continue;
-      if (
-        Zx < bestZ - 1e-9 ||
-        (Math.abs(Zx - bestZ) <= 1e-9 && s.wLb < bestW - 1e-9) ||
-        (Math.abs(Zx - bestZ) <= 1e-9 &&
-          Math.abs(s.wLb - bestW) <= 1e-9 &&
-          s.Ix < bestIx - 1e-9)
-      ) {
-        best = s;
-        bestZ = Zx;
-        bestW = s.wLb;
-        bestIx = s.Ix;
-      }
-    }
-    return best;
-  }
-
   function pickBeamSelfWeightShape(isLRFD, sorted, I_min, dl, ll, L_ft, KMOM, Fy, E) {
     let w_self = 0;
     let picked = null;
@@ -1072,39 +1043,25 @@
         };
 
         if (deflOn) {
-          const zxReqL = (12 * lrfdR.Mu_tot) / (PHI_B * Fy);
-          const zxReqA = (12 * asdR.Ma_tot * OMEGA_B) / Fy;
-          const zxPickL = pickSmallestZxGeq(zxReqL, sorted);
-          const zxPickA = pickSmallestZxGeq(zxReqA, sorted);
-          const zxPrimary = isLRFD ? zxPickL : zxPickA;
-          const zxAlt = isLRFD ? zxPickA : zxPickL;
-
-          if (zxPrimary) {
-            const p = shapeProps(zxPrimary, Fy, E);
-            setOutSpan(els.ass1.sec, zxPrimary.lab);
+          /** Same converged W-shape as strength + I_min iteration (not a separate Z_x-only catalog pick). */
+          const gov = isLRFD ? lrfdR.picked : asdR.picked;
+          if (gov) {
+            const p = shapeProps(gov, Fy, E);
+            setOutSpan(els.ass1.sec, gov.lab);
             setOutSpan(els.ass1.zx, fmt(p.Zx, 3));
-            setOutSpan(els.ass1.w, fmt(zxPrimary.wLb, 1));
+            setOutSpan(els.ass1.w, fmt(gov.wLb, 1));
             setOutSpan(els.ass1.sx, fmt(p.Sx, 3));
-            setOutSpan(els.ass1.ix, fmt(zxPrimary.Ix, 1));
+            setOutSpan(els.ass1.ix, fmt(gov.Ix, 1));
             setOutSpan(els.ass1.lf, fmt(p.lamF, 6));
-            setRemarkSafe(els.ass1.rm, deflAss1Remark(zxPrimary, isLRFD));
+            setRemarkSafe(els.ass1.rm, deflAss1Remark(gov, isLRFD));
           } else {
             ['sec', 'zx', 'w', 'sx', 'ix', 'lf'].forEach((k) => setOutSpan(els.ass1[k], '—'));
             setRemarkSafe(els.ass1.rm, null);
           }
-
-          if (zxAlt) {
-            const p = shapeProps(zxAlt, Fy, E);
-            setOutSpan(els.ass1.secAsd, zxAlt.lab);
-            setOutSpan(els.ass1.zxAsd, fmt(p.Zx, 3));
-            setOutSpan(els.ass1.ixAsd, fmt(zxAlt.Ix, 1));
-            setRemarkSafe(els.ass1.rmAsd, deflAss1Remark(zxAlt, !isLRFD));
-          } else {
-            setOutSpan(els.ass1.secAsd, '—');
-            setOutSpan(els.ass1.zxAsd, '—');
-            setOutSpan(els.ass1.ixAsd, '—');
-            setRemarkSafe(els.ass1.rmAsd, null);
-          }
+          setOutSpan(els.ass1.secAsd, '—');
+          setOutSpan(els.ass1.zxAsd, '—');
+          setOutSpan(els.ass1.ixAsd, '—');
+          setRemarkSafe(els.ass1.rmAsd, null);
           return;
         }
 
@@ -1299,14 +1256,12 @@
       }
 
       /**
-       * ASSUMED SECTION BY I_x:
-       * - WITH deflection: lightest W-shape in catalog order whose I_x meets required I_c (matches “pick lightest that works” / prior no-deflection branch style).
-       * - WITHOUT deflection: inertia-driven pick using workbook Δ limit, else governing strength pick.
+       * ASSUMED SECTION BY I_x: same W-shape as governing strength pick so Z_x / I_x / S_x stay one section.
+       * (Without deflection: may still use lightest-by-order pick that meets required I_c when that path applies.)
        */
       let shapeForIxPanel = null;
       if (deflOn) {
-        shapeForIxPanel =
-          Number.isFinite(I_min) && I_min > 0 ? pickLightestMeetingIx(I_min, sorted) : null;
+        shapeForIxPanel = govPick || null;
       } else {
         shapeForIxPanel = ixPickNoDef || govPick || null;
       }

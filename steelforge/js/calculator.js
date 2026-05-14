@@ -2144,6 +2144,23 @@
       };
     };
 
+    /**
+     * Workbook block "SHEAR CAPACITY ASSUMING Cv = 1": Vn = 0.6 Fy Aw, ϕVn = 1·Vn,
+     * ASD allowable = Vn/1.5 (independent of λ-band φ=0.9 when Cv is still 1).
+     */
+    const shearStrengthCv1Cap = (shape, fyV) => {
+      const aw =
+        Number.isFinite(shape.Aw) ? shape.Aw
+        : Number.isFinite(shape.d) && Number.isFinite(shape.tw) ? shape.d * shape.tw
+        : null;
+      const Vn1 = Number.isFinite(fyV) && Number.isFinite(aw) ? 0.6 * fyV * aw * 1 : null;
+      return {
+        Vn: Vn1,
+        phiVn: Vn1,
+        Vallow: Number.isFinite(Vn1) ? Vn1 / 1.5 : null,
+      };
+    };
+
     const pickAssumedForMoment = (zxReqV) => {
       if (!shapesSorted.length) return null;
       const ok = shapesSorted.filter((s) => Number.isFinite(s.zx) && s.zx >= zxReqV);
@@ -2151,9 +2168,10 @@
       return shapesSorted.reduce((a, b) => ((a.zx ?? 0) >= (b.zx ?? 0) ? a : b));
     };
 
-    const pickLightestForShear = (zxReqV, shearVV, fyV, EV, kvV, lrfd) => {
+    /** Lightest section that satisfies workbook Cv=1 shear capacity (ϕVn=Vn, Vn/Ω=Vn/1.5). */
+    const pickLightestForShear = (zxReqV, shearVV, fyV, lrfd) => {
       const passes = (shape) => {
-        const { phiVn: pv, Vallow: va } = shearStrengthForShape(shape, fyV, EV, kvV);
+        const { phiVn: pv, Vallow: va } = shearStrengthCv1Cap(shape, fyV);
         if (lrfd) return Number.isFinite(pv) && Number.isFinite(shearVV) && shearVV <= pv;
         return Number.isFinite(va) && Number.isFinite(shearVV) && shearVV <= va;
       };
@@ -2355,31 +2373,28 @@
       let beamWeightKlf = 0;
       let wTopBw = 0;
       let w14Bw = null;
-      let wCombBw = 0;
       let Mbw = 0;
       let Vbw = 0;
       for (let iter = 0; iter < 12; iter++) {
         const dlW = dl + beamWeightKlf;
         let wT;
         let w14i;
-        let wC;
         if (isLRFD) {
           wT = 1.2 * dlW + 1.6 * ll;
           w14i = 1.4 * dlW;
-          wC = Math.max(wT, w14i);
         } else {
           wT = dlW + ll;
           w14i = null;
-          wC = dlW + ll;
         }
-        const Mb = wC * L ** 2 * momentFac;
-        const Vb = wC * L * shearFac;
+        // With beam weight: workbook M34/M35/M36 use the primary line only (not MAX with 1.4(DL+BW)) for Wu, Mu, Vu.
+        const wBwMuVu = wT;
+        const Mb = wBwMuVu * L ** 2 * momentFac;
+        const Vb = wBwMuVu * L * shearFac;
         const zxIter = zxFromMomentKft(Mb);
         const nextShape = pickAssumedForMoment(zxIter);
         const nextBw = shapeWeightKlf(nextShape);
         wTopBw = wT;
         w14Bw = w14i;
-        wCombBw = wC;
         Mbw = Mb;
         Vbw = Vb;
         assumedShape = nextShape;
@@ -2393,7 +2408,7 @@
       const lim224 = 2.24 * Math.sqrt(E / fy);
 
       const lightestShape =
-        pickLightestForShear(zxReqPick, Vbw, fy, E, kv, isLRFD) ?? assumedShape;
+        pickLightestForShear(zxReqPick, Vbw, fy, isLRFD) ?? assumedShape;
       const condShape = lightestShape ?? assumedShape;
 
       const lambdaPglob = 1.10 * Math.sqrt((kv * E) / fy);
@@ -2413,6 +2428,7 @@
       let phiVn;
       let Vallow;
       let shearCondShapeResult = null;
+      let shearCapCv1 = null;
 
       if (condShape) {
         shearCondShapeResult = shearStrengthForShape(condShape, fy, E, kv);
@@ -2420,9 +2436,15 @@
         Vn = shearCondShapeResult.Vn;
         phiVn = shearCondShapeResult.phiVn;
         Vallow = shearCondShapeResult.Vallow;
+        shearCapCv1 = shearStrengthCv1Cap(condShape, fy);
       } else {
         cv = Vn = phiVn = Vallow = null;
+        shearCapCv1 = null;
       }
+
+      const capVn = shearCapCv1?.Vn ?? null;
+      const capPhiVn = shearCapCv1?.phiVn ?? null;
+      const capVallow = shearCapCv1?.Vallow ?? null;
 
       /** Web slenderness for the Z<sub>x</sub>-assumed shape (must match plastic modulus / depth / t<sub>w</sub> in the same card). */
       const lambdaWebAssumed =
@@ -2448,7 +2470,7 @@
           ? fmtNum(wDlLlSuper, 2)
           : fmtNum(wTopBw, 2),
       );
-      setText('sfShearDesBwWu', fmtNum(wCombBw, 2));
+      setText('sfShearDesBwWu', fmtNum(wTopBw, 2));
       setText('sfShearDesBwW14', w14Bw == null ? '—' : fmtNum(w14Bw, 2));
       setText('sfShearDesBwMu', fmtNum(Mbw, 3));
       setText('sfShearDesBwVu', fmtNum(Vbw, 3));
@@ -2472,13 +2494,11 @@
       );
       setText('sfShearDesVn', fmtNum(Vn, 2));
 
-      // ---- SHEAR CAPACITY card (top-right) ----
-      // Title shows Cv (rounded), then Vn and the design capacity (ϕVn for LRFD
-      // / Vn/Ω for ASD). Remarks pill shares the same id as before so the SAFE
-      // / UNSAFE logic below still drives it.
-      setText('sfShearDesCapCv', Number.isFinite(cv) ? fmtNum(cv, 3) : '—');
-      setText('sfShearDesCapVn', Number.isFinite(Vn) ? fmtNum(Vn, 3) : '—');
-      const designShearCap = isLRFD ? phiVn : Vallow;
+      // ---- SHEAR CAPACITY card (top-right) — workbook "ASSUMING Cv = 1": Cv=1, Vn=0.6FyAw, ϕVn=Vn, Vn/Ω=Vn/1.5.
+      // CONDITION CHECKING (left) still shows actual Cv, φv, Ωv, Vn from web slenderness.
+      setText('sfShearDesCapCv', Number.isFinite(capVn) ? fmtNum(1, 3) : '—');
+      setText('sfShearDesCapVn', Number.isFinite(capVn) ? fmtNum(capVn, 3) : '—');
+      const designShearCap = isLRFD ? capPhiVn : capVallow;
       setText(
         'sfShearDesCapPhiVn',
         Number.isFinite(designShearCap) ? fmtNum(designShearCap, 3) : '—',
@@ -2487,10 +2507,10 @@
       let isSafe;
       if (isLRFD) {
         isSafe =
-          Number.isFinite(Vbw) && Number.isFinite(phiVn) ? Vbw <= phiVn + 1e-6 : null;
+          Number.isFinite(Vbw) && Number.isFinite(capPhiVn) ? Vbw <= capPhiVn + 1e-6 : null;
       } else {
         isSafe =
-          Number.isFinite(Vbw) && Number.isFinite(Vallow) ? Vbw <= Vallow + 1e-6 : null;
+          Number.isFinite(Vbw) && Number.isFinite(capVallow) ? Vbw <= capVallow + 1e-6 : null;
       }
       const demandShear = Vbw;
 
@@ -2506,7 +2526,7 @@
       if (shearDebugEnabled()) {
         console.debug('[SteelForge shear · design]', {
           wComb,
-          wCombBw,
+          wTopBw_line: wTopBw,
           M_kft: M,
           Mbw_kft: Mbw,
           Vu_or_Va_bw: demandShear,
@@ -2515,6 +2535,7 @@
           lightest: lightestShape?.name,
           governing: condShape?.name,
           ...(shearCondShapeResult ?? {}),
+          capCv1: shearCapCv1,
           phiVn,
           Vallow,
           lim224,
