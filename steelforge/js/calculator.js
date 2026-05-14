@@ -2215,6 +2215,13 @@
       setText('sfShearDesBwWuUnit', layout.wCombUnit);
       setHtml('sfShearDesBwLoadBottomLabel', layout.loadBottomLabel);
       setText('sfShearDesBwLoadBottomUnit', layout.loadBottomUnit);
+      /* LOAD WITH BEAM WEIGHT: show BW in the combination text (same math as workbook LRFD/ASD). */
+      if (isLRFD) {
+        setHtml('sfShearDesBwLoadTopLabel', '1.2(DL+BW)+1.6LL =');
+        setHtml('sfShearDesBwLoadBottomLabel', '1.4(DL+BW) =');
+      } else {
+        setHtml('sfShearDesBwLoadTopLabel', 'DL+BW+LL =');
+      }
       setHtml('sfShearDesBwMomentLabel', layout.momentLabel);
       setText('sfShearDesBwMomentUnit', layout.momentUnit);
       setHtml('sfShearDesBwShearLabel', layout.shearLabel);
@@ -2317,11 +2324,59 @@
           ? (M * 12) / (phiB * fy)
           : (M * 12) / (fy / omegaB);
 
+      const zxFromMomentKft = (mKft) =>
+        isLRFD ? (mKft * 12) / (phiB * fy) : (mKft * 12) / (fy / omegaB);
+
+      /**
+       * Converge trial section weight (BW, klf) with factored / service line load so the
+       * "LOAD WITH BEAM WEIGHT" card matches LRFD 1.2(DL+BW)+1.6LL (and ASD DL+BW+LL).
+       */
+      let assumedShape = null;
+      let beamWeightKlf = 0;
+      let wTopBw = 0;
+      let w14Bw = null;
+      let wCombBw = 0;
+      let Mbw = 0;
+      let Vbw = 0;
+      for (let iter = 0; iter < 12; iter++) {
+        const dlW = dl + beamWeightKlf;
+        let wT;
+        let w14i;
+        let wC;
+        if (isLRFD) {
+          wT = 1.2 * dlW + 1.6 * ll;
+          w14i = 1.4 * dlW;
+          wC = Math.max(wT, w14i);
+        } else {
+          wT = dlW + ll;
+          w14i = null;
+          wC = dlW + ll;
+        }
+        const Mb = wC * L ** 2 * momentFac;
+        const Vb = wC * L * shearFac;
+        const zxIter = zxFromMomentKft(Mb);
+        const nextShape = pickAssumedForMoment(zxIter);
+        const nextBw =
+          nextShape && Number.isFinite(nextShape.weight) && nextShape.weight >= 0
+            ? nextShape.weight / 1000
+            : 0;
+        wTopBw = wT;
+        w14Bw = w14i;
+        wCombBw = wC;
+        Mbw = Mb;
+        Vbw = Vb;
+        assumedShape = nextShape;
+        if (Math.abs(nextBw - beamWeightKlf) < 1e-6) break;
+        beamWeightKlf = nextBw;
+      }
+
+      const zxReqWithBw = zxFromMomentKft(Mbw);
+      const zxReqPick = Math.max(zxReq, zxReqWithBw);
+
       const lim224 = 2.24 * Math.sqrt(E / fy);
 
-      const assumedShape = pickAssumedForMoment(zxReq);
       const lightestShape =
-        pickLightestForShear(zxReq, V, fy, E, kv, isLRFD) ?? assumedShape;
+        pickLightestForShear(zxReqPick, Vbw, fy, E, kv, isLRFD) ?? assumedShape;
       const condShape = lightestShape ?? assumedShape;
 
       const lambdaPglob = 1.10 * Math.sqrt((kv * E) / fy);
@@ -2368,29 +2423,6 @@
       setText('sfShearDesVu', fmtNum(V, 3));
       setText('sfShearDesZx', fmtNum(zxReq, 4));
 
-      // ---- LOAD WITH BEAM WEIGHT (uses assumedShape.weight in lbs/ft → klf) ----
-      // If the AISC catalog provides the section's self-weight (lbs/ft), add it
-      // to DL and recompute the combined load + moment + shear. If unknown, fall
-      // back to the same numbers as LOAD W/O to keep the card visually consistent.
-      const beamWeightKlf =
-        assumedShape && Number.isFinite(assumedShape.weight)
-          ? assumedShape.weight / 1000
-          : 0;
-      const dlWithBw = dl + beamWeightKlf;
-      let wTopBw;
-      let w14Bw;
-      let wCombBw;
-      if (isLRFD) {
-        wTopBw = 1.2 * dlWithBw + 1.6 * ll;
-        w14Bw = 1.4 * dlWithBw;
-        wCombBw = Math.max(wTopBw, w14Bw);
-      } else {
-        wTopBw = dlWithBw + ll;
-        w14Bw = null;
-        wCombBw = dlWithBw + ll;
-      }
-      const Mbw = wCombBw * L ** 2 * momentFac;
-      const Vbw = wCombBw * L * shearFac;
       setText('sfShearDesBwWult', fmtNum(wTopBw, 2));
       setText('sfShearDesBwWu', fmtNum(wCombBw, 2));
       setText('sfShearDesBwW14', w14Bw == null ? '—' : fmtNum(w14Bw, 2));
@@ -2430,11 +2462,13 @@
 
       let isSafe;
       if (isLRFD) {
-        isSafe = Number.isFinite(V) && Number.isFinite(phiVn) ? V <= phiVn : null;
+        isSafe =
+          Number.isFinite(Vbw) && Number.isFinite(phiVn) ? Vbw <= phiVn + 1e-6 : null;
       } else {
-        isSafe = Number.isFinite(V) && Number.isFinite(Vallow) ? V <= Vallow : null;
+        isSafe =
+          Number.isFinite(Vbw) && Number.isFinite(Vallow) ? Vbw <= Vallow + 1e-6 : null;
       }
-      const demandShear = V;
+      const demandShear = Vbw;
 
       setText('sfShearDesUltimateVal', Number.isFinite(demandShear) ? fmtNum(demandShear, 3) : '—');
       setText('sfShearDesUltHdrVal', Number.isFinite(demandShear) ? fmtNum(demandShear, 3) : '—');
@@ -2448,8 +2482,10 @@
       if (shearDebugEnabled()) {
         console.debug('[SteelForge shear · design]', {
           wComb,
+          wCombBw,
           M_kft: M,
-          Vu_or_Va: demandShear,
+          Mbw_kft: Mbw,
+          Vu_or_Va_bw: demandShear,
           zxReq,
           assumed: assumedShape?.name,
           lightest: lightestShape?.name,
