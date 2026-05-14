@@ -111,6 +111,57 @@ const Ldef_ft = 35;
 const delta_allow_ft = Ldef_ft / 360;
 add('Δallow L/n as ft (0.097222)', nearly(delta_allow_ft, 0.097222222, 1e-6));
 
+/** Excel MATCH(lookup, range, -1) on non-increasing SECTION ZX columns C / D. */
+function largestIndexGeNonIncreasing(arr, val) {
+  let lo = 0;
+  let hi = arr.length - 1;
+  let ans = -1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (arr[mid] >= val) {
+      ans = mid;
+      lo = mid + 1;
+    } else hi = mid - 1;
+  }
+  return ans;
+}
+const zxCsv = [
+  { lab: 'W21X44', zx: 95.4, ix: 843 },
+  { lab: 'W18X35', zx: 66.5, ix: 510 },
+];
+const zxCol = zxCsv.map((r) => r.zx);
+const ixCol = zxCsv.map((r) => r.ix);
+add(
+  'SECTION ZX Zx req 62.07 → W18X35',
+  zxCsv[largestIndexGeNonIncreasing(zxCol, 62.06666667)]?.lab === 'W18X35',
+);
+add(
+  'SECTION ZX Ix req 798.362 → W21X44',
+  zxCsv[largestIndexGeNonIncreasing(ixCol, 798.362069)]?.lab === 'W21X44',
+);
+
+// BENDING DESIGN WITH DEFLECTION — L=35 ft, A992 Fy=50, DL=0.2, LL=0.8, simple UDL, L/360 (workbook screenshots)
+const dl35 = 0.2;
+const ll35 = 0.8;
+const L35 = 35;
+const Fy50 = 50;
+const Wu35 = Math.max(1.2 * dl35 + 1.6 * ll35, 1.4 * dl35);
+const Mu35 = Wu35 * L35 * L35 * (1 / 8);
+const Zreq35 = (12 * Mu35) / (PHI_B * Fy50);
+add('Demo L=35 Mu w/o BW (232.75)', nearly(Mu35, 232.75, 0.01), `got ${Mu35}`);
+add('Demo L=35 Zx,req LRFD (~62.067)', nearly(Zreq35, 62.06666667, 0.002), `got ${Zreq35}`);
+const Eksi = 29000;
+const kDefl = 5 / 384;
+const deltaIn35 = (L35 * 12) / 360;
+const Ireq35 =
+  (kDefl * ll35 * Math.pow(12, 3) * Math.pow(L35, 4)) / (Eksi * deltaIn35);
+add('Demo L=35 Ix,req LL-only (~798.362)', nearly(Ireq35, 798.362069, 0.001), `got ${Ireq35}`);
+const wBeam44 = 44 / 1000;
+const WuBw35 = 1.2 * (dl35 + wBeam44) + 1.6 * ll35;
+const MuBw35 = WuBw35 * L35 * L35 * (1 / 8);
+add('Demo W21×44 Wu incl. BW (1.5728)', nearly(WuBw35, 1.5728, 1e-4), `got ${WuBw35}`);
+add('Demo W21×44 Mu incl. BW (240.835)', nearly(MuBw35, 240.835, 0.01), `got ${MuBw35}`);
+
 /**
  * Workbook BENDING sheet — full analysis example.
  * Section W21X48 at Fy=100, Zx=107, Sx=93, λf=9.47, λw=53.6.

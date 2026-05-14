@@ -1,5 +1,7 @@
 (() => {
   const CSV_NAME = 'exel program EWIWIWI(S(STEEL SELECTION)).csv';
+  /** Same table as Excel `[1]SECTION ZX` — INDEX/MATCH(-1) picks for ASSUMED SECTION BY Z_x / BY I_x. */
+  const SECTION_ZX_CSV = 'exel program EWIWIWI(SECTION ZX).csv';
   const COL = { type: 0, label: 2, weight: 4, lamF: 23, lamW: 24, Ix: 29, Sx: 30, Zx: 33 };
   const PHI_B = 0.9;
   const OMEGA_B = 1.67;
@@ -290,6 +292,67 @@
     return (k * W_svc_klf * Math.pow(12, 3) * Math.pow(L_ft, 4)) / (E_ksi * delta_in);
   }
 
+  /**
+   * Excel MATCH(lookup, range, -1) on a **non-increasing** numeric column (SECTION ZX Z_x or I_x).
+   * Returns the largest index i with arr[i] ≥ val (0-based), or -1 if none.
+   */
+  function largestIndexGeNonIncreasing(arr, val) {
+    if (!Array.isArray(arr) || arr.length === 0 || !Number.isFinite(val)) return -1;
+    let lo = 0;
+    let hi = arr.length - 1;
+    let ans = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (arr[mid] >= val) {
+        ans = mid;
+        lo = mid + 1;
+      } else hi = mid - 1;
+    }
+    return ans;
+  }
+
+  function parseSectionZxCsv(txt) {
+    const lines = String(txt || '')
+      .split(/\r?\n/)
+      .filter((ln) => ln.trim());
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      const parts = parseCsvLine(lines[i]);
+      const lab = String(parts[1] || '').trim();
+      const zx = parseNumLike(parts[2]);
+      const ix = parseNumLike(parts[3]);
+      if (lab && Number.isFinite(zx) && Number.isFinite(ix)) rows.push({ lab, zx, ix });
+    }
+    return rows;
+  }
+
+  function sectionZxLabelForZxReq(rows, zxReq) {
+    if (!rows.length || !Number.isFinite(zxReq) || zxReq <= 0) return null;
+    const zxCol = rows.map((r) => r.zx);
+    const idx = largestIndexGeNonIncreasing(zxCol, zxReq);
+    return idx >= 0 ? rows[idx].lab : null;
+  }
+
+  function sectionZxLabelForIxReq(rows, ixReq) {
+    if (!rows.length || !Number.isFinite(ixReq) || ixReq <= 0) return null;
+    const ixCol = rows.map((r) => r.ix);
+    const idx = largestIndexGeNonIncreasing(ixCol, ixReq);
+    return idx >= 0 ? rows[idx].lab : null;
+  }
+
+  function canonWLabel(s) {
+    return String(s || '')
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, '');
+  }
+
+  function findSortedShapeByLab(sorted, lab) {
+    const t = canonWLabel(lab);
+    if (!t || !sorted.length) return null;
+    return sorted.find((s) => canonWLabel(s.lab) === t) ?? null;
+  }
+
   /** Lightest W-shape in CSV order whose I<sub>x</sub> meets the serviceability minimum. */
   function pickLightestMeetingIx(I_min, sorted) {
     if (!sorted.length) return null;
@@ -485,6 +548,7 @@
     const loadCardDefl = $('sfBendDeflLoadWo');
 
     let wRows = [];
+    let sectionZxRows = [];
 
     function isDeflOn() {
       return deflYes && deflYes.checked;
@@ -1019,7 +1083,30 @@
       setOutSpan(els.lw.Wa, fmt(asdR.Wa_tot, 4));
       setOutSpan(els.lw.Ma, fmt(asdR.Ma_tot, 3));
 
+      let shapeZxL_wb = null;
+      let shapeZxA_wb = null;
+      let shapeIx_wb = null;
+      if (deflOn && sectionZxRows.length && Number.isFinite(Fy) && Fy > 0) {
+        const ZreqL = (12 * Mu_val) / (Fy * PHI_B);
+        const labZL = sectionZxLabelForZxReq(sectionZxRows, ZreqL);
+        if (labZL) shapeZxL_wb = findSortedShapeByLab(sorted, labZL);
+        const ZreqA = (12 * Ma_req_val * OMEGA_B) / Fy;
+        const labZA = sectionZxLabelForZxReq(sectionZxRows, ZreqA);
+        if (labZA) shapeZxA_wb = findSortedShapeByLab(sorted, labZA);
+        if (Number.isFinite(I_min) && I_min > 0) {
+          const labI = sectionZxLabelForIxReq(sectionZxRows, I_min);
+          if (labI) shapeIx_wb = findSortedShapeByLab(sorted, labI);
+        }
+      }
+
       const applyAss1Dual = () => {
+        const deflAss1RemarkWorkbook = (shapeZx) => {
+          if (!shapeZx) return null;
+          /** BENDING!AC25 — IF(AC24>AC23,"UNSAFE","SAFE"): required I_x vs inertia of Z_x-picked section only. */
+          if (!Number.isFinite(I_min) || I_min <= 0) return null;
+          return !(I_min > shapeZx.Ix + 1e-9);
+        };
+
         const deflAss1Remark = (shape, lrfdDemand) => {
           if (!shape) return null;
           const cap = designStrengthKipFt(Fy, E, shape.row, lrfdDemand);
@@ -1043,17 +1130,17 @@
         };
 
         if (deflOn) {
-          /** Same converged W-shape as strength + I_min iteration (not a separate Z_x-only catalog pick). */
-          const gov = isLRFD ? lrfdR.picked : asdR.picked;
-          if (gov) {
-            const p = shapeProps(gov, Fy, E);
-            setOutSpan(els.ass1.sec, gov.lab);
+          const shapeZx = isLRFD ? shapeZxL_wb : shapeZxA_wb;
+          const disp = shapeZx || (isLRFD ? lrfdR.picked : asdR.picked);
+          if (disp) {
+            const p = shapeProps(disp, Fy, E);
+            setOutSpan(els.ass1.sec, disp.lab);
             setOutSpan(els.ass1.zx, fmt(p.Zx, 3));
-            setOutSpan(els.ass1.w, fmt(gov.wLb, 1));
+            setOutSpan(els.ass1.w, fmt(disp.wLb, 1));
             setOutSpan(els.ass1.sx, fmt(p.Sx, 3));
-            setOutSpan(els.ass1.ix, fmt(gov.Ix, 1));
+            setOutSpan(els.ass1.ix, fmt(disp.Ix, 1));
             setOutSpan(els.ass1.lf, fmt(p.lamF, 6));
-            setRemarkSafe(els.ass1.rm, deflAss1Remark(gov, isLRFD));
+            setRemarkSafe(els.ass1.rm, shapeZx ? deflAss1RemarkWorkbook(shapeZx) : deflAss1Remark(disp, isLRFD));
           } else {
             ['sec', 'zx', 'w', 'sx', 'ix', 'lf'].forEach((k) => setOutSpan(els.ass1[k], '—'));
             setRemarkSafe(els.ass1.rm, null);
@@ -1165,18 +1252,11 @@
         ? capL != null && capL >= lrfdR.Mu_tot
         : capA != null && capA >= asdR.Ma_tot;
 
-      let deflGovOk = true;
-      if (deflOn && govPick && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
-        const Wdefl = Math.max(0, ll);
-        const dMax = deltaInches(Wdefl, L, E, govPick.Ix, bcDesign.deflectionK);
-        deflGovOk =
-          Number.isFinite(dMax) &&
-          dMax <= deltaLimIn + 1e-9 &&
-          (!(Number.isFinite(I_min) && I_min > 0) || govPick.Ix >= I_min - 1e-6);
-      }
-
-      /** SAFE when strength and serviceability pass; M_n already reflects non-compact/slender limits. */
-      const overallOk = Boolean(govPick && bendGovOk && deflGovOk);
+      /**
+       * Final section remarks follow workbook bending capacity (AB53 vs AC38), not the DEFLECTION row (AC61).
+       * Deflection SAFE/UNSAFE remains on the DEFLECTION card only.
+       */
+      const overallOk = Boolean(govPick && bendGovOk);
 
       setRemarkSafe(els.finalRm, govPick ? overallOk : null);
 
@@ -1256,12 +1336,12 @@
       }
 
       /**
-       * ASSUMED SECTION BY I_x: same W-shape as governing strength pick so Z_x / I_x / S_x stay one section.
-       * (Without deflection: may still use lightest-by-order pick that meets required I_c when that path applies.)
+       * ASSUMED SECTION BY I_x: workbook `INDEX(SECTION ZX!B, MATCH(I_req, SECTION ZX!D, -1))` (AD29).
+       * With deflection, this is independent of the Z_x card (AB20).
        */
       let shapeForIxPanel = null;
       if (deflOn) {
-        shapeForIxPanel = govPick || null;
+        shapeForIxPanel = shapeIx_wb || govPick || null;
       } else {
         shapeForIxPanel = ixPickNoDef || govPick || null;
       }
@@ -1364,19 +1444,28 @@
       recompute();
     });
 
-    fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' })
-      .then((r) => {
-        if (!r.ok) throw new Error(String(r.status));
-        return r.text();
-      })
-      .then((txt) => {
-        const lines = txt.split(/\r?\n/);
-        wRows = lines
-          .slice(4)
-          .map(parseCsvLine)
-          .filter((r) => String(r[COL.type] || '').trim() === 'W' && String(r[COL.label] || '').trim());
-        recompute();
-      })
-      .catch(() => recompute());
+    async function loadDesignCsvs() {
+      try {
+        const r = await fetch(`./${encodeURIComponent(CSV_NAME)}`, { cache: 'no-store' });
+        if (r.ok) {
+          const lines = (await r.text()).split(/\r?\n/);
+          wRows = lines
+            .slice(4)
+            .map(parseCsvLine)
+            .filter((row) => String(row[COL.type] || '').trim() === 'W' && String(row[COL.label] || '').trim());
+        } else wRows = [];
+      } catch {
+        wRows = [];
+      }
+      try {
+        const r = await fetch(`./${encodeURIComponent(SECTION_ZX_CSV)}`, { cache: 'no-store' });
+        sectionZxRows = r.ok ? parseSectionZxCsv(await r.text()) : [];
+      } catch {
+        sectionZxRows = [];
+      }
+      recompute();
+    }
+
+    loadDesignCsvs();
   };
 })();
