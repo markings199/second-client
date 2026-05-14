@@ -2098,6 +2098,18 @@
     const kv = 5;
     const E = 29000;
 
+    /**
+     * Web area for V_n = 0.6 F_y A_w C_v — matches SHEAR DESIGN `0.6*N5*M25*M24` (d·t_w from assumed section),
+     * not a catalog A_w column that can differ slightly from d·t_w.
+     */
+    const shearWebAreaWorkbook = (shape) => {
+      if (!shape) return null;
+      if (Number.isFinite(shape.d) && Number.isFinite(shape.tw) && shape.tw > 0) {
+        return shape.d * shape.tw;
+      }
+      return Number.isFinite(shape.Aw) ? shape.Aw : null;
+    };
+
     const shearStrengthForShape = (shape, fyV, EV, kvV) => {
       const lambda =
         Number.isFinite(shape.h) && Number.isFinite(shape.tw) && shape.tw > 0
@@ -2105,10 +2117,7 @@
           : Number.isFinite(shape.lambdaW)
             ? shape.lambdaW
             : null;
-      const aw =
-        Number.isFinite(shape.Aw) ? shape.Aw
-        : Number.isFinite(shape.d) && Number.isFinite(shape.tw) ? shape.d * shape.tw
-        : null;
+      const aw = shearWebAreaWorkbook(shape);
       const lambdaP =
         Number.isFinite(fyV) && fyV > 0 && Number.isFinite(EV) && EV > 0 && Number.isFinite(kvV) && kvV > 0
           ? 1.10 * Math.sqrt((kvV * EV) / fyV)
@@ -2149,10 +2158,7 @@
      * ASD allowable = Vn/1.5 (independent of λ-band φ=0.9 when Cv is still 1).
      */
     const shearStrengthCv1Cap = (shape, fyV) => {
-      const aw =
-        Number.isFinite(shape.Aw) ? shape.Aw
-        : Number.isFinite(shape.d) && Number.isFinite(shape.tw) ? shape.d * shape.tw
-        : null;
+      const aw = shearWebAreaWorkbook(shape);
       const Vn1 = Number.isFinite(fyV) && Number.isFinite(aw) ? 0.6 * fyV * aw * 1 : null;
       return {
         Vn: Vn1,
@@ -2409,7 +2415,6 @@
 
       const lightestShape =
         pickLightestForShear(zxReqPick, Vbw, fy, isLRFD) ?? assumedShape;
-      const condShape = lightestShape ?? assumedShape;
 
       const lambdaPglob = 1.10 * Math.sqrt((kv * E) / fy);
       const lambdaRglob = 1.37 * Math.sqrt((kv * E) / fy);
@@ -2430,13 +2435,14 @@
       let shearCondShapeResult = null;
       let shearCapCv1 = null;
 
-      if (condShape) {
-        shearCondShapeResult = shearStrengthForShape(condShape, fy, E, kv);
+      /** Workbook rows 30 & 59–62: C_v, φ_v, Ω_v, V_n, and ultimate shear use the ASSUMED section (N22), not the lightest shopping row. */
+      if (assumedShape) {
+        shearCondShapeResult = shearStrengthForShape(assumedShape, fy, E, kv);
         cv = shearCondShapeResult.cv;
         Vn = shearCondShapeResult.Vn;
         phiVn = shearCondShapeResult.phiVn;
         Vallow = shearCondShapeResult.Vallow;
-        shearCapCv1 = shearStrengthCv1Cap(condShape, fy);
+        shearCapCv1 = shearStrengthCv1Cap(assumedShape, fy);
       } else {
         cv = Vn = phiVn = Vallow = null;
         shearCapCv1 = null;
@@ -2552,7 +2558,7 @@
           zxReq,
           assumed: assumedShape?.name,
           lightest: lightestShape?.name,
-          governing: condShape?.name,
+          governing: assumedShape?.name,
           ...(shearCondShapeResult ?? {}),
           capCv1: shearCapCv1,
           phiVn,

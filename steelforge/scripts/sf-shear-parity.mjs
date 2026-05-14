@@ -126,6 +126,12 @@ function loadShearShapesFromRepoCsv() {
   return { shapes: out, shapesSortedByWeight: sortedByWeight };
 }
 
+function shearWebAreaWorkbook(shape) {
+  if (!shape) return null;
+  if (Number.isFinite(shape.d) && Number.isFinite(shape.tw) && shape.tw > 0) return shape.d * shape.tw;
+  return Number.isFinite(shape.Aw) ? shape.Aw : null;
+}
+
 function shearStrengthForShape(shape, fyV, EV, kvV, phiV, omegaV) {
   const lambda =
     Number.isFinite(shape.h) && Number.isFinite(shape.tw) && shape.tw > 0
@@ -133,12 +139,7 @@ function shearStrengthForShape(shape, fyV, EV, kvV, phiV, omegaV) {
       : Number.isFinite(shape.lambdaW)
         ? shape.lambdaW
         : null;
-  const aw =
-    Number.isFinite(shape.Aw)
-      ? shape.Aw
-      : Number.isFinite(shape.d) && Number.isFinite(shape.tw)
-        ? shape.d * shape.tw
-        : null;
+  const aw = shearWebAreaWorkbook(shape);
   const lambdaP =
     Number.isFinite(fyV) && fyV > 0 && Number.isFinite(EV) && EV > 0 && Number.isFinite(kvV) && kvV > 0
       ? 1.1 * Math.sqrt((kvV * EV) / fyV)
