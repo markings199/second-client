@@ -111,6 +111,54 @@
     return g;
   }
 
+  /** Populate a datalist with catalog steel grade labels (searchable combobox). */
+  function fillSteelGradeDatalist(datalistEl) {
+    if (!datalistEl) return;
+    const grades = window.SteelForgeStructuralSteelGrades ?? [];
+    datalistEl.innerHTML = '';
+    const seen = new Set();
+    [...grades]
+      .slice()
+      .sort((a, b) => String(a.label || '').localeCompare(String(b.label || '')))
+      .forEach((g) => {
+        const lab = String(g.label || '').trim();
+        if (!lab) return;
+        const up = lab.toUpperCase();
+        if (seen.has(up)) return;
+        seen.add(up);
+        const opt = document.createElement('option');
+        opt.value = lab;
+        datalistEl.appendChild(opt);
+      });
+  }
+
+  /**
+   * Numeric U from shear lag case (analysis / design).
+   * CASE 2: U = 1 − x̄/L when x̄ and L are finite and L > 0; otherwise workbook fallback (e.g. 0.75).
+   */
+  function shearLagUFromSelection(lagRaw, xbarIn, LconnIn) {
+    const raw = String(lagRaw ?? '').trim();
+    if (!raw) return null;
+    const nDirect = parseNumLike(raw);
+    if (Number.isFinite(nDirect)) return nDirect;
+    const m = raw.match(/^case\s*(.+)$/i);
+    if (!m) return null;
+    let key = String(m[1]).trim().replace(/\s+/g, '').toLowerCase();
+    key = key.replace(/^0+/, '') || '0';
+    if (key === '8') key = '8a';
+    const case2ish = key === '2' || key === '2a';
+    if (case2ish && Number.isFinite(xbarIn) && Number.isFinite(LconnIn) && LconnIn > 0) {
+      const u = 1 - xbarIn / LconnIn;
+      if (Number.isFinite(u)) return Math.max(0, Math.min(1, u));
+    }
+    if (window.SteelForgeWorkbookShearLagU) {
+      const bookKey = case2ish ? '2' : key;
+      const uBook = window.SteelForgeWorkbookShearLagU(bookKey);
+      if (Number.isFinite(uBook)) return uBook;
+    }
+    return null;
+  }
+
   window.SteelForge = window.SteelForge || {};
   window.SteelForge.initTensionAnalysis = (panelRoot) => {
     const pane = panelRoot?.querySelector?.('.sf-comp--tension .sf-comp__mode[data-comp-mode-pane="analysis"]');
@@ -196,19 +244,11 @@
      *   - Bare "CASE 8" coerces to 8a for parity with design tension.
      */
     function getUFromLagSelect() {
-      const raw = String(lagEl?.value || '').trim();
-      if (!raw) return null;
-      const nDirect = parseNumLike(raw);
-      if (Number.isFinite(nDirect)) return nDirect;
-      const m = raw.match(/^case\s*(.+)$/i);
-      if (m && window.SteelForgeWorkbookShearLagU) {
-        let key = String(m[1]).trim().replace(/\s+/g, '').toLowerCase();
-        key = key.replace(/^0+/, '') || '0';
-        if (key === '8') key = '8a';
-        const uBook = window.SteelForgeWorkbookShearLagU(key);
-        if (Number.isFinite(uBook)) return uBook;
-      }
-      return null;
+      return shearLagUFromSelection(
+        lagEl?.value,
+        parseNumLike(xbarEl?.value),
+        parseNumLike(lenEl?.value),
+      );
     }
 
     const isManualMode = () => String(shapeEl.value || '').toLowerCase() === 'manual';
@@ -508,16 +548,6 @@
       if (outAsdF) outAsdF.textContent = fmt(asdFrac, 3);
       if (outAsdGov) outAsdGov.textContent = fmt(finAsdGov, 3);
       if (outAsdAllow) outAsdAllow.textContent = fmt(finAsdGov, 3);
-
-      const syncCapMirror = (srcId, dstId) => {
-        const src = el(srcId);
-        const dst = el(dstId);
-        if (src && dst) dst.textContent = src.textContent;
-      };
-      syncCapMirror('sfTenAnaLrfdYield', 'sfTenAnaLrfdYieldMir');
-      syncCapMirror('sfTenAnaLrfdFracture', 'sfTenAnaLrfdFractureMir');
-      syncCapMirror('sfTenAnaCapBlock', 'sfTenAnaCapBlockMir');
-      syncCapMirror('sfTenAnaLrfdGov', 'sfTenAnaLrfdGovMir');
     }
 
     function setDefaults() {
@@ -569,6 +599,7 @@
     }
 
     function wire() {
+      fillSteelGradeDatalist(pane.querySelector('#sfTenAnaSteelList'));
       const bump = () => {
         recompute();
       };
@@ -582,9 +613,16 @@
       );
 
       pane.querySelectorAll('input, select').forEach((x) => {
+        if (x === steelEl) return;
         x.addEventListener('input', bump);
         x.addEventListener('change', bump);
       });
+      const bumpSteel = () => {
+        applySteelDefaults();
+        recompute();
+      };
+      steelEl?.addEventListener('input', bumpSteel);
+      steelEl?.addEventListener('change', bumpSteel);
 
       let debounce;
       aiscEl.addEventListener('input', () => {
@@ -630,10 +668,6 @@
         true,
       );
 
-      steelEl?.addEventListener('change', () => {
-        applySteelDefaults();
-        recompute();
-      });
       shapeEl?.addEventListener('change', () => {
         const manual = isManualMode();
         setGeometryReadOnly(!manual);
@@ -716,6 +750,7 @@
     const fyEl = el('sfTenDesFy');
     const fuEl = el('sfTenDesFu');
     const lagEl = el('sfTenDesShearLag');
+    const xbarDesEl = el('sfTenDesXbar');
     const uEl = el('sfTenDesU');
     const rEl = el('sfTenDesR');
     const nEl = el('sfTenDesN');
@@ -742,21 +777,8 @@
 
     let angleRows = [];
 
-    const getUFromLagText = () => {
-      const raw = String(lagEl?.value || '').trim();
-      if (!raw) return null;
-      const nDirect = parseNumLike(raw);
-      if (Number.isFinite(nDirect)) return nDirect;
-      const m = raw.trim().match(/^case\s*(.+)$/i);
-      if (m && window.SteelForgeWorkbookShearLagU) {
-        let key = String(m[1]).trim().replace(/\s+/g, '').toLowerCase();
-        key = key.replace(/^0+/, '') || '0';
-        if (key === '8') key = '8a';
-        const uBook = window.SteelForgeWorkbookShearLagU(key);
-        if (Number.isFinite(uBook)) return uBook;
-      }
-      return null;
-    };
+    const getUFromLagText = () =>
+      shearLagUFromSelection(lagEl?.value, parseNumLike(xbarDesEl?.value), parseNumLike(lEl?.value));
 
     const rowArea = (r) => parseNumLike(r?.[COL.Ag]);
     const rowRmin = (r) => {
@@ -822,6 +844,7 @@
       if (!String(lEl.value).trim()) lEl.value = '120';
       if (!String(steelEl.value).trim()) steelEl.value = activeGrade?.label ?? 'A992';
       if (!String(lagEl?.value || '').trim()) lagEl.value = 'CASE 2';
+      if (xbarDesEl && !String(xbarDesEl.value).trim()) xbarDesEl.value = '1.2';
       if (!String(nEl?.value || '').trim()) nEl.value = '2';
       if (!String(dhEl?.value || '').trim()) dhEl.value = '7/8';
       if (uEl) uEl.readOnly = true;
@@ -955,14 +978,18 @@
     }
 
     function wire() {
+      fillSteelGradeDatalist(pane.querySelector('#sfTenDesSteelList'));
+      const bumpSteel = () => {
+        applySteelDefaults();
+        recompute();
+      };
       pane.querySelectorAll('input, select').forEach((x) => {
+        if (x === steelEl) return;
         x.addEventListener('input', recompute);
         x.addEventListener('change', recompute);
       });
-      steelEl.addEventListener('change', () => {
-        applySteelDefaults();
-        recompute();
-      });
+      steelEl.addEventListener('input', bumpSteel);
+      steelEl.addEventListener('change', bumpSteel);
       solveBtn?.addEventListener('click', recompute);
     }
 

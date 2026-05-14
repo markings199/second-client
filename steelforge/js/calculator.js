@@ -1540,9 +1540,9 @@
   }
 
   /**
-   * Client workbook / spec: λ_w = h/t_w. Sequential limits:
-   * A = 2.24√(E/Fy), B = 1.10√(k_v E/Fy), C = 1.37√(k_v E/Fy).
-   * If A > λ → cond 1; else if B > λ → cond 2; else if C > λ → cond 3; else cond 4.
+   * Client workbook (SHEAR sheet IFS): λ_w = h/t_w. Limits shown beside the figure:
+   * λ₁ = 2.24√(E/Fy), λ_p = 1.10√(k_v E/Fy), λ_r = 1.37√(k_v E/Fy).
+   * Regions: λ ≤ λ₁ → cond 1; λ₁ < λ ≤ λ_p → cond 2; λ_p < λ ≤ λ_r → cond 3; λ > λ_r → cond 4.
    * Nominal V_n = 0.6 F_y A_w C_v with C_v and resistance factors per condition.
    */
   function shearClientShearState(lambda, fy, E, kv) {
@@ -1551,13 +1551,13 @@
     const limB = 1.1 * Math.sqrt((kv * E) / fy);
     const limC = 1.37 * Math.sqrt((kv * E) / fy);
 
-    if (limA > lambda) {
+    if (lambda <= limA) {
       return { condition: 1, cv: 1, phiV: 1, omegaV: 1.5, limA, limB, limC };
     }
-    if (limB > lambda) {
+    if (lambda <= limB) {
       return { condition: 2, cv: 1, phiV: 0.9, omegaV: 1.67, limA, limB, limC };
     }
-    if (limC > lambda) {
+    if (lambda <= limC) {
       return { condition: 3, cv: limB / lambda, phiV: 0.9, omegaV: 1.67, limA, limB, limC };
     }
     const cv = (1.51 * kv * E) / (fy * lambda * lambda);
@@ -1874,6 +1874,10 @@
         lambdaWeb != null && Number.isFinite(fy) && Number.isFinite(E) && Number.isFinite(kv)
           ? shearClientShearState(lambdaWeb, fy, E, kv)
           : null;
+      /** Pills must use the same λ₁, λ_p, λ_r as Cv / verdict (single source when shear state exists). */
+      const lim224Disp = shearSt ? shearSt.limA : lim224;
+      const lambdaPDisp = shearSt ? shearSt.limB : lambdaP;
+      const lambdaRDisp = shearSt ? shearSt.limC : lambdaR;
       const cv = shearSt ? shearSt.cv : null;
       const Vn =
         Number.isFinite(cv) && Number.isFinite(fy) && Number.isFinite(aw) ? 0.6 * fy * aw * cv : null;
@@ -1902,9 +1906,9 @@
       if (phiEl) phiEl.textContent = shearSt ? fmtNum(shearSt.phiV, 3) : '—';
       if (omgEl) omgEl.textContent = shearSt ? fmtNum(shearSt.omegaV, 2) : '—';
       if (vnEl) vnEl.textContent = fmtNum(Vn, 2);
-      if (b1) b1.textContent = fmtShearLimit(lim224);
-      if (b2) b2.textContent = fmtShearLimit(lambdaP);
-      if (b3) b3.textContent = fmtShearLimit(lambdaR);
+      if (b1) b1.textContent = fmtShearLimit(lim224Disp);
+      if (b2) b2.textContent = fmtShearLimit(lambdaPDisp);
+      if (b3) b3.textContent = fmtShearLimit(lambdaRDisp);
 
       const verdictEl = out('sfShearAnaVerdictPill');
       if (verdictEl) {

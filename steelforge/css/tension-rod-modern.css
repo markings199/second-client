@@ -412,25 +412,25 @@
   color: #334155 !important;
 }
 
-/* TENSILE DEMAND: LRFD highlights factored pair; ASD highlights service DL+LL */
-.sf-comp--tensionRod.sf-rod--lrfd .tr-rod-shell .tensile-card .sf-rod__dem1216,
-.sf-comp--tensionRod.sf-rod--lrfd .tr-rod-shell .tensile-card .sf-rod__dem14 {
+/* TENSILE DEMAND: LRFD → yellow on factored rows; ASD → yellow on DL+LL. Include .result-pill so base pill color does not win. */
+.sf-comp--tensionRod.sf-rod--lrfd .tr-rod-shell .tensile-card .result-pill.sf-rod__dem1216,
+.sf-comp--tensionRod.sf-rod--lrfd .tr-rod-shell .tensile-card .result-pill.sf-rod__dem14 {
   background: #facc15 !important;
   color: #1f2937 !important;
 }
 
-.sf-comp--tensionRod.sf-rod--lrfd .tr-rod-shell .tensile-card .sf-rod__demDlll {
+.sf-comp--tensionRod.sf-rod--lrfd .tr-rod-shell .tensile-card .result-pill.sf-rod__demDlll {
   background: #cbd5e1 !important;
   color: #334155 !important;
 }
 
-.sf-comp--tensionRod.sf-rod--asd .tr-rod-shell .tensile-card .sf-rod__demDlll {
+.sf-comp--tensionRod.sf-rod--asd .tr-rod-shell .tensile-card .result-pill.sf-rod__demDlll {
   background: #facc15 !important;
   color: #1f2937 !important;
 }
 
-.sf-comp--tensionRod.sf-rod--asd .tr-rod-shell .tensile-card .sf-rod__dem1216,
-.sf-comp--tensionRod.sf-rod--asd .tr-rod-shell .tensile-card .sf-rod__dem14 {
+.sf-comp--tensionRod.sf-rod--asd .tr-rod-shell .tensile-card .result-pill.sf-rod__dem1216,
+.sf-comp--tensionRod.sf-rod--asd .tr-rod-shell .tensile-card .result-pill.sf-rod__dem14 {
   background: #cbd5e1 !important;
   color: #334155 !important;
 }

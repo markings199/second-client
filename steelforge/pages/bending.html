@@ -230,7 +230,7 @@
               <div class="sf-bendNoDef__formRow"><span>BEAM TYPE</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesBeamLblN">—</div></div>
               <div class="sf-bendNoDef__loadRow"><span>ULTIMATE MOMENT (M<sub>u</sub>) =</span><div class="sf-bendNoDef__inlinePill" id="sfBendDesMomentFormulaN">WL²/8</div></div>
               <div class="sf-bendNoDef__loadRow"><span>MAX DEFLECTION (Δ<sub>max</sub>) =</span><div class="sf-bendNoDef__inlinePill" id="sfBendDesDeflFormulaN">5WL⁴/384EI</div></div>
-              <div class="sf-bendNoDef__loadRow sf-bendNoDef__loadRow--reverse"><span>ALLOWABLE MOMENT OF INERTIA I<sub>c</sub> =</span><div class="sf-bendNoDef__highlightPill" id="sfBendDesIxReqChip" title="Minimum Ix (in⁴) for Δ = L(ft)/n using service W = DL+LL (klf) and δ = k·W·L⁴/(E·I); k from beam case (simple UDL: 5/384), E = 29 000 ksi.">—</div></div>
+              <div class="sf-bendNoDef__loadRow sf-bendNoDef__loadRow--reverse"><span>REQUIRED MOMENT OF INERTIA I<sub>c</sub> =</span><div class="sf-bendNoDef__highlightPill" id="sfBendDesIxReqChip" title="Required Ix (in⁴) for Δ = L(ft)/n using service W = DL+LL (klf) and δ = k·W·L⁴/(E·I); k from beam case (simple UDL: 5/384), E = 29 000 ksi.">—</div></div>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendNoDef__sectionCard">
@@ -242,14 +242,16 @@
               <div class="sf-bendNoDef__formRow"><span>MOMENT OF INERTIA I<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1Ix">—</div><span class="sf-bendNoDef__unitHint">in⁴</span></div>
               <div class="sf-bendNoDef__formRow"><span>λ<sub>f</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1Lf">—</div></div>
               <div class="sf-bendNoDef__remarkPill" id="sfBendDesAss1Rm">—</div>
-              <div class="sf-bendNoDef__panelHeading sf-bendNoDef__panelHeading--sub">ASD (strength pick)</div>
-              <div class="sf-bendNoDef__formRow"><span>STEEL SECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesAss1SecAsd">—</div></div>
-              <div class="sf-bendNoDef__formRow"><span>Z<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1ZxAsd">—</div><span class="sf-bendNoDef__unitHint">in³</span></div>
-              <div class="sf-bendNoDef__formRow"><span>I<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1IxAsd">—</div><span class="sf-bendNoDef__unitHint">in⁴</span></div>
-              <div class="sf-bendNoDef__remarkPill sf-bendNoDef__remarkPill--safe" id="sfBendDesAss1RmAsd">—</div>
+              <div class="sf-bendNoDef__asdStrengthPick" aria-hidden="true">
+                <div class="sf-bendNoDef__panelHeading sf-bendNoDef__panelHeading--sub">ASD (strength pick)</div>
+                <div class="sf-bendNoDef__formRow"><span>STEEL SECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesAss1SecAsd">—</div></div>
+                <div class="sf-bendNoDef__formRow"><span>Z<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1ZxAsd">—</div><span class="sf-bendNoDef__unitHint">in³</span></div>
+                <div class="sf-bendNoDef__formRow"><span>I<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesAss1IxAsd">—</div><span class="sf-bendNoDef__unitHint">in⁴</span></div>
+                <div class="sf-bendNoDef__remarkPill sf-bendNoDef__remarkPill--safe" id="sfBendDesAss1RmAsd">—</div>
+              </div>
             </div>
 
-            <div class="sf-bendNoDef__card sf-bendNoDef__sectionCard">
+            <div class="sf-bendNoDef__card sf-bendNoDef__sectionCard sf-bendNoDef__assumedIxCard">
               <div class="sf-bendNoDef__panelHeading">ASSUMED SECTION BY I<sub>x</sub></div>
               <div class="sf-bendNoDef__formRow"><span>STEEL SECTION</span><div class="sf-bendNoDef__fieldPill" id="sfBendDesSecY">—</div></div>
               <div class="sf-bendNoDef__formRow"><span>PLASTIC MODULUS Z<sub>x</sub></span><div class="sf-bendNoDef__highlightPill" id="sfBendDesIxZx">—</div></div>
@@ -346,7 +348,7 @@
               </div>
             </div>
 
-            <div class="sf-bendNoDef__card sf-bendNoDef__loadCard">
+            <div class="sf-bendNoDef__card sf-bendNoDef__loadCard" id="sfBendDeflLoadWo" aria-label="Factored and allowable loads with deflection">
               <div class="sf-bendNoDef__cardTitle">LOAD W/O BEAM WEIGHT</div>
               <div class="sf-bendNoDef__tableRow"><span>1.2DL + 1.6LL =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesY_c12">—</span><span>kips/ft</span></div>
               <div class="sf-bendNoDef__tableRow"><span>1.4DL =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesY_c14">—</span><span>kips/ft</span></div>
@@ -367,7 +369,7 @@
               <div class="sf-bendNoDef__tableRow"><span>BEAM TYPE =</span><span class="sf-bendNoDef__fieldPill" id="sfBendDesDeflBeamLbl">—</span></div>
               <div class="sf-bendNoDef__tableRow"><span>ULTIMATE MOMENT (M<sub>u</sub>) =</span><span class="sf-bendNoDef__inlinePill" id="sfBendDesMomentFormulaY">WL²/8</span></div>
               <div class="sf-bendNoDef__tableRow"><span>ULTIMATE DEFLECTION (Δ<sub>max</sub>) =</span><span class="sf-bendNoDef__inlinePill" id="sfBendDesDeflFormulaY">5WL⁴/384EI</span></div>
-              <div class="sf-bendNoDef__tableRow"><span>ALLOWABLE MOMENT OF INERTIA I<sub>c</sub> =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesIxReqChipDefl" title="Minimum Ix (in⁴) for Δ = L(ft)/n using service W = DL+LL (klf) and δ = k·W·L⁴/(E·I); k from beam case (simple UDL: 5/384), E = 29 000 ksi.">—</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>REQUIRED MOMENT OF INERTIA I<sub>c</sub> =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesIxReqChipDefl" title="Required Ix (in⁴) per client workbook WITH DEFLECTION: service W = LL only (klf), Δallow = L(ft)/n in inches, δ = k·W·L⁴/(E·I), k = 5/384, E = 29 000 ksi.">—</span></div>
             </div>
 
             <div class="sf-bendNoDef__card sf-bendWithDef__assumed1">
@@ -376,6 +378,7 @@
               <div class="sf-bendNoDef__tableRow"><span>PLASTIC MODULUS Z<sub>x</sub> =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflAss1Zx">—</span><span>in³</span></div>
               <div class="sf-bendNoDef__tableRow"><span>WEIGHT w<sub>e</sub> =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflAss1W">—</span></div>
               <div class="sf-bendNoDef__tableRow"><span>ELASTIC SECTION S<sub>x</sub> =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflAss1Sx">—</span><span>in³</span></div>
+              <div class="sf-bendNoDef__tableRow"><span>MOMENT OF INERTIA I<sub>x</sub> =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflAss1Ix">—</span><span>in⁴</span></div>
               <div class="sf-bendNoDef__tableRow"><span>λ<sub>f</sub> =</span><span class="sf-bendNoDef__highlightPill" id="sfBendDesDeflAss1Lf">—</span></div>
               <div class="sf-bendNoDef__remarkPill" id="sfBendDesDeflAss1Rm">—</div>
             </div>

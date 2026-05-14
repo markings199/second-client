@@ -118,6 +118,36 @@
   max-width: 100%;
 }
 
+/* LOAD W/O BEAM WEIGHT — cooler grey card + tab title (not full-width blue banner) */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__loadBox--wo {
+  background: #eef1f4 !important;
+  border-color: rgba(100, 116, 139, 0.24) !important;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__loadBox--wo > .sf-shearDes-cardTitle.sf-shearDes__loadTitle {
+  display: inline-flex !important;
+  width: fit-content !important;
+  max-width: min(100%, 22rem) !important;
+  margin: 0 0 12px !important;
+  padding: 9px 18px !important;
+  border-radius: 14px 14px 6px 6px !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: rgba(30, 58, 138, 0.96) !important;
+  background: linear-gradient(180deg, #faf8f4 0%, #f0ebe3 100%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.4) !important;
+  box-shadow: none !important;
+  line-height: 1.35 !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  height: auto !important;
+}
+
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-card--small,
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-card--small.sf-shearDes-card {
   padding: 18px !important;
@@ -132,7 +162,7 @@
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes-cardTitle,
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__paramsTitle,
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__beamTitle,
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__loadTitle,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__loadBox:not(.sf-shearDes__loadBox--wo) > .sf-shearDes-cardTitle.sf-shearDes__loadTitle,
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__steelTitle,
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__conditionTitle,
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes-shell .sf-shearDes__ultimateTitle,

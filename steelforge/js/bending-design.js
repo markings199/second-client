@@ -293,6 +293,65 @@
     return null;
   }
 
+  /**
+   * Workbook `SECTION ZX` + MATCH(…,-1): smallest tabulated Z<sub>x</sub> (in³) that still meets Z_req.
+   * Tie-break: lighter nominal weight, then smaller I<sub>x</sub> (same as Excel row order for a given Z<sub>x</sub> tier).
+   */
+  function pickSmallestZxGeq(Z_req, sorted) {
+    if (!Number.isFinite(Z_req) || Z_req <= 0 || !sorted?.length) return null;
+    let best = null;
+    let bestZ = Infinity;
+    let bestW = Infinity;
+    let bestIx = Infinity;
+    for (const s of sorted) {
+      const Zx = parseNumLike(s.row[COL.Zx]);
+      if (!Number.isFinite(Zx) || Zx + 1e-9 < Z_req) continue;
+      if (
+        Zx < bestZ - 1e-9 ||
+        (Math.abs(Zx - bestZ) <= 1e-9 && s.wLb < bestW - 1e-9) ||
+        (Math.abs(Zx - bestZ) <= 1e-9 &&
+          Math.abs(s.wLb - bestW) <= 1e-9 &&
+          s.Ix < bestIx - 1e-9)
+      ) {
+        best = s;
+        bestZ = Zx;
+        bestW = s.wLb;
+        bestIx = s.Ix;
+      }
+    }
+    return best;
+  }
+
+  /**
+   * Workbook `SECTION ZX` I<sub>x</sub> column + MATCH(…,-1): smallest tabulated I<sub>x</sub> (in⁴) ≥ I_min.
+   * Tie-break: lighter weight, then smaller Z<sub>x</sub>.
+   */
+  function pickSmallestIxGeq(I_min, sorted) {
+    if (!Number.isFinite(I_min) || I_min <= 0 || !sorted?.length) return null;
+    let best = null;
+    let bestIx = Infinity;
+    let bestW = Infinity;
+    let bestZ = Infinity;
+    for (const s of sorted) {
+      if (!(s.Ix >= I_min - 1e-9)) continue;
+      const Zx = parseNumLike(s.row[COL.Zx]);
+      if (
+        s.Ix < bestIx - 1e-9 ||
+        (Math.abs(s.Ix - bestIx) <= 1e-9 && s.wLb < bestW - 1e-9) ||
+        (Math.abs(s.Ix - bestIx) <= 1e-9 &&
+          Math.abs(s.wLb - bestW) <= 1e-9 &&
+          Number.isFinite(Zx) &&
+          Zx < bestZ - 1e-9)
+      ) {
+        best = s;
+        bestIx = s.Ix;
+        bestW = s.wLb;
+        bestZ = Number.isFinite(Zx) ? Zx : Infinity;
+      }
+    }
+    return best;
+  }
+
   function pickBeamSelfWeightShape(isLRFD, sorted, I_min, dl, ll, L_ft, KMOM, Fy, E) {
     let w_self = 0;
     let picked = null;
@@ -436,6 +495,7 @@
         ass1Zx: $('sfBendDesDeflAss1Zx'),
         ass1W: $('sfBendDesDeflAss1W'),
         ass1Sx: $('sfBendDesDeflAss1Sx'),
+        ass1Ix: $('sfBendDesDeflAss1Ix'),
         ass1Lf: $('sfBendDesDeflAss1Lf'),
         ass1Rm: $('sfBendDesDeflAss1Rm'),
         ixSec: $('sfBendDesDeflIxSec'),
@@ -474,6 +534,7 @@
     if (!methodEl || !steelN || !steelY) return;
 
     const loadCardNoDef = $('sfBendNoDefLoadCard');
+    const loadCardDefl = $('sfBendDeflLoadWo');
 
     let wRows = [];
 
@@ -495,6 +556,7 @@
         copyVal(els.beamY, els.beamN);
         if (steelY && steelN) copyVal(steelY, steelN);
         if (els.deflLimY && els.deflLim) copyVal(els.deflLimY, els.deflLim);
+        if (methodDefl && methodEl) copyVal(methodDefl, methodEl);
       } else {
         copyVal(els.lN, els.lY);
         copyVal(els.dlN, els.dlY);
@@ -502,6 +564,7 @@
         copyVal(els.beamN, els.beamY);
         if (steelN && steelY) copyVal(steelN, steelY);
         if (els.deflLim && els.deflLimY) copyVal(els.deflLim, els.deflLimY);
+        if (methodDefl && methodEl) copyVal(methodEl, methodDefl);
       }
     }
 
@@ -608,6 +671,7 @@
       copySpan(d.ass1Zx, els.ass1.zx);
       copySpan(d.ass1W, els.ass1.w);
       copySpan(d.ass1Sx, els.ass1.sx);
+      if (d.ass1Ix) copySpan(d.ass1Ix, els.ass1.ix);
       copySpan(d.ass1Lf, els.ass1.lf);
       copyRemarkPill(d.ass1Rm, els.ass1.rm);
       copySpan(d.lwWu, els.lw.Wu);
@@ -754,7 +818,9 @@
     function recompute() {
       syncBendingParameterPeers();
       normalizeInputs();
-      const method = String(methodEl.value || 'lrfd').toLowerCase();
+      const deflOn = isDeflOn();
+      const methodSel = deflOn && methodDefl ? methodDefl : methodEl;
+      const method = String(methodSel?.value || 'lrfd').toLowerCase();
       const isLRFD = method === 'lrfd';
       const E = E_DEFAULT;
       const FyN = fyFromSelect(steelN);
@@ -803,11 +869,14 @@
       const ll = ins.ll;
       const L = ins.L;
 
-      const deflOn = isDeflOn();
       if (pane) pane.dataset.sfBendDesMethod = isLRFD ? 'lrfd' : 'asd';
       if (loadCardNoDef) {
         if (!deflOn) loadCardNoDef.dataset.sfBendDesMethod = isLRFD ? 'lrfd' : 'asd';
         else delete loadCardNoDef.dataset.sfBendDesMethod;
+      }
+      if (loadCardDefl) {
+        if (deflOn) loadCardDefl.dataset.sfBendDesMethod = isLRFD ? 'lrfd' : 'asd';
+        else delete loadCardDefl.dataset.sfBendDesMethod;
       }
       if (els.deflLim && els.deflLimY && els.deflLim.value !== els.deflLimY.value) {
         if (deflOn) els.deflLim.value = els.deflLimY.value;
@@ -827,7 +896,8 @@
         Fy <= 0;
 
       const clearDesignOutputs = () => {
-        const methodClear = String(methodEl?.value || 'lrfd').toLowerCase();
+        const methodClearEl = deflOn && methodDefl ? methodDefl : methodEl;
+        const methodClear = String(methodClearEl?.value || 'lrfd').toLowerCase();
         const isLRFDClear = methodClear === 'lrfd';
         if (pane) {
           pane.dataset.sfBendDesMethod = isLRFDClear ? 'lrfd' : 'asd';
@@ -835,6 +905,10 @@
         if (loadCardNoDef) {
           if (!deflOn) loadCardNoDef.dataset.sfBendDesMethod = isLRFDClear ? 'lrfd' : 'asd';
           else delete loadCardNoDef.dataset.sfBendDesMethod;
+        }
+        if (loadCardDefl) {
+          if (deflOn) loadCardDefl.dataset.sfBendDesMethod = isLRFDClear ? 'lrfd' : 'asd';
+          else delete loadCardDefl.dataset.sfBendDesMethod;
         }
         if (els.beamLblN) els.beamLblN.textContent = '—';
         [
@@ -903,6 +977,8 @@
       const Wa_val = dlll_val;
       const Mu_val = Wu_val * L * L * KMOM;
       const Ma_req_val = Wa_val * L * L * KMOM;
+      /** Client workbook WITH DEFLECTION: required I_x and displayed Δ use live load (LL) only — not DL+LL. */
+      const wIxReq = deflOn ? Math.max(0, ll) : dlll_val;
 
       const denomIxPanel =
         els.deflLim?.value ||
@@ -920,7 +996,7 @@
         Number.isFinite(dlll_val) &&
         dlll_val >= 0
       ) {
-        const ixR = requiredIx(dlll_val, L, E, deltaIxPanelIn, bcDesign.deflectionK);
+        const ixR = requiredIx(wIxReq, L, E, deltaIxPanelIn, bcDesign.deflectionK);
         if (Number.isFinite(ixR) && ixR > 0) I_ix_panel_min = ixR;
       }
 
@@ -934,7 +1010,7 @@
 
       let I_min = 0;
       if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
-        const ixReqDisp = requiredIx(dlll_val, L, E, deltaLimIn, bcDesign.deflectionK);
+        const ixReqDisp = requiredIx(wIxReq, L, E, deltaLimIn, bcDesign.deflectionK);
         if (Number.isFinite(ixReqDisp) && ixReqDisp > 0) I_min = ixReqDisp;
         setMomentInertiaReqChip(Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
         setOutSpan(els.allowDefl, formatDeflectionWorkbookFt(deltaLimIn));
@@ -950,7 +1026,7 @@
         /* Allowable Δ and required I<sub>c</sub> use span, service load, and limit only — not the W-shape CSV.
            clearDesignOutputs() wipes them; restore so WITH DEFLECTION card is not stuck on “—” while CSV loads or if fetch fails. */
         if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
-          const ixReqDisp = requiredIx(dlll_val, L, E, deltaLimIn, bcDesign.deflectionK);
+          const ixReqDisp = requiredIx(wIxReq, L, E, deltaLimIn, bcDesign.deflectionK);
           setMomentInertiaReqChip(Number.isFinite(ixReqDisp) ? fmt(ixReqDisp, 3) : '—');
           setOutSpan(els.allowDefl, formatDeflectionWorkbookFt(deltaLimIn));
         } else if (!deflOn && Number.isFinite(L) && L > 0) {
@@ -985,8 +1061,6 @@
 
       const lrfdR = pickBeamSelfWeightShape(true, sorted, I_min, dl, ll, L, KMOM, Fy, E);
       const asdR = pickBeamSelfWeightShape(false, sorted, I_min, dl, ll, L, KMOM, Fy, E);
-      const ixPickDefl =
-        deflOn && Number.isFinite(I_min) && I_min > 0 ? pickLightestMeetingIx(I_min, sorted) : null;
       const ixPickNoDef =
         !deflOn && Number.isFinite(I_ix_panel_min) && I_ix_panel_min > 0
           ? pickLightestMeetingIx(I_ix_panel_min, sorted)
@@ -998,45 +1072,83 @@
       setOutSpan(els.lw.Ma, fmt(asdR.Ma_tot, 3));
 
       const applyAss1Dual = () => {
-        if (lrfdR.picked) {
-          const p = shapeProps(lrfdR.picked, Fy, E);
-          setOutSpan(els.ass1.sec, lrfdR.picked.lab);
-          setOutSpan(els.ass1.zx, fmt(p.Zx, 3));
-          setOutSpan(els.ass1.w, fmt(lrfdR.picked.wLb, 1));
-          setOutSpan(els.ass1.sx, fmt(p.Sx, 3));
-          setOutSpan(els.ass1.ix, fmt(lrfdR.picked.Ix, 1));
-          setOutSpan(els.ass1.lf, fmt(p.lamF, 6));
-          const capL = designStrengthKipFt(Fy, E, p.row, true);
-          const WsvcL = dl + ll + lrfdR.w_self;
-          let ok = capL != null && capL >= lrfdR.Mu_tot;
-          if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
-            const dMax = deltaInches(WsvcL, L, E, lrfdR.picked.Ix, bcDesign.deflectionK);
-            const ixOk = !(Number.isFinite(I_min) && I_min > 0) || lrfdR.picked.Ix >= I_min - 1e-6;
-            const delOk =
-              Number.isFinite(dMax) && Number.isFinite(deltaLimIn) ? dMax <= deltaLimIn + 1e-9 : false;
-            ok = ok && ixOk && delOk;
+        const deflAss1Remark = (shape, lrfdDemand) => {
+          if (!shape) return null;
+          const cap = designStrengthKipFt(Fy, E, shape.row, lrfdDemand);
+          const dem = lrfdDemand ? Mu_val : Ma_req_val;
+          const wBeam = shape.wLb / 1000;
+          let ok = cap != null && cap >= dem - 1e-6;
+          if (Number.isFinite(I_min) && I_min > 0) ok = ok && shape.Ix >= I_min - 1e-6;
+          if (!deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
+            const Wsvc = dlll_val + wBeam;
+            const dMax = deltaInches(Wsvc, L, E, shape.Ix, bcDesign.deflectionK);
+            ok = ok && Number.isFinite(dMax) && dMax <= deltaLimIn + 1e-9;
           }
+          return ok;
+        };
+
+        if (deflOn) {
+          const zxReqL = (12 * Mu_val) / (PHI_B * Fy);
+          const zxReqA = (12 * Ma_req_val * OMEGA_B) / Fy;
+          const zxPickL = pickSmallestZxGeq(zxReqL, sorted);
+          const zxPickA = pickSmallestZxGeq(zxReqA, sorted);
+          const zxPrimary = isLRFD ? zxPickL : zxPickA;
+          const zxAlt = isLRFD ? zxPickA : zxPickL;
+
+          if (zxPrimary) {
+            const p = shapeProps(zxPrimary, Fy, E);
+            setOutSpan(els.ass1.sec, zxPrimary.lab);
+            setOutSpan(els.ass1.zx, fmt(p.Zx, 3));
+            setOutSpan(els.ass1.w, fmt(zxPrimary.wLb, 1));
+            setOutSpan(els.ass1.sx, fmt(p.Sx, 3));
+            setOutSpan(els.ass1.ix, fmt(zxPrimary.Ix, 1));
+            setOutSpan(els.ass1.lf, fmt(p.lamF, 6));
+            setRemarkSafe(els.ass1.rm, deflAss1Remark(zxPrimary, isLRFD));
+          } else {
+            ['sec', 'zx', 'w', 'sx', 'ix', 'lf'].forEach((k) => setOutSpan(els.ass1[k], '—'));
+            setRemarkSafe(els.ass1.rm, null);
+          }
+
+          if (zxAlt) {
+            const p = shapeProps(zxAlt, Fy, E);
+            setOutSpan(els.ass1.secAsd, zxAlt.lab);
+            setOutSpan(els.ass1.zxAsd, fmt(p.Zx, 3));
+            setOutSpan(els.ass1.ixAsd, fmt(zxAlt.Ix, 1));
+            setRemarkSafe(els.ass1.rmAsd, deflAss1Remark(zxAlt, !isLRFD));
+          } else {
+            setOutSpan(els.ass1.secAsd, '—');
+            setOutSpan(els.ass1.zxAsd, '—');
+            setOutSpan(els.ass1.ixAsd, '—');
+            setRemarkSafe(els.ass1.rmAsd, null);
+          }
+          return;
+        }
+
+        const prMain = isLRFD ? lrfdR : asdR;
+        if (prMain.picked) {
+          const p = shapeProps(prMain.picked, Fy, E);
+          setOutSpan(els.ass1.sec, prMain.picked.lab);
+          setOutSpan(els.ass1.zx, fmt(p.Zx, 3));
+          setOutSpan(els.ass1.w, fmt(prMain.picked.wLb, 1));
+          setOutSpan(els.ass1.sx, fmt(p.Sx, 3));
+          setOutSpan(els.ass1.ix, fmt(prMain.picked.Ix, 1));
+          setOutSpan(els.ass1.lf, fmt(p.lamF, 6));
+          const capM = designStrengthKipFt(Fy, E, prMain.picked.row, isLRFD);
+          let ok = capM != null && capM >= (isLRFD ? prMain.Mu_tot : prMain.Ma_tot);
           setRemarkSafe(els.ass1.rm, ok);
         } else {
           ['sec', 'zx', 'w', 'sx', 'ix', 'lf'].forEach((k) => setOutSpan(els.ass1[k], '—'));
           setRemarkSafe(els.ass1.rm, null);
         }
 
-        if (asdR.picked) {
-          const p = shapeProps(asdR.picked, Fy, E);
-          setOutSpan(els.ass1.secAsd, asdR.picked.lab);
+        const prAlt = isLRFD ? asdR : lrfdR;
+        if (prAlt.picked) {
+          const p = shapeProps(prAlt.picked, Fy, E);
+          setOutSpan(els.ass1.secAsd, prAlt.picked.lab);
           setOutSpan(els.ass1.zxAsd, fmt(p.Zx, 3));
-          setOutSpan(els.ass1.ixAsd, fmt(asdR.picked.Ix, 1));
-          const capA = designStrengthKipFt(Fy, E, p.row, false);
-          const WsvcA = dl + ll + asdR.w_self;
-          let ok = capA != null && capA >= asdR.Ma_tot;
-          if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
-            const dMax = deltaInches(WsvcA, L, E, asdR.picked.Ix, bcDesign.deflectionK);
-            const ixOk = !(Number.isFinite(I_min) && I_min > 0) || asdR.picked.Ix >= I_min - 1e-6;
-            const delOk =
-              Number.isFinite(dMax) && Number.isFinite(deltaLimIn) ? dMax <= deltaLimIn + 1e-9 : false;
-            ok = ok && ixOk && delOk;
-          }
+          setOutSpan(els.ass1.ixAsd, fmt(prAlt.picked.Ix, 1));
+          const capA = designStrengthKipFt(Fy, E, prAlt.picked.row, !isLRFD);
+          let ok = capA != null && capA >= (isLRFD ? prAlt.Ma_tot : prAlt.Mu_tot);
           setRemarkSafe(els.ass1.rmAsd, ok);
         } else {
           setOutSpan(els.ass1.secAsd, '—');
@@ -1114,8 +1226,8 @@
 
       let deflGovOk = true;
       if (deflOn && govPick && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
-        const Wsvc = dl + ll + (isLRFD ? lrfdR.w_self : asdR.w_self);
-        const dMax = deltaInches(Wsvc, L, E, govPick.Ix, bcDesign.deflectionK);
+        const Wdefl = Math.max(0, ll);
+        const dMax = deltaInches(Wdefl, L, E, govPick.Ix, bcDesign.deflectionK);
         deflGovOk =
           Number.isFinite(dMax) &&
           dMax <= deltaLimIn + 1e-9 &&
@@ -1129,7 +1241,7 @@
 
       if (deflOn && Number.isFinite(deltaLimIn) && deltaLimIn > 0) {
         if (lrfdR.picked) {
-          const Wl = dl + ll + lrfdR.w_self;
+          const Wl = Math.max(0, ll);
           const dL = deltaInches(Wl, L, E, lrfdR.picked.Ix, bcDesign.deflectionK);
           setOutSpan(els.deflYLrfd, Number.isFinite(dL) ? formatDeflectionWorkbookFt(dL) : '—');
           const ok =
@@ -1142,7 +1254,7 @@
           setRemarkSafe(els.deflRmLrfd, null);
         }
         if (asdR.picked) {
-          const Wa = dl + ll + asdR.w_self;
+          const Wa = Math.max(0, ll);
           const dA = deltaInches(Wa, L, E, asdR.picked.Ix, bcDesign.deflectionK);
           setOutSpan(els.deflYAsd, Number.isFinite(dA) ? formatDeflectionWorkbookFt(dA) : '—');
           const ok =
@@ -1155,8 +1267,11 @@
           setRemarkSafe(els.deflRmAsd, null);
         }
         const dLegacy =
-          lrfdR.picked &&
-          deltaInches(dl + ll + lrfdR.w_self, L, E, lrfdR.picked.Ix, bcDesign.deflectionK);
+          isLRFD && lrfdR.picked
+            ? deltaInches(Math.max(0, ll), L, E, lrfdR.picked.Ix, bcDesign.deflectionK)
+            : !isLRFD && asdR.picked
+              ? deltaInches(Math.max(0, ll), L, E, asdR.picked.Ix, bcDesign.deflectionK)
+              : null;
         setOutSpan(
           els.deflY,
           Number.isFinite(dLegacy) ? formatDeflectionDual(dLegacy) : '—'
@@ -1201,11 +1316,16 @@
 
       /**
        * ASSUMED SECTION BY I_x:
-       * - WITH deflection: lightest shape meeting required I_x (may differ from Z_x strength pick).
-       * - WITHOUT deflection: same inertia-driven pick using workbook Δ limit and service DL+LL
-       *   (strength iteration still omits I_min when deflection design is off).
+       * - WITH deflection: smallest I_x ≥ required (SECTION ZX / Excel MATCH on I_x), using LL-only required I.
+       * - WITHOUT deflection: inertia-driven pick using workbook Δ limit, else governing strength pick.
        */
-      const shapeForIxPanel = ixPickDefl || ixPickNoDef || govPick || null;
+      let shapeForIxPanel = null;
+      if (deflOn) {
+        shapeForIxPanel =
+          Number.isFinite(I_min) && I_min > 0 ? pickSmallestIxGeq(I_min, sorted) : null;
+      } else {
+        shapeForIxPanel = ixPickNoDef || govPick || null;
+      }
 
       if (shapeForIxPanel) {
         const ip = shapeProps(shapeForIxPanel, Fy, E);

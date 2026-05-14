@@ -23,6 +23,8 @@ const KV = 5;
 function calcShearCv(lambda, lambdaP, lambdaR, Fy, Ev, kv) {
   if (![lambda, lambdaP, lambdaR, Fy, Ev, kv].every(Number.isFinite)) return null;
   if (lambda <= 0 || lambdaP <= 0 || lambdaR <= 0 || Fy <= 0 || Ev <= 0 || kv <= 0) return null;
+  const limA = 2.24 * Math.sqrt(Ev / Fy);
+  if (lambda <= limA) return 1;
   if (lambda <= lambdaP) return 1;
   if (lambda <= lambdaR) return lambdaP / lambda;
   return (1.51 * kv * Ev) / (Fy * lambda ** 2);

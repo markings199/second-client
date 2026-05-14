@@ -6,8 +6,10 @@
   const OMEGA_Y = 1.67;
   const OMEGA_F = 2.0;
 
-  /** Workbook A<sub>e</sub> = k A<sub>g</sub> with k = 0.75 (design page omits k input). */
-  const ROD_K_EFFECTIVE = 0.75;
+  /** Analysis pane: user-entered k for A<sub>e</sub> = k A<sub>g</sub> (0–1). */
+  const ROD_K_EFFECTIVE_ANALYSIS = 0.75;
+  /** Design pane: client Excel has no k row — use gross area for rupture check (A<sub>e</sub> = A<sub>g</sub>). */
+  const ROD_K_EFFECTIVE_DESIGN = 1;
 
   /**
    * Standard threaded rod diameters per workbook (in inches).
@@ -99,6 +101,61 @@
     return v.toFixed(d).replace(/\.?0+$/, '');
   }
 
+  /** While the user is still typing a decimal (e.g. `1.` or `-2.`), do not rewrite the field. */
+  function isIncompleteDecimalInput(raw) {
+    const s = String(raw ?? '').trim();
+    if (!s) return false;
+    if (s === '-' || s === '.' || s === '-.') return true;
+    return /[.]$/.test(s);
+  }
+
+  /**
+   * For custom Fy: pick Fu from `SteelForgeStructuralSteelGrades` — exact Fy match first (lowest catalogId),
+   * otherwise closest Fy in the catalog.
+   */
+  function matchFuForCustomFy(fyKsi) {
+    const grades = window.SteelForgeStructuralSteelGrades ?? [];
+    if (!Number.isFinite(fyKsi) || fyKsi <= 0 || !grades.length) return null;
+    const tol = 0.001;
+    const near = grades.filter((g) => Number.isFinite(g.fy) && Math.abs(g.fy - fyKsi) <= tol);
+    if (near.length) {
+      near.sort((a, b) => (a.catalogId ?? 999) - (b.catalogId ?? 999));
+      const fu = near[0].fu;
+      return Number.isFinite(fu) ? fu : null;
+    }
+    let bestG = null;
+    let bestDist = Infinity;
+    for (const g of grades) {
+      if (!Number.isFinite(g.fy)) continue;
+      const d = Math.abs(g.fy - fyKsi);
+      if (d < bestDist - 1e-9) {
+        bestDist = d;
+        bestG = g;
+      } else if (Math.abs(d - bestDist) <= 1e-9 && bestG) {
+        if ((g.catalogId ?? 999) < (bestG.catalogId ?? 999)) bestG = g;
+      }
+    }
+    return bestG && Number.isFinite(bestG.fu) ? bestG.fu : null;
+  }
+
+  function normalizeNumericField(el, decimals, { minZero = true } = {}) {
+    if (!el) return;
+    if (isIncompleteDecimalInput(el.value)) return;
+    const v = parseNumLike(el.value);
+    if (!Number.isFinite(v)) return;
+    const c = minZero ? Math.max(0, v) : v;
+    el.value = fmt(c, decimals);
+  }
+
+  function applyCustomSteelFu(steelEl, fyEl, fuEl) {
+    if (!steelEl || steelEl.value !== 'custom' || !fyEl || !fuEl) return;
+    if (isIncompleteDecimalInput(fyEl.value)) return;
+    const fy = parseNumLike(fyEl.value);
+    if (!Number.isFinite(fy) || fy <= 0) return;
+    const fu = matchFuForCustomFy(fy);
+    if (fu != null) fuEl.value = fmt(fu, 3);
+  }
+
   function filterRodCatalogRows(lines) {
     return lines
       .slice(4)
@@ -155,7 +212,7 @@
     });
     const customOpt = document.createElement('option');
     customOpt.value = 'custom';
-    customOpt.textContent = 'Custom Fy / Fu (edit fields)';
+    customOpt.textContent = 'Custom Fy — Fu matched to grade catalog';
     selectEl.appendChild(customOpt);
     const ids = new Set(grades.map((x) => x.id));
     if (ids.has(preferredId)) selectEl.value = preferredId;
@@ -179,26 +236,6 @@
       Number.isFinite(yieldCap) ? yieldCap :
       Number.isFinite(fracCap) ? fracCap : null;
     return { yieldCap, fracCap, capGov };
-  }
-
-  function pickLightestRod(rows, demand, k, Fy, Fu, method) {
-    if (!Number.isFinite(demand) || demand < 0) return null;
-    if (!Number.isFinite(k) || k < 0 || k > 1) return null;
-    if (!Number.isFinite(Fy) || !Number.isFinite(Fu)) return null;
-    const sorted = [...rows]
-      .map((r) => {
-        const Ag = parseNumLike(r[COL.Ag]);
-        const lab = String(r[COL.label] || '').trim();
-        return { r, Ag, lab };
-      })
-      .filter((x) => Number.isFinite(x.Ag) && x.Ag > 0 && x.lab);
-    sorted.sort((a, b) => a.Ag - b.Ag || a.lab.localeCompare(b.lab));
-    for (const s of sorted) {
-      const Ae = k * s.Ag;
-      const { capGov } = capacityBreakdown(s.Ag, Ae, Fy, Fu, method);
-      if (Number.isFinite(capGov) && capGov + 1e-6 >= demand) return s;
-    }
-    return null;
   }
 
   /** Keep rod steel dropdown aligned with hub grade changes (custom grade left untouched). */
@@ -256,29 +293,20 @@
     let catalogRows = [];
 
     function normalizeInputs() {
-      const d = parseNumLike(dEl?.value);
-      if (dEl && Number.isFinite(d)) dEl.value = d < 0 ? '0' : fmt(d, 4);
-
-      const L = parseNumLike(lEl?.value);
-      if (lEl && Number.isFinite(L)) lEl.value = L < 0 ? '0' : fmt(L, 3);
-
-      const k = parseNumLike(kEl?.value);
-      if (kEl && Number.isFinite(k)) {
-        const kc = Math.max(0, Math.min(1, k));
-        kEl.value = fmt(kc, 4);
+      normalizeNumericField(dEl, 4);
+      normalizeNumericField(lEl, 3);
+      if (kEl && !isIncompleteDecimalInput(kEl.value)) {
+        const k = parseNumLike(kEl.value);
+        if (Number.isFinite(k)) {
+          const kc = Math.max(0, Math.min(1, k));
+          kEl.value = fmt(kc, 4);
+        }
       }
-
-      const dl = parseNumLike(dlEl?.value);
-      if (dlEl && Number.isFinite(dl)) dlEl.value = dl < 0 ? '0' : fmt(dl, 3);
-
-      const ll = parseNumLike(llEl?.value);
-      if (llEl && Number.isFinite(ll)) llEl.value = ll < 0 ? '0' : fmt(ll, 3);
-
-      const fy = parseNumLike(fyEl?.value);
-      if (fyEl && Number.isFinite(fy)) fyEl.value = fy < 0 ? '0' : fmt(fy, 3);
-
-      const fu = parseNumLike(fuEl?.value);
-      if (fuEl && Number.isFinite(fu)) fuEl.value = fu < 0 ? '0' : fmt(fu, 3);
+      normalizeNumericField(dlEl, 3);
+      normalizeNumericField(llEl, 3);
+      const custom = steelEl?.value === 'custom';
+      normalizeNumericField(fyEl, 3);
+      if (!custom) normalizeNumericField(fuEl, 3);
     }
 
     function applyCatalogSelection() {
@@ -301,7 +329,7 @@
     function syncSteel() {
       if (!steelEl || steelEl.value === 'custom') {
         if (fyEl) fyEl.readOnly = false;
-        if (fuEl) fuEl.readOnly = false;
+        if (fuEl) fuEl.readOnly = true;
         return;
       }
       const g = steelFromSelectValue(steelEl.value);
@@ -318,6 +346,7 @@
     function recompute() {
       normalizeInputs();
       syncSteel();
+      applyCustomSteelFu(steelEl, fyEl, fuEl);
       applyCatalogSelection();
 
       const method = String(methodEl.value || 'lrfd').toLowerCase();
@@ -474,23 +503,17 @@
     if (!methodEl || !steelEl || !fyEl || !fuEl) return;
 
     function normalizeInputs() {
-      const dl = parseNumLike(dlEl?.value);
-      if (dlEl && Number.isFinite(dl)) dlEl.value = dl < 0 ? '0' : fmt(dl, 3);
-
-      const ll = parseNumLike(llEl?.value);
-      if (llEl && Number.isFinite(ll)) llEl.value = ll < 0 ? '0' : fmt(ll, 3);
-
-      const fy = parseNumLike(fyEl?.value);
-      if (fyEl && Number.isFinite(fy)) fyEl.value = fy < 0 ? '0' : fmt(fy, 3);
-
-      const fu = parseNumLike(fuEl?.value);
-      if (fuEl && Number.isFinite(fu)) fuEl.value = fu < 0 ? '0' : fmt(fu, 3);
+      normalizeNumericField(dlEl, 3);
+      normalizeNumericField(llEl, 3);
+      const custom = steelEl?.value === 'custom';
+      normalizeNumericField(fyEl, 3);
+      if (!custom) normalizeNumericField(fuEl, 3);
     }
 
     function syncSteel() {
       if (!steelEl || steelEl.value === 'custom') {
         if (fyEl) fyEl.readOnly = false;
-        if (fuEl) fuEl.readOnly = false;
+        if (fuEl) fuEl.readOnly = true;
         return;
       }
       const g = steelFromSelectValue(steelEl.value);
@@ -507,6 +530,7 @@
     function recompute() {
       normalizeInputs();
       syncSteel();
+      applyCustomSteelFu(steelEl, fyEl, fuEl);
 
       const method = String(methodEl.value || 'lrfd').toLowerCase();
       root.classList.toggle('sf-rod--lrfd', method === 'lrfd');
@@ -551,7 +575,7 @@
       if (standardRod && Number.isFinite(Fy) && Number.isFinite(Fu)) {
         const Ag = grossAreaFromD(standardRod.value);
         if (Number.isFinite(Ag) && Ag > 0) {
-          const Ae = ROD_K_EFFECTIVE * Ag;
+          const Ae = ROD_K_EFFECTIVE_DESIGN * Ag;
           capGov = capacityBreakdown(Ag, Ae, Fy, Fu, method).capGov;
         }
       }

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 118" role="img" aria-labelledby="sfLimTitle sfLimDesc">
   <title id="sfLimTitle">Limiting web slenderness (AISC shear)</title>
-  <desc id="sfLimDesc">Three threshold expressions used with web slenderness »w for shear strength.</desc>
+  <desc id="sfLimDesc">Three threshold expressions used with web slenderness for shear strength.</desc>
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#faf8f4"/>
@@ -10,13 +10,13 @@
   <rect width="320" height="118" rx="8" fill="url(#bg)" stroke="#d4cfc4" stroke-width="1"/>
   <g fill="#1e293b" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="650">
     <text x="14" y="30">
-      <tspan>2.24</tspan><tspan font-style="italic"></tspan><tspan>(</tspan><tspan font-style="italic">E</tspan><tspan>/</tspan><tspan font-style="italic">F</tspan><tspan baseline-shift="-3" font-size="11">y</tspan><tspan>)</tspan>
+      <tspan>2.24</tspan><tspan font-size="17">&#8730;</tspan><tspan>(</tspan><tspan font-style="italic">E</tspan><tspan>/</tspan><tspan font-style="italic">F</tspan><tspan baseline-shift="-3" font-size="11">y</tspan><tspan>)</tspan>
     </text>
     <text x="14" y="58">
-      <tspan>1.10</tspan><tspan font-style="italic"></tspan><tspan>(</tspan><tspan font-style="italic">k</tspan><tspan baseline-shift="-3" font-size="11">v</tspan><tspan font-style="italic">E</tspan><tspan>/</tspan><tspan font-style="italic">F</tspan><tspan baseline-shift="-3" font-size="11">y</tspan><tspan>)</tspan>
+      <tspan>1.10</tspan><tspan font-size="17">&#8730;</tspan><tspan>(</tspan><tspan font-style="italic">k</tspan><tspan baseline-shift="-3" font-size="11">v</tspan><tspan font-style="italic">E</tspan><tspan>/</tspan><tspan font-style="italic">F</tspan><tspan baseline-shift="-3" font-size="11">y</tspan><tspan>)</tspan>
     </text>
     <text x="14" y="86">
-      <tspan>1.37</tspan><tspan font-style="italic"></tspan><tspan>(</tspan><tspan font-style="italic">k</tspan><tspan baseline-shift="-3" font-size="11">v</tspan><tspan font-style="italic">E</tspan><tspan>/</tspan><tspan font-style="italic">F</tspan><tspan baseline-shift="-3" font-size="11">y</tspan><tspan>)</tspan>
+      <tspan>1.37</tspan><tspan font-size="17">&#8730;</tspan><tspan>(</tspan><tspan font-style="italic">k</tspan><tspan baseline-shift="-3" font-size="11">v</tspan><tspan font-style="italic">E</tspan><tspan>/</tspan><tspan font-style="italic">F</tspan><tspan baseline-shift="-3" font-size="11">y</tspan><tspan>)</tspan>
     </text>
   </g>
 </svg>

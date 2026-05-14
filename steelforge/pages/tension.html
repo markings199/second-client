@@ -94,7 +94,17 @@
               <table>
                 <tr>
                   <th>GRADE</th>
-                  <td><input class="sf-tensionAnalysisLayout__inp sf-tbRef__inp--steelGrade" id="sfTenAnaSteel" type="text" autocomplete="off" /></td>
+                  <td>
+                    <input
+                      class="sf-tensionAnalysisLayout__inp sf-tbRef__inp--steelGrade"
+                      id="sfTenAnaSteel"
+                      type="text"
+                      list="sfTenAnaSteelList"
+                      autocomplete="off"
+                      title="Pick a catalog grade or type a custom name; Fy/Fu fill when a listed grade matches."
+                    />
+                    <datalist id="sfTenAnaSteelList"></datalist>
+                  </td>
                 </tr>
                 <tr>
                   <th>F<sub>y</sub></th>
@@ -117,11 +127,11 @@
                       class="sf-tensionAnalysisLayout__sel"
                       id="sfTenAnaShearLag"
                       aria-label="Shear lag case selector"
-                      title="Pick the AISC D3 shear-lag case. Choosing a case auto-fills U from the workbook table (S(ASTM))."
+                      title="Pick the AISC D3 shear-lag case. Most cases use fixed U from the workbook; CASE 2 uses U = 1 − x̄/L with x̄ and LENGTH (in)."
                     >
                       <option value="">— select case —</option>
                       <option value="CASE 1">CASE 1 — direct to fasteners (U = 1.00)</option>
-                      <option value="CASE 2">CASE 2 — some to fasteners (U = 0.75)</option>
+                      <option value="CASE 2">CASE 2 — U = 1 − x̄/L (x̄, LENGTH in in.)</option>
                       <option value="CASE 3">CASE 3 — transverse welds (U = 1.00)</option>
                       <option value="CASE 4">CASE 4 — longitudinal welds (U = 0.5625)</option>
                       <option value="CASE 7b">CASE 7b — W / H / S / HP web ≥ 4 (U = 0.70)</option>
@@ -358,27 +368,6 @@
               </table>
             </div>
 
-            <div class="capacity-inline">
-              <div class="capacity-inline__title">FIND GOVERNING CAPACITY</div>
-              <table class="capacity-table capacity-table--inline capacity-table--mirror">
-                <tr>
-                  <th>YIELDING (φT<sub>n</sub>, LRFD)</th>
-                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaLrfdYieldMir"></span> kips</td>
-                </tr>
-                <tr>
-                  <th>FRACTURE (φT<sub>n</sub>, LRFD)</th>
-                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaLrfdFractureMir"></span> kips</td>
-                </tr>
-                <tr>
-                  <th>BLOCK SHEAR (LRFD)</th>
-                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaCapBlockMir">—</span> kips</td>
-                </tr>
-                <tr class="governing-row">
-                  <th>GOVERNING (LRFD)</th>
-                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaLrfdGovMir"></span> kips</td>
-                </tr>
-              </table>
-            </div>
           </article>
         </section>
 
@@ -434,7 +423,16 @@
               <div class="section-card narrow-card">
                 <div class="section-header">STEEL GRADE</div>
                 <div class="grade-row">
-                  <input class="grade-row__inp sf-tbRef__inp--steelGrade" id="sfTenDesSteel" type="text" autocomplete="off" aria-label="Steel grade" />
+                  <input
+                    class="grade-row__inp sf-tbRef__inp--steelGrade"
+                    id="sfTenDesSteel"
+                    type="text"
+                    list="sfTenDesSteelList"
+                    autocomplete="off"
+                    aria-label="Steel grade"
+                    title="Pick a catalog grade or type custom; Fy/Fu auto-fill when a listed grade matches."
+                  />
+                  <datalist id="sfTenDesSteelList"></datalist>
                   <label class="grade-value"><span class="vh">Fy</span>F<sub>y</sub> = <input id="sfTenDesFy" class="grade-value__inp" inputmode="decimal" /> ksi</label>
                   <label class="grade-value"><span class="vh">Fu</span>F<sub>u</sub> = <input id="sfTenDesFu" class="grade-value__inp" inputmode="decimal" /> ksi</label>
                 </div>
@@ -445,7 +443,30 @@
                 <table>
                   <tr>
                     <th>CASE</th>
-                    <td><input class="sf-tensionDesignLayout__inp" id="sfTenDesShearLag" type="text" autocomplete="off" placeholder="e.g. CASE 2" /></td>
+                    <td>
+                      <select
+                        class="sf-tensionDesignLayout__sel"
+                        id="sfTenDesShearLag"
+                        aria-label="Shear lag case"
+                        title="Same cases as Analysis. CASE 2 uses U = 1 − x̄/L with x̄ and LENGTH (in)."
+                      >
+                        <option value="">— select case —</option>
+                        <option value="CASE 1">CASE 1 — direct to fasteners (U = 1.00)</option>
+                        <option value="CASE 2">CASE 2 — U = 1 − x̄/L (x̄, LENGTH in in.)</option>
+                        <option value="CASE 3">CASE 3 — transverse welds (U = 1.00)</option>
+                        <option value="CASE 4">CASE 4 — longitudinal welds (U = 0.5625)</option>
+                        <option value="CASE 7b">CASE 7b — W / H / S / HP web ≥ 4 (U = 0.70)</option>
+                        <option value="CASE 8a">CASE 8a — L / 2L (≥ 4 bolts, U = 0.80)</option>
+                        <option value="CASE 8b">CASE 8b — L / 2L (&lt; 3 bolts, U = 0.60)</option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>x̄</th>
+                    <td>
+                      <input class="sf-tensionDesignLayout__inp" id="sfTenDesXbar" type="text" inputmode="decimal" autocomplete="off" title="Used for CASE 2: U = 1 − x̄/L with LENGTH (in)" />
+                      in
+                    </td>
                   </tr>
                   <tr>
                     <th>U</th>
@@ -506,7 +527,7 @@
                     <small>kips</small>
                   </div>
                   <div>
-                    <span>T<sub>s</sub></span>
+                    <span>T<sub>a</sub></span>
                     <strong id="sfTenDesTs">—</strong>
                     <small>kips</small>
                   </div>

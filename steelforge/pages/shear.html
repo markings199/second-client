@@ -129,8 +129,12 @@
                   <div class="sf-shearDash__formulaVisual" aria-label="Limiting slenderness equations and values">
                     <img
                       class="sf-shearDash__formulaImg"
-                      src="./assets/shear/limiting-slenderness-clear.png"
+                      src="./assets/shear/limiting-slenderness-clear.svg"
                       alt="2.24√(E/Fy), 1.10√(kvE/Fy), and 1.37√(kvE/Fy)"
+                      width="400"
+                      height="400"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <span class="sf-shearDash__formulaBar sf-shearDash__formulaBar--muted sf-shearDash__formulaBar--stacked" id="sfShearAnaBar1">—</span>
                     <span class="sf-shearDash__formulaBar sf-shearDash__formulaBar--muted sf-shearDash__formulaBar--stacked" id="sfShearAnaBar2">—</span>
@@ -272,7 +276,7 @@
               </div>
             </section>
 
-            <section class="sf-shearDes-card sf-shearDes__loadBox" aria-label="Load without beam weight">
+            <section class="sf-shearDes-card sf-shearDes__loadBox sf-shearDes__loadBox--wo" aria-label="Load without beam weight">
               <div class="sf-shearDes-cardTitle sf-shearDes__loadTitle">LOAD W/O BEAM WEIGHT</div>
               <div class="sf-shearDes__loadGrid">
                 <div class="sf-shearDes__loadRow sf-shearDes__loadRow--leftTop">
@@ -282,7 +286,7 @@
                 </div>
                 <div class="sf-shearDes__loadRow sf-shearDes__loadRow--wu">
                   <span class="sf-shearDes__loadLabel" id="sfShearDesWuLabel">W<sub>u</sub> =</span>
-                  <span class="sf-shearDes__loadPill sf-shearDes__loadPill--accent" id="sfShearDesWu">—</span>
+                  <span class="sf-shearDes__loadPill" id="sfShearDesWu">—</span>
                   <span class="sf-shearDes__loadUnit" id="sfShearDesWuUnit">kips/ft</span>
                 </div>
                 <div class="sf-shearDes__loadRow sf-shearDes__loadRow--leftBottom" id="sfShearDesLoadBottomRow">
@@ -381,17 +385,58 @@
               <div class="sf-shearDes-cardTitle sf-shearDes__conditionTitle">CONDITION CHECKING</div>
 
               <div class="sf-shearDes__conditionTri">
-                <div class="sf-shearDes__conditionSeg sf-shearDes__conditionSeg--formula">
-                  <div class="sf-shearDes__conditionSubTitle">LIMITING SLENDERNESS</div>
-                  <div class="sf-shearDes__conditionFormula">
-                    <img src="./assets/shear/limiting-slenderness-clear.png" alt="Limiting slenderness equations" />
-                  </div>
-                </div>
-                <div class="sf-shearDes__conditionSeg sf-shearDes__conditionSeg--limits">
-                  <div class="sf-shearDes__conditionPillCol" aria-hidden="false">
-                    <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaVal">—</span>
-                    <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaP">—</span>
-                    <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaR">—</span>
+                <div class="sf-shearDes__conditionSeg sf-shearDes__conditionSeg--limiting">
+                  <div class="sf-shearDes__conditionLimiting">
+                    <div class="sf-shearDes__conditionLimiting__heading">LIMITING SLENDERNESS</div>
+                    <div class="sf-shearDes__conditionLimiting__panel" role="group" aria-label="Limiting slenderness thresholds">
+                      <div class="sf-shearDes__conditionLimiting__stack">
+                        <div class="sf-shearDes__conditionLimiting__row sf-shearDes__conditionLimiting__row--1">
+                          <div class="sf-shearDes__conditionLimiting__formulaClip">
+                            <img
+                              class="sf-shearDes__conditionLimiting__formulaStrip"
+                              src="./assets/shear/limiting-slenderness-clear.png"
+                              width="272"
+                              height="418"
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              aria-hidden="true"
+                            />
+                          </div>
+                          <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaVal">—</span>
+                        </div>
+                        <div class="sf-shearDes__conditionLimiting__row sf-shearDes__conditionLimiting__row--2">
+                          <div class="sf-shearDes__conditionLimiting__formulaClip">
+                            <img
+                              class="sf-shearDes__conditionLimiting__formulaStrip"
+                              src="./assets/shear/limiting-slenderness-clear.png"
+                              width="272"
+                              height="418"
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              aria-hidden="true"
+                            />
+                          </div>
+                          <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaP">—</span>
+                        </div>
+                        <div class="sf-shearDes__conditionLimiting__row sf-shearDes__conditionLimiting__row--3">
+                          <div class="sf-shearDes__conditionLimiting__formulaClip">
+                            <img
+                              class="sf-shearDes__conditionLimiting__formulaStrip"
+                              src="./assets/shear/limiting-slenderness-clear.png"
+                              width="272"
+                              height="418"
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              aria-hidden="true"
+                            />
+                          </div>
+                          <span class="sf-shearDes__conditionPill" id="sfShearDesLambdaR">—</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="sf-shearDes__conditionSeg sf-shearDes__conditionSeg--factors">

@@ -85,8 +85,8 @@ const okHoleRule =
   Math.abs(dhBoltMode - 0.875) < 1e-12 && Math.abs(dhHoleMode - 0.8125) < 1e-12;
 console.log(okHoleRule ? 'OK — bolt vs hole final diameter rules' : 'FAIL — bolt/hole d_h');
 
-/** Shear lag auto U (analysis): Case 2 = max(0.6, 1 − x̄/L); Case 8 from bolt count. */
-const uCase2 = Math.max(0.6, 1 - 1 / 10);
+/** Shear lag auto U (analysis): Case 2 = clamp(0,1, 1 − x̄/L); Case 8a/8b from discrete workbook table. */
+const uCase2 = Math.min(1, Math.max(0, 1 - 1 / 10));
 const okU2 = Math.abs(uCase2 - 0.9) < 1e-12;
 const u8a = 4 >= 4 ? 0.8 : 0.6;
 const u8b = 2 >= 4 ? 0.8 : 0.6;
@@ -107,7 +107,7 @@ console.log(okSastmCsv && okWmDiscrete ? 'OK — S(ASTM) discrete U vs workbook-
 
 /**
  * Workbook TENSION sheet — example case (analysis side).
- * Section L10X10X1-3/8, t=1.375, Ag=25.6, x̄=3, L=12 → U=0.75, A36 (Fy=36, Fu=58),
+ * Section L10X10X1-3/8, t=1.375, Ag=25.6, x̄=3, L=12 → U = 1 − x̄/L = 0.75, A36 (Fy=36, Fu=58),
  * Block shear with n_shear=5, L_shear=7.5, n_tens=3, L_tens=9, db=0.75 → dh=0.875, Ubs=1.
  * Cached workbook outputs: Agv=20.625, Anv=14.609, Ant=8.766, Vrupt=508.406, Vyield=445.5,
  * Vgov=445.5, Ublk=508.406, BlockLRFD=715.43, Yield_LRFD=829.44, Frac_LRFD ≈ 717.4, Gov=715.43.

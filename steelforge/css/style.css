@@ -7931,6 +7931,7 @@ input.sf-secprops__val:focus {
   --des-load-wide-pill-w: 72px;
   --des-load-wide-label-w: minmax(0, 1fr);
   --des-load-wide-gap: 6px;
+  /* Nudge wide rows right inside the card (client: use remaining space on the right) */
   --des-load-wide-offset-x: 0px;
   --des-load-zx-pill-w: minmax(72px, 1fr);
   --des-load-label-size: 0.56rem;
@@ -8392,29 +8393,97 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionTri {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) 74px minmax(0, 1.45fr);
-  gap: 8px 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 12px 16px;
   margin-top: 8px;
-  align-items: stretch;
+  align-items: start;
 }
 
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--formula {
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--limiting {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--limits {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: stretch;
   min-width: 0;
 }
 
-.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--limits .sf-shearDes__conditionPillCol {
-  padding-top: 10px;
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+  max-width: min(420px, 100%);
+  margin-inline: auto;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__heading {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(51, 47, 44, 0.9);
+  line-height: 1.25;
+  margin: 0;
+  text-align: left;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__panel {
+  border: 1px solid rgba(105, 100, 90, 0.14);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px 16px;
+  padding: 18px 14px;
+  border-bottom: 1px solid rgba(105, 100, 90, 0.12);
+  min-width: 0;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__row:last-child {
+  border-bottom: none;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__formulaClip {
+  width: 100%;
+  max-width: 220px;
+  margin-inline: auto;
+  aspect-ratio: 272 / calc(418 / 3);
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__formulaStrip {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: top;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__row--2 .sf-shearDes__conditionLimiting__formulaStrip {
+  transform: translate3d(0, -33.333333%, 0);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__row--3 .sf-shearDes__conditionLimiting__formulaStrip {
+  transform: translate3d(0, -66.666666%, 0);
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__row .sf-shearDes__conditionPill {
+  min-width: 88px;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--factors {
@@ -8522,8 +8591,9 @@ input.sf-secprops__val:focus {
   display: grid;
   grid-template-rows: repeat(3, minmax(28px, auto));
   row-gap: 8px;
-  align-content: start;
-  padding: 2px 0 0;
+  align-content: center;
+  padding: 0;
+  justify-items: stretch;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionPill {
@@ -8552,41 +8622,42 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRow {
   display: grid;
-  grid-template-columns: minmax(44px, auto) minmax(72px, 1fr) auto;
-  grid-template-rows: auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto minmax(2.5rem, max-content);
+  grid-template-rows: auto;
   column-gap: 8px;
-  row-gap: 3px;
+  row-gap: 0;
   align-items: center;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLabel {
-  grid-column: 1 / -1;
+  grid-column: 1;
   grid-row: 1;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.78rem;
-  color: rgba(62, 55, 49, 0.82);
+  font-size: 0.68rem;
+  color: rgba(42, 70, 140, 0.92);
   text-transform: uppercase;
   white-space: normal;
   line-height: 1.25;
   overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionExpr {
-  grid-column: 1;
-  grid-row: 2;
+  grid-column: 2;
+  grid-row: 1;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.90rem;
+  font-size: 0.82rem;
   color: rgba(62, 55, 49, 0.80);
   white-space: nowrap;
-  min-width: 46px;
   text-align: right;
+  min-width: 0;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRow .sf-shearDes__conditionPill {
-  grid-column: 2;
-  grid-row: 2;
+  grid-column: 3;
+  grid-row: 1;
   min-height: 28px;
   min-width: 72px;
   padding: 4px 10px;
@@ -8596,14 +8667,17 @@ input.sf-secprops__val:focus {
   justify-content: center;
 }
 
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRow--vn .sf-shearDes__conditionUnit {
+  grid-column: 4;
+  grid-row: 1;
+}
+
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionRow--vn .sf-shearDes__conditionPill {
   background: rgba(246, 214, 106, 0.95);
-  color: rgba(62,55,49,0.9);
+  color: rgba(62, 55, 49, 0.9);
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionUnit {
-  grid-column: 3;
-  grid-row: 2;
   align-self: center;
   font-family: 'Inter', sans-serif;
   font-weight: 900;
@@ -8650,7 +8724,7 @@ input.sf-secprops__val:focus {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 10px 16px;
 }
 
@@ -8876,6 +8950,38 @@ input.sf-secprops__val:focus {
   margin: 0;
 }
 
+/* LOAD W/O — layout like client ref: tab title + light panel, left-aligned rows, W_u same blue as other pills */
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--leftTop,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--leftBottom {
+  grid-template-columns: auto var(--des-load-pill-w) auto;
+  justify-self: start;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wu {
+  grid-template-columns: auto var(--des-load-pill-w) auto;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--leftTop .sf-shearDes__loadLabel,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--leftBottom .sf-shearDes__loadLabel,
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wu .sf-shearDes__loadLabel {
+  text-align: left;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wide {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  justify-items: start;
+  justify-content: start;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--wide .sf-shearDes__loadLabel {
+  text-align: left;
+  justify-self: start;
+}
+
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadRow--zx {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadTitle {
   position: absolute;
   top: var(--des-load-title-top);
@@ -8895,18 +9001,27 @@ input.sf-secprops__val:focus {
   text-transform: uppercase;
 }
 
+.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadBox--wo .sf-shearDes__loadTitle {
+  position: static;
+  top: auto;
+  left: auto;
+  height: auto;
+  margin: 0 0 8px;
+}
+
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadGrid {
   margin-top: var(--des-load-grid-top-mt);
   display: grid;
-  grid-template-columns: max-content max-content;
+  grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto auto;
-  column-gap: var(--des-load-grid-gap-x);
+  column-gap: 14px;
   row-gap: var(--des-load-grid-gap-y);
-  justify-content: start;
+  justify-content: stretch;
+  justify-items: stretch;
   align-items: start;
-  min-height: 0;
   align-content: start;
   width: 100%;
+  min-height: 0;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadRow {
@@ -8934,6 +9049,7 @@ input.sf-secprops__val:focus {
   grid-column: 2;
   grid-row: 1 / span 2;
   align-self: center;
+  justify-self: end;
   margin-top: 0;
   grid-template-columns: var(--des-load-top-wu-label-w) var(--des-load-pill-w) auto;
 }
@@ -8952,24 +9068,25 @@ input.sf-secprops__val:focus {
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadRow--wide {
   grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 1fr) var(--des-load-wide-pill-w) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: var(--des-load-wide-gap);
-  justify-content: stretch;
+  justify-content: start;
+  justify-items: end;
   justify-self: stretch;
   width: 100%;
   max-width: 100%;
-  transform: translateX(var(--des-load-wide-offset-x));
+  transform: none;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadRow--wide .sf-shearDes__loadLabel {
-  text-align: left;
-  justify-self: start;
+  text-align: right;
+  justify-self: end;
   white-space: normal;
   line-height: 1.2;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadRow--zx {
-  grid-template-columns: max-content var(--des-load-zx-pill-w) auto;
+  grid-template-columns: 1fr var(--des-load-zx-pill-w) auto;
 }
 
 .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__loadLabel {
@@ -9129,8 +9246,8 @@ input.sf-secprops__val:focus {
     grid-template-columns: 1fr;
   }
 
-  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionSeg--limits .sf-shearDes__conditionPillCol {
-    padding-top: 0;
+  .sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__conditionLimiting__row {
+    padding: 14px 10px;
   }
 }
 
@@ -9797,6 +9914,7 @@ input.sf-secprops__val:focus {
 
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateGrid {
   margin-top: 0 !important;
+  justify-content: center !important;
 }
 
 .content-panel.comp-panel > .sf-comp.sf-comp--shear .sf-comp__mode[data-comp-mode-pane="design"] .sf-shearDes__ultimateRow {
@@ -10681,6 +10799,13 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   gap: 22px;
 }
 
+/* DESIGN bending, WITHOUT deflection: hide DEFLECTION card, ASD strength pick, and ASSUMED BY Ix (client) */
+.sf-comp.sf-comp--bending .sf-bendDes__branch--noDefl #sfBendNoDefDeflectionCard,
+.sf-comp.sf-comp--bending .sf-bendDes__branch--noDefl .sf-bendNoDef__asdStrengthPick,
+.sf-comp.sf-comp--bending .sf-bendDes__branch--noDefl .sf-bendNoDef__assumedIxCard {
+  display: none !important;
+}
+
 .sf-comp.sf-comp--bending .sf-bendNoDef__panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -10912,6 +11037,32 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   align-items: center;
   border: 0;
   box-sizing: border-box;
+}
+
+/* WITH deflection — same LRFD / ASD emphasis on LOAD W/O BEAM WEIGHT */
+.sf-comp.sf-comp--bending #sfBendDeflLoadWo[data-sf-bend-des-method="asd"] .sf-bendNoDef__tableRow .sf-bendNoDef__highlightPill {
+  background: #e7dfd5;
+  color: var(--text);
+  border: 1px solid rgba(53, 47, 39, 0.08);
+}
+
+.sf-comp.sf-comp--bending #sfBendDeflLoadWo[data-sf-bend-des-method="asd"] .sf-bendNoDef__tableRow .sf-bendNoDef__subtext {
+  background: #b2afaa;
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 16px;
+  min-width: 130px;
+  justify-content: center;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  box-sizing: border-box;
+}
+
+.sf-comp.sf-comp--bending #sfBendNoDefLoadCard[data-sf-bend-des-method="lrfd"] .sf-bendNoDef__tableRow .sf-bendNoDef__subtext,
+.sf-comp.sf-comp--bending #sfBendDeflLoadWo[data-sf-bend-des-method="lrfd"] .sf-bendNoDef__tableRow .sf-bendNoDef__subtext {
+  opacity: 0.5;
 }
 
 .sf-comp.sf-comp--bending .sf-comp__mode[data-comp-mode-pane="design"][data-sf-bend-des-method="asd"] .sf-bendNoDef__finalNote--lrfd {
