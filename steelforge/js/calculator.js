@@ -4,12 +4,16 @@
   const OMEGA_C = 1.67; // AISC ASD safety factor (compression)
 
   /**
-   * Reference workbook (Excel export) column curve: Fcr = 0.658^(Fy/Fe)·Fy for all slender regimes
-   * (no transition to 0.877·Fe). Matches exported Fe / Fcr / φPn rows when KL/r > 4.71√(E/Fy).
+   * COMPRESSION sheet F50 (exported workbook): AISC column curve with Euler branch.
+   * `=IF(GovKLr<4.71*SQRT(E/Fy),0.658^(Fy/Fe)*Fy,0.877*Fe)` — same as Fy/Fe ≤ 2.25 vs > 2.25.
    */
   function sfCompressionWorkbookFcr(Fy, Fe) {
     if (![Fy, Fe].every((x) => Number.isFinite(x) && x > 0)) return null;
-    return (0.658 ** (Fy / Fe)) * Fy;
+    const fyOverFe = Fy / Fe;
+    if (fyOverFe <= 2.25) {
+      return (0.658 ** fyOverFe) * Fy;
+    }
+    return 0.877 * Fe;
   }
 
   function $(root, sel) {

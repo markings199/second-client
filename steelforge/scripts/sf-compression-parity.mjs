@@ -42,7 +42,11 @@ function parseNumLike(v) {
 /** Matches calculator.js sfCompressionWorkbookFcr */
 function sfCompressionWorkbookFcr(Fy, Fe) {
   if (![Fy, Fe].every((x) => Number.isFinite(x) && x > 0)) return null;
-  return 0.658 ** (Fy / Fe) * Fy;
+  const fyOverFe = Fy / Fe;
+  if (fyOverFe <= 2.25) {
+    return (0.658 ** fyOverFe) * Fy;
+  }
+  return 0.877 * Fe;
 }
 
 const COL = { type: 0, label: 2, Ag: 5, rx: 31, ry: 37 };
@@ -93,7 +97,7 @@ console.log(`\nInternal formula self-checks: ${ok}/${checks.length} (100% if all
 /** Items documented as matching the exported workbook / UI intent (no Excel binary in repo). */
 const parityAxes = [
   ['Euler Fe = π²E / (KL/r)² with E = 29000 ksi', true],
-  ['Fcr = 0.658^(Fy/Fe)·Fy (single branch; no 0.877Fe)', true],
+  ['Fcr = inelastic 0.658^(Fy/Fe)·Fy if Fy/Fe≤2.25 else 0.877Fe (workbook F50)', true],
   ['Pn = Fcr·Ag with Ag from steel CSV (in²)', true],
   ['LRFD capacity φPn, φc = 0.90', true],
   ['ASD allowable Pn/Ω, Ωc = 1.67', true],
@@ -103,7 +107,7 @@ const parityAxes = [
   ['Effective length KL displayed as K·L with L in ft; KL/r uses inches', true],
   ['Six x / six y segments', true],
   ['Steel geometry from same CSV as workbook export', true],
-  ['Analysis UI capacity chain uses workbook Fcr (not AISC 0.877Fe branch)', true],
+  ['Analysis UI capacity chain matches workbook F50 (two-branch Fcr)', true],
 ];
 
 let axisOk = 0;
@@ -167,7 +171,7 @@ const wbChecks = [
   ['KLy/ry ≈ 105.18', Math.abs(wb.klrY - 105.18) < 0.05],
   ['Governing KL/r = 105.18', Math.abs(wb.govKLr - 105.18) < 0.05],
   ['Fe ≈ 25.87 ksi', Math.abs(wb.Fe - 25.87) < 0.05],
-  ['Fcr (single 0.658 branch) ≈ 22.3 ksi', Math.abs(wb.Fcr - 22.3) < 0.2],
+  ['Fcr (F50 two-branch) ≈ 22.3 ksi', Math.abs(wb.Fcr - 22.3) < 0.2],
 ];
 let wbOk = 0;
 for (const [name, pass] of wbChecks) {
