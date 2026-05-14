@@ -456,8 +456,7 @@
       const outBlkTermFuAnv = el('sfTenAnaBlkTermFuAnv');
       const outBlkTermFyAgv = el('sfTenAnaBlkTermFyAgv');
       const outBlkTermUbFuAnt = el('sfTenAnaBlkTermUbFuAnt');
-      const outBlkRn1 = el('sfTenAnaBlkRn1');
-      const outBlkRn2 = el('sfTenAnaBlkRn2');
+      const outBlkGovShearLeg = el('sfTenAnaBlkGovShearLeg');
       const outBlkRnGov = el('sfTenAnaBlkRnGov');
       const capBlkEl = el('sfTenAnaCapBlock');
 
@@ -470,8 +469,7 @@
           outBlkTermFuAnv,
           outBlkTermFyAgv,
           outBlkTermUbFuAnt,
-          outBlkRn1,
-          outBlkRn2,
+          outBlkGovShearLeg,
           outBlkRnGov,
           capBlkEl,
         ].forEach((node) => {
@@ -487,8 +485,7 @@
           outBlkTermFuAnv,
           outBlkTermFyAgv,
           outBlkTermUbFuAnt,
-          outBlkRn1,
-          outBlkRn2,
+          outBlkGovShearLeg,
           outBlkRnGov,
           capBlkEl,
         ].forEach((node) => {
@@ -524,23 +521,32 @@
         if (outBlkAnv) outBlkAnv.textContent = fmt(AnvBlk, 4);
         if (outBlkAgt) outBlkAgt.textContent = fmt(AgtBlk, 4);
         if (outBlkAnt) outBlkAnt.textContent = fmt(AntBlk, 4);
+
+        const f1v = AnvBlk > 0 ? 0.6 * Fu * AnvBlk : null;
+        const f2v = AgvBlk > 0 ? 0.6 * Fy * AgvBlk : null;
+        const ft = AntBlk > 0 ? blkUbs * Fu * AntBlk : null;
+
+        if (outBlkTermFuAnv) outBlkTermFuAnv.textContent = f1v != null ? fmt(f1v, 4) : '—';
+        if (outBlkTermFyAgv) outBlkTermFyAgv.textContent = f2v != null ? fmt(f2v, 4) : '—';
+        if (outBlkTermUbFuAnt) outBlkTermUbFuAnt.textContent = ft != null ? fmt(ft, 4) : '—';
+        if (outBlkGovShearLeg) {
+          if (f1v != null && f2v != null) outBlkGovShearLeg.textContent = fmt(Math.min(f1v, f2v), 4);
+          else outBlkGovShearLeg.textContent = '—';
+        }
+
         if (AnvBlk > 0 && AntBlk > 0) {
-          const termFuAnv = 0.6 * Fu * AnvBlk;
-          const termFyAgv = 0.6 * Fy * AgvBlk;
-          const tensPart = blkUbs * Fu * AntBlk;
-          const rnShearRupt = termFuAnv + tensPart;
-          const rnShearYield = termFyAgv + tensPart;
+          const tensPart = ft;
+          const rnShearRupt = f1v + tensPart;
+          const rnShearYield = f2v + tensPart;
           const rnGovBlk = Math.min(rnShearRupt, rnShearYield);
           lrfdBlock = PHI_LRFD_BLOCK * rnGovBlk;
           asdBlock = rnGovBlk / OMEGA_ASD_BLOCK;
-          if (outBlkTermFuAnv) outBlkTermFuAnv.textContent = fmt(termFuAnv, 3);
-          if (outBlkTermFyAgv) outBlkTermFyAgv.textContent = fmt(termFyAgv, 3);
-          if (outBlkTermUbFuAnt) outBlkTermUbFuAnt.textContent = fmt(tensPart, 3);
-          if (outBlkRn1) outBlkRn1.textContent = fmt(rnShearRupt, 3);
-          if (outBlkRn2) outBlkRn2.textContent = fmt(rnShearYield, 3);
           if (outBlkRnGov) outBlkRnGov.textContent = fmt(rnGovBlk, 3);
         } else {
-          clearBlkStrength();
+          if (outBlkRnGov) outBlkRnGov.textContent = '—';
+          lrfdBlock = null;
+          asdBlock = null;
+          if (capBlkEl) capBlkEl.textContent = '—';
         }
       } else {
         clearBlkAll();

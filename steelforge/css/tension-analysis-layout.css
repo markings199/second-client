@@ -161,15 +161,26 @@
   border-top: 1px solid rgba(148, 163, 184, 0.15);
 }
 
-/* AREAS banner inside FOR BLOCK SHEAR — match full-width blue card titles */
-.sf-comp--tension .sf-tensionAnalysisLayout .block-shear .subsection > .sf-tensionAnalysisLayout__areasBanner.card-title {
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+/* Single-table block shear: inputs then results (workbook-style) */
+.sf-comp--tension .sf-tensionAnalysisLayout .sf-tensionAnalysisLayout__blockShearTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
 }
 
-.sf-comp--tension .sf-tensionAnalysisLayout .sf-tensionAnalysisLayout__areasTable th {
+.sf-comp--tension .sf-tensionAnalysisLayout .sf-tensionAnalysisLayout__bsOutputs {
+  border-top: 2px solid rgba(148, 163, 184, 0.35);
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .sf-tensionAnalysisLayout__bsOutputs > tr:first-child > th,
+.sf-comp--tension .sf-tensionAnalysisLayout .sf-tensionAnalysisLayout__bsOutputs > tr:first-child > td {
+  padding-top: 14px;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .sf-tensionAnalysisLayout__blockShearTable th {
   width: 52%;
 }
+
 
 .sf-comp--tension .sf-tensionAnalysisLayout .subheading {
   display: block;

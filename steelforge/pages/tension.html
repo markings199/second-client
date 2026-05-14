@@ -311,83 +311,76 @@
 
           <article class="card block-shear">
             <div class="card-title">FOR BLOCK SHEAR</div>
-            <table>
-              <tr>
-                <th>NUMBER OF BOLTS TO SHEAR</th>
-                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkNShear" inputmode="numeric" autocomplete="off" /></td>
-              </tr>
-              <tr>
-                <th>LENGTH IN SHEAR, L</th>
-                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkLshear" inputmode="decimal" autocomplete="off" /> in</td>
-              </tr>
-              <tr>
-                <th>NUMBER OF BOLTS IN TENSION</th>
-                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkNTension" inputmode="numeric" autocomplete="off" /></td>
-              </tr>
-              <tr>
-                <th>LENGTH IN TENSION, L<sub>t</sub></th>
-                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkLtension" inputmode="decimal" autocomplete="off" /> in</td>
-              </tr>
-              <tr>
-                <th>GIVEN DIAMETER</th>
-                <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkBoltAlias">—</span> in</td>
-              </tr>
-              <tr>
-                <th>FINAL DIAMETER</th>
-                <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkDhDisp">—</span> in</td>
-              </tr>
-              <tr>
-                <th>REDUCTION FACTOR, U<sub>b</sub></th>
-                <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkUbs" inputmode="decimal" autocomplete="off" value="1" /></td>
-              </tr>
-            </table>
-
-            <div class="subsection">
-              <div class="card-title sf-tensionAnalysisLayout__areasBanner">AREAS</div>
-              <table class="sf-tensionAnalysisLayout__areasTable">
+            <table class="sf-tensionAnalysisLayout__blockShearTable">
+              <tbody class="sf-tensionAnalysisLayout__bsInputs">
                 <tr>
-                  <th>GROSS AREA SHEAR, A<sub>gv</sub></th>
+                  <th>NUMBER OF BOLTS IN SHEAR, n =</th>
+                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkNShear" inputmode="numeric" autocomplete="off" /></td>
+                </tr>
+                <tr>
+                  <th>LENGTH IN SHEAR, L =</th>
+                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkLshear" inputmode="decimal" autocomplete="off" /> in</td>
+                </tr>
+                <tr>
+                  <th>NUMBER OF BOLTS IN TENSION, n =</th>
+                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkNTension" inputmode="numeric" autocomplete="off" /></td>
+                </tr>
+                <tr>
+                  <th>LENGTH IN TENSION, L<sub>t</sub> =</th>
+                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkLtension" inputmode="decimal" autocomplete="off" /> in</td>
+                </tr>
+                <tr>
+                  <th>GIVEN DIAMETER</th>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkBoltAlias">—</span> in</td>
+                </tr>
+                <tr>
+                  <th>FINAL DIAMETER</th>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkDhDisp">—</span> in</td>
+                </tr>
+                <tr>
+                  <th>REDUCTION FACTOR, U<sub>bs</sub> =</th>
+                  <td><input class="sf-tensionAnalysisLayout__inp" id="sfTenAnaBlkUbs" inputmode="decimal" autocomplete="off" value="1" /></td>
+                </tr>
+              </tbody>
+              <tbody class="sf-tensionAnalysisLayout__bsOutputs">
+                <tr>
+                  <th>GROSS AREA SHEAR, A<sub>gv</sub> =</th>
                   <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAgv">—</span> in²</td>
                 </tr>
                 <tr>
-                  <th>NET SHEAR AREA, A<sub>nv</sub></th>
+                  <th>NET SHEAR AREA, A<sub>nv</sub> =</th>
                   <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAnv">—</span> in²</td>
                 </tr>
                 <tr>
-                  <th>GROSS AREA TENSION, A<sub>gt</sub></th>
+                  <th>GROSS AREA TENSION, A<sub>gt</sub> =</th>
                   <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAgt">—</span> in²</td>
                 </tr>
                 <tr>
-                  <th>NET TENSION AREA, A<sub>nt</sub></th>
+                  <th>NET TENSION AREA, A<sub>nt</sub> =</th>
                   <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAnt">—</span> in²</td>
                 </tr>
                 <tr>
-                  <th>0.6F<sub>u</sub>A<sub>nv</sub></th>
+                  <th>SHEAR RESISTANCE, F<sub>1v</sub> = 0.6F<sub>u</sub>A<sub>nv</sub></th>
                   <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkTermFuAnv">—</span> kips</td>
                 </tr>
                 <tr>
-                  <th>0.6F<sub>y</sub>A<sub>gv</sub></th>
+                  <th>F<sub>2v</sub> = 0.6F<sub>y</sub>A<sub>gv</sub></th>
                   <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkTermFyAgv">—</span> kips</td>
                 </tr>
                 <tr>
-                  <th>U<sub>bs</sub>F<sub>u</sub>A<sub>nt</sub></th>
-                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkTermUbFuAnt">—</span> kips</td>
+                  <th>TENSION RESISTANCE, F<sub>t</sub> = U<sub>bs</sub>F<sub>u</sub>A<sub>nt</sub></th>
+                  <td><span class="sf-tensionAnalysisLayout__out sf-tensionAnalysisLayout__pillYellow" id="sfTenAnaBlkTermUbFuAnt">—</span> kips</td>
                 </tr>
                 <tr>
-                  <th>R<sub>n,1</sub> (0.6F<sub>u</sub>A<sub>nv</sub> + U<sub>bs</sub>F<sub>u</sub>A<sub>nt</sub>)</th>
-                  <td><span class="sf-tensionAnalysisLayout__out sf-tensionAnalysisLayout__pillYellow" id="sfTenAnaBlkRn1">—</span> kips</td>
+                  <th>GOVERNING SHEAR RESISTANCE = min(F<sub>1v</sub>, F<sub>2v</sub>)</th>
+                  <td><span class="sf-tensionAnalysisLayout__out sf-tensionAnalysisLayout__pillYellow" id="sfTenAnaBlkGovShearLeg">—</span> kips</td>
                 </tr>
                 <tr>
-                  <th>R<sub>n,2</sub> (0.6F<sub>y</sub>A<sub>gv</sub> + U<sub>bs</sub>F<sub>u</sub>A<sub>nt</sub>)</th>
-                  <td><span class="sf-tensionAnalysisLayout__out sf-tensionAnalysisLayout__pillYellow" id="sfTenAnaBlkRn2">—</span> kips</td>
+                  <th>NOMINAL BLOCK SHEAR, R<sub>n</sub> = min(R<sub>n,1</sub>, R<sub>n,2</sub>)</th>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkRnGov">—</span> kips</td>
                 </tr>
-                <tr>
-                  <th>GOVERNING NOMINAL, R<sub>n</sub></th>
-                  <td><span class="sf-tensionAnalysisLayout__out sf-tensionAnalysisLayout__pillYellow" id="sfTenAnaBlkRnGov">—</span> kips</td>
-                </tr>
-              </table>
-            </div>
-
+              </tbody>
+            </table>
           </article>
         </section>
 
