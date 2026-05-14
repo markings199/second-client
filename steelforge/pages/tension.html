@@ -227,11 +227,14 @@
                   class="stagger-mini"
                   title="For each row, enter both s and g (g > 0). SUM updates with Σ(s²/4g); NET AREA (STAGGERED) uses that SUM with gross area and hole area."
                 >
+                  <thead>
                   <tr>
-                    <th></th>
-                    <th>s</th>
-                    <th>g</th>
+                    <th scope="col"></th>
+                    <th scope="col">s</th>
+                    <th scope="col">g</th>
                   </tr>
+                  </thead>
+                  <tbody>
                   <tr>
                     <th>1</th>
                     <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaS1" inputmode="decimal" autocomplete="off" /></td>
@@ -257,6 +260,7 @@
                     <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaS5" inputmode="decimal" autocomplete="off" /></td>
                     <td><input class="sf-tensionAnalysisLayout__inp sf-tensionAnalysisLayout__inp--compact" id="sfTenAnaG5" inputmode="decimal" autocomplete="off" /></td>
                   </tr>
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -339,8 +343,8 @@
             </table>
 
             <div class="subsection">
-              <div class="subheading">AREAS</div>
-              <table>
+              <div class="card-title sf-tensionAnalysisLayout__areasBanner">AREAS</div>
+              <table class="sf-tensionAnalysisLayout__areasTable">
                 <tr>
                   <th>GROSS AREA SHEAR, A<sub>gv</sub></th>
                   <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAgv">—</span> in²</td>
@@ -350,16 +354,36 @@
                   <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAnv">—</span> in²</td>
                 </tr>
                 <tr>
-                  <th>SHEAR RESISTANCE</th>
-                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkRnCap">—</span> kips</td>
+                  <th>GROSS AREA TENSION, A<sub>gt</sub></th>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAgt">—</span> in²</td>
                 </tr>
                 <tr>
-                  <th>TENSION RESISTANCE</th>
-                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkRnTen">—</span> kips</td>
+                  <th>NET TENSION AREA, A<sub>nt</sub></th>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkAnt">—</span> in²</td>
                 </tr>
                 <tr>
-                  <th>GOVERNING SHEAR RESISTANCE</th>
-                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkRnGov">—</span> kips</td>
+                  <th>0.6F<sub>u</sub>A<sub>nv</sub></th>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkTermFuAnv">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>0.6F<sub>y</sub>A<sub>gv</sub></th>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkTermFyAgv">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>U<sub>bs</sub>F<sub>u</sub>A<sub>nt</sub></th>
+                  <td><span class="sf-tensionAnalysisLayout__out" id="sfTenAnaBlkTermUbFuAnt">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>R<sub>n,1</sub> (0.6F<sub>u</sub>A<sub>nv</sub> + U<sub>bs</sub>F<sub>u</sub>A<sub>nt</sub>)</th>
+                  <td><span class="sf-tensionAnalysisLayout__out sf-tensionAnalysisLayout__pillYellow" id="sfTenAnaBlkRn1">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>R<sub>n,2</sub> (0.6F<sub>y</sub>A<sub>gv</sub> + U<sub>bs</sub>F<sub>u</sub>A<sub>nt</sub>)</th>
+                  <td><span class="sf-tensionAnalysisLayout__out sf-tensionAnalysisLayout__pillYellow" id="sfTenAnaBlkRn2">—</span> kips</td>
+                </tr>
+                <tr>
+                  <th>GOVERNING NOMINAL, R<sub>n</sub></th>
+                  <td><span class="sf-tensionAnalysisLayout__out sf-tensionAnalysisLayout__pillYellow" id="sfTenAnaBlkRnGov">—</span> kips</td>
                 </tr>
               </table>
             </div>

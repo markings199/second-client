@@ -161,6 +161,16 @@
   border-top: 1px solid rgba(148, 163, 184, 0.15);
 }
 
+/* AREAS banner inside FOR BLOCK SHEAR — match full-width blue card titles */
+.sf-comp--tension .sf-tensionAnalysisLayout .block-shear .subsection > .sf-tensionAnalysisLayout__areasBanner.card-title {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .sf-tensionAnalysisLayout__areasTable th {
+  width: 52%;
+}
+
 .sf-comp--tension .sf-tensionAnalysisLayout .subheading {
   display: block;
   box-sizing: border-box;
@@ -246,6 +256,26 @@
   table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.78rem;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .stagger-mini thead th {
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(15, 61, 110, 0.35);
+  background: linear-gradient(180deg, #1a5fa8 0%, var(--ta-accent) 50%, #0f3d6e 100%);
+  color: #f0f7ff !important;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.72rem;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .stagger-mini thead th:first-child {
+  border-radius: 10px 0 0 0;
+}
+
+.sf-comp--tension .sf-tensionAnalysisLayout .stagger-mini thead th:last-child {
+  border-radius: 0 10px 0 0;
 }
 
 .sf-comp--tension .sf-tensionAnalysisLayout .stagger-mini th,
