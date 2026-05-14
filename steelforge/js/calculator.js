@@ -2513,9 +2513,27 @@
           Number.isFinite(Vbw) && Number.isFinite(capVallow) ? Vbw <= capVallow + 1e-6 : null;
       }
       const demandShear = Vbw;
+      /**
+       * ULTIMATE SHEAR card: workbook / client — LRFD V_u = φ_v[0.6F_y A_w C_v] = φV_n;
+       * ASD V_a = (0.6F_y A_w C_v)/Ω_v, using the same C_v, φ_v, Ω_v as LIMITING SLENDerness / CONDITION CHECKING
+       * (not the factored load-line shear shown in the load card pills).
+       */
+      const ultimateShearStrength = isLRFD
+        ? Number.isFinite(phiVn)
+          ? phiVn
+          : null
+        : Number.isFinite(Vallow)
+          ? Vallow
+          : null;
 
-      setText('sfShearDesUltimateVal', Number.isFinite(demandShear) ? fmtNum(demandShear, 3) : '—');
-      setText('sfShearDesUltHdrVal', Number.isFinite(demandShear) ? fmtNum(demandShear, 3) : '—');
+      setText(
+        'sfShearDesUltimateVal',
+        Number.isFinite(ultimateShearStrength) ? fmtNum(ultimateShearStrength, 3) : '—',
+      );
+      setText(
+        'sfShearDesUltHdrVal',
+        Number.isFinite(ultimateShearStrength) ? fmtNum(ultimateShearStrength, 3) : '—',
+      );
       if (isSafe == null) {
         setText('sfShearDesRemarks', '—');
       } else {
@@ -2529,7 +2547,8 @@
           wTopBw_line: wTopBw,
           M_kft: M,
           Mbw_kft: Mbw,
-          Vu_or_Va_bw: demandShear,
+          shearDemand_bw: demandShear,
+          ultimateShearStrength_cond: ultimateShearStrength,
           zxReq,
           assumed: assumedShape?.name,
           lightest: lightestShape?.name,

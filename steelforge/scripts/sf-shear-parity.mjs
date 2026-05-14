@@ -2,6 +2,7 @@
  * Node parity checks vs reference workbook `reference/exel program EWIWIWI(SHEAR).csv`.
  * Mirrors shear formulas in js/calculator.js (analysis φv=1 Ωv=1.5; design CONDITION CHECKING
  * uses λ-band φ/Ω; design SHEAR CAPACITY card assumes Cv=1 → ϕVn=Vn, Vn/Ω=Vn/1.5).
+ * Design ULTIMATE SHEAR / header pills show φVn (LRFD) or Vn/Ω (ASD) from CONDITION CHECKING — same C_v, φ_v, Ω_v as V_n row.
  * Loads shape catalog like js/shear-csv-shapes.js for section-pick regression checks.
  * Run: node scripts/sf-shear-parity.mjs
  */
@@ -352,6 +353,11 @@ add('Workbook SHEAR DESIGN W16X40 Cv = 1', wbDes.Cv === 1);
 add('Workbook SHEAR DESIGN W16X40 Vn = 105.408', nearly(wbDes.Vn, 105.408, 0.01), `got ${wbDes.Vn}`);
 add('Workbook SHEAR DESIGN W16X40 LRFD UNSAFE (φVn < Vu)', wbDes.safeLRFD === false);
 add('Workbook SHEAR DESIGN W16X40 ASD SAFE (Va > Vu_ASD)', wbDes.safeASD === true);
+add(
+  'Design ULTIMATE SHEAR pill matches φVn (not factored demand Vu)',
+  nearly(wbDes.phiVn, 105.408, 0.01) && Math.abs(wbDes.phiVn - wbDes.Vu) > 1,
+  `φVn=${wbDes.phiVn}, Vu=${wbDes.Vu}`,
+);
 
 const passed = checks.filter((c) => c.ok).length;
 const total = checks.length;
