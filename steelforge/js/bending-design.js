@@ -150,6 +150,11 @@
   }
 
   function populateSteelSelect(selectEl, preferredId = 'a992') {
+    const pop = window.SteelForge?.populateStructuralSteelGradeSelect;
+    if (typeof pop === 'function' && selectEl) {
+      pop(selectEl, preferredId);
+      return;
+    }
     const grades = window.SteelForgeStructuralSteelGrades ?? [];
     if (!selectEl || grades.length === 0) return;
     const sorted = [...grades].sort((a, b) => {
@@ -164,13 +169,15 @@
     sorted.forEach((g) => {
       const opt = document.createElement('option');
       opt.value = g.id;
-      const idPart = g.catalogId != null ? `[${g.catalogId}] ` : '';
-      opt.textContent = `${idPart}${g.label} — Fy=${g.fy}, Fu=${g.fu} ksi`;
+      const label = String(g.label || '').trim() || g.id;
+      opt.textContent = label;
+      const cat = g.catalogId != null ? `ASTM catalog ${g.catalogId}. ` : '';
+      opt.title = `${cat}Fy = ${g.fy} ksi, Fu = ${g.fu} ksi`;
       selectEl.appendChild(opt);
     });
     const customOpt = document.createElement('option');
     customOpt.value = 'custom';
-    customOpt.textContent = 'Custom (Fy = 50 ksi)';
+    customOpt.textContent = 'Custom Fy / Fu (edit fields)';
     selectEl.appendChild(customOpt);
     const ids = new Set(grades.map((x) => x.id));
     if (ids.has(preferredId)) selectEl.value = preferredId;
@@ -317,36 +324,6 @@
         bestZ = Zx;
         bestW = s.wLb;
         bestIx = s.Ix;
-      }
-    }
-    return best;
-  }
-
-  /**
-   * Workbook `SECTION ZX` I<sub>x</sub> column + MATCH(…,-1): smallest tabulated I<sub>x</sub> (in⁴) ≥ I_min.
-   * Tie-break: lighter weight, then smaller Z<sub>x</sub>.
-   */
-  function pickSmallestIxGeq(I_min, sorted) {
-    if (!Number.isFinite(I_min) || I_min <= 0 || !sorted?.length) return null;
-    let best = null;
-    let bestIx = Infinity;
-    let bestW = Infinity;
-    let bestZ = Infinity;
-    for (const s of sorted) {
-      if (!(s.Ix >= I_min - 1e-9)) continue;
-      const Zx = parseNumLike(s.row[COL.Zx]);
-      if (
-        s.Ix < bestIx - 1e-9 ||
-        (Math.abs(s.Ix - bestIx) <= 1e-9 && s.wLb < bestW - 1e-9) ||
-        (Math.abs(s.Ix - bestIx) <= 1e-9 &&
-          Math.abs(s.wLb - bestW) <= 1e-9 &&
-          Number.isFinite(Zx) &&
-          Zx < bestZ - 1e-9)
-      ) {
-        best = s;
-        bestIx = s.Ix;
-        bestW = s.wLb;
-        bestZ = Number.isFinite(Zx) ? Zx : Infinity;
       }
     }
     return best;
@@ -1075,7 +1052,14 @@
         const deflAss1Remark = (shape, lrfdDemand) => {
           if (!shape) return null;
           const cap = designStrengthKipFt(Fy, E, shape.row, lrfdDemand);
-          const dem = lrfdDemand ? Mu_val : Ma_req_val;
+          /** With deflection, workbook line loads include beam self-weight — use converged M_u / M_a from pickBeamSelfWeightShape. */
+          const dem = deflOn
+            ? lrfdDemand
+              ? lrfdR.Mu_tot
+              : asdR.Ma_tot
+            : lrfdDemand
+              ? Mu_val
+              : Ma_req_val;
           const wBeam = shape.wLb / 1000;
           let ok = cap != null && cap >= dem - 1e-6;
           if (Number.isFinite(I_min) && I_min > 0) ok = ok && shape.Ix >= I_min - 1e-6;
@@ -1088,8 +1072,8 @@
         };
 
         if (deflOn) {
-          const zxReqL = (12 * Mu_val) / (PHI_B * Fy);
-          const zxReqA = (12 * Ma_req_val * OMEGA_B) / Fy;
+          const zxReqL = (12 * lrfdR.Mu_tot) / (PHI_B * Fy);
+          const zxReqA = (12 * asdR.Ma_tot * OMEGA_B) / Fy;
           const zxPickL = pickSmallestZxGeq(zxReqL, sorted);
           const zxPickA = pickSmallestZxGeq(zxReqA, sorted);
           const zxPrimary = isLRFD ? zxPickL : zxPickA;
@@ -1316,13 +1300,13 @@
 
       /**
        * ASSUMED SECTION BY I_x:
-       * - WITH deflection: smallest I_x ≥ required (SECTION ZX / Excel MATCH on I_x), using LL-only required I.
+       * - WITH deflection: lightest W-shape in catalog order whose I_x meets required I_c (matches “pick lightest that works” / prior no-deflection branch style).
        * - WITHOUT deflection: inertia-driven pick using workbook Δ limit, else governing strength pick.
        */
       let shapeForIxPanel = null;
       if (deflOn) {
         shapeForIxPanel =
-          Number.isFinite(I_min) && I_min > 0 ? pickSmallestIxGeq(I_min, sorted) : null;
+          Number.isFinite(I_min) && I_min > 0 ? pickLightestMeetingIx(I_min, sorted) : null;
       } else {
         shapeForIxPanel = ixPickNoDef || govPick || null;
       }

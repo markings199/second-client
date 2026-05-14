@@ -125,6 +125,11 @@
   }
 
   function populateSteelSelect(selectEl, preferredId = 'a992') {
+    const pop = window.SteelForge?.populateStructuralSteelGradeSelect;
+    if (typeof pop === 'function' && selectEl) {
+      pop(selectEl, preferredId);
+      return;
+    }
     const grades = window.SteelForgeStructuralSteelGrades ?? [];
     if (!selectEl || grades.length === 0) return;
     const sorted = [...grades].sort((a, b) => {
@@ -139,13 +144,15 @@
     sorted.forEach((g) => {
       const opt = document.createElement('option');
       opt.value = g.id;
-      const idPart = g.catalogId != null ? `[${g.catalogId}] ` : '';
-      opt.textContent = `${idPart}${g.label} — Fy=${g.fy}, Fu=${g.fu} ksi`;
+      const label = String(g.label || '').trim() || g.id;
+      opt.textContent = label;
+      const cat = g.catalogId != null ? `ASTM catalog ${g.catalogId}. ` : '';
+      opt.title = `${cat}Fy = ${g.fy} ksi, Fu = ${g.fu} ksi`;
       selectEl.appendChild(opt);
     });
     const customOpt = document.createElement('option');
     customOpt.value = 'custom';
-    customOpt.textContent = 'Custom Fy (edit field)';
+    customOpt.textContent = 'Custom Fy / Fu (edit fields)';
     selectEl.appendChild(customOpt);
     const ids = new Set(grades.map((x) => x.id));
     if (ids.has(preferredId)) selectEl.value = preferredId;
