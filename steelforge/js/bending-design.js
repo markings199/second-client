@@ -971,6 +971,7 @@
           if (el) {
             el.textContent = '—';
             el.classList.remove('sf-bendNoDef__remarkPill--safe', 'sf-bendNoDef__remarkPill--unsafe');
+            el.removeAttribute('title');
           }
         });
         if (els.capSym) els.capSym.innerHTML = 'M<sub>u</sub>';
@@ -1145,6 +1146,10 @@
             ['sec', 'zx', 'w', 'sx', 'ix', 'lf'].forEach((k) => setOutSpan(els.ass1[k], '—'));
             setRemarkSafe(els.ass1.rm, null);
           }
+          if (els.ass1.rm) {
+            els.ass1.rm.title =
+              'Workbook BENDING!AC25: SAFE if required Ix is less than or equal to this section’s Ix. UNSAFE here only means this Zx-picked trial is too flexible for deflection; the member used in the rest of the sheet is ASSUMED SECTION BY Ix and FINAL STEEL SECTION.';
+          }
           setOutSpan(els.ass1.secAsd, '—');
           setOutSpan(els.ass1.zxAsd, '—');
           setOutSpan(els.ass1.ixAsd, '—');
@@ -1152,6 +1157,7 @@
           return;
         }
 
+        if (els.ass1.rm) els.ass1.rm.removeAttribute('title');
         const prMain = isLRFD ? lrfdR : asdR;
         if (prMain.picked) {
           const p = shapeProps(prMain.picked, Fy, E);

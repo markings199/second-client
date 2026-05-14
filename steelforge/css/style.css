@@ -11027,6 +11027,15 @@ body:has(.sf-comp.sf-comp--bending) .content-panel.sheet-panel > .sf-comp > .sf-
   color: #7b6e5f;
 }
 
+.sf-comp.sf-comp--bending .sf-bendNoDef__zxIxHint {
+  margin: -2px 0 8px;
+  padding: 0 2px;
+  font-size: 0.7rem;
+  line-height: 1.38;
+  color: #5c5349;
+  font-weight: 600;
+}
+
 /* Bending (no deflection): emphasize LRFD vs ASD load-line pills to match active design method */
 .sf-comp.sf-comp--bending #sfBendNoDefLoadCard[data-sf-bend-des-method="asd"] .sf-bendNoDef__loadRow .sf-bendNoDef__highlightPill {
   background: #e7dfd5;
