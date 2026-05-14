@@ -2208,19 +2208,19 @@
       setText('sfShearDesUltimateTitle', layout.ultimateTitle);
       setHtml('sfShearDesUltimateExpr', layout.ultimateExpr);
 
-      // Mirror the dynamic labels on the new LOAD WITH BEAM WEIGHT card.
-      setHtml('sfShearDesBwLoadTopLabel', layout.loadTopLabel);
+      // LOAD WITH BEAM WEIGHT — labels/units. Do not mirror the W/O card's "DL+LL" value into
+      // the first pill here: for ASD, row 1 is superimposed DL+LL only; W_a (row 2) is DL+LL+BW
+      // per workbook (e.g. Wₐ = N6+V27+N7). LRFD rows stay factored (DL+BW)+LL combinations.
       setText('sfShearDesBwLoadTopUnit', layout.loadTopUnit);
       setHtml('sfShearDesBwWuLabel', layout.wCombLabel);
       setText('sfShearDesBwWuUnit', layout.wCombUnit);
-      setHtml('sfShearDesBwLoadBottomLabel', layout.loadBottomLabel);
       setText('sfShearDesBwLoadBottomUnit', layout.loadBottomUnit);
-      /* LOAD WITH BEAM WEIGHT: show BW in the combination text (same math as workbook LRFD/ASD). */
       if (isLRFD) {
         setHtml('sfShearDesBwLoadTopLabel', '1.2(DL+BW)+1.6LL =');
         setHtml('sfShearDesBwLoadBottomLabel', '1.4(DL+BW) =');
       } else {
-        setHtml('sfShearDesBwLoadTopLabel', 'DL+BW+LL =');
+        setHtml('sfShearDesBwLoadTopLabel', 'DL + LL =');
+        setHtml('sfShearDesBwLoadBottomLabel', '');
       }
       setHtml('sfShearDesBwMomentLabel', layout.momentLabel);
       setText('sfShearDesBwMomentUnit', layout.momentUnit);
@@ -2431,7 +2431,14 @@
       setText('sfShearDesVu', fmtNum(V, 3));
       setText('sfShearDesZx', fmtNum(zxReq, 4));
 
-      setText('sfShearDesBwWult', fmtNum(wTopBw, 2));
+      const wDlLlSuper =
+        Number.isFinite(dl) && dl >= 0 && Number.isFinite(ll) && ll >= 0 ? dl + ll : NaN;
+      setText(
+        'sfShearDesBwWult',
+        !isLRFD && Number.isFinite(wDlLlSuper)
+          ? fmtNum(wDlLlSuper, 2)
+          : fmtNum(wTopBw, 2),
+      );
       setText('sfShearDesBwWu', fmtNum(wCombBw, 2));
       setText('sfShearDesBwW14', w14Bw == null ? '—' : fmtNum(w14Bw, 2));
       setText('sfShearDesBwMu', fmtNum(Mbw, 3));
